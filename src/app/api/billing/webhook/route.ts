@@ -10,6 +10,14 @@ const oneMonthFromNow = () => {
   return date;
 };
 
+const parseBody = (rawBody: string): unknown => {
+  try {
+    return JSON.parse(rawBody || '{}');
+  } catch {
+    return {};
+  }
+};
+
 export const POST = async (request: Request) => {
   const rawBody = await request.text();
   const signature = request.headers.get('x-webhook-signature');
@@ -19,27 +27,31 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: 'invalid_signature' }, { status: 401 });
   }
 
-  const payload = JSON.parse(rawBody || '{}');
-  const event = parseWebhookEvent(payload);
+  const event = parseWebhookEvent(parseBody(rawBody));
 
+  // Evento sem correlationID nosso (ex: teste do Woovi). Confirma recebimento.
   if (!event.userId) {
-    // Evento sem correlationID nosso (ex: teste do Woovi). Confirma recebimento.
     return NextResponse.json({ ok: true });
   }
 
-  if (event.kind === 'paid' && event.plan && event.plan !== 'free') {
-    await upsertUserProfile(event.userId, {
-      plan: event.plan,
-      subscriptionStatus: 'active',
-      currentPeriodEnd: oneMonthFromNow(),
-    });
-    logger.info(`Plano ${event.plan} liberado para ${event.userId} via Woovi`);
-  } else if (event.kind === 'canceled') {
-    await upsertUserProfile(event.userId, {
-      plan: 'free',
-      subscriptionStatus: 'canceled',
-    });
-    logger.info(`Assinatura cancelada/expirada para ${event.userId} — voltou pro free`);
+  try {
+    if (event.kind === 'paid' && event.plan && event.plan !== 'free') {
+      await upsertUserProfile(event.userId, {
+        plan: event.plan,
+        subscriptionStatus: 'active',
+        currentPeriodEnd: oneMonthFromNow(),
+      });
+      logger.info(`Plano ${event.plan} liberado para ${event.userId} via Woovi`);
+    } else if (event.kind === 'canceled') {
+      await upsertUserProfile(event.userId, {
+        plan: 'free',
+        subscriptionStatus: 'canceled',
+      });
+      logger.info(`Assinatura cancelada/expirada para ${event.userId} — voltou pro free`);
+    }
+  } catch (error) {
+    // Não estoura 500: loga e devolve 200 pra evitar retentativas em loop do Woovi.
+    logger.error(`Erro ao processar webhook Woovi ${event.userId}: ${(error as Error).message}`);
   }
 
   return NextResponse.json({ ok: true });

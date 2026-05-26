@@ -3,7 +3,6 @@ import type { KnipConfig } from 'knip';
 const config: KnipConfig = {
   // Files to exclude from Knip analysis
   ignore: [
-    'checkly.config.ts',
     'src/libs/I18n.ts',
     'src/types/I18n.ts',
     'src/components/LocaleSwitcher.tsx', // Kept for future locale switching UI
@@ -19,10 +18,6 @@ const config: KnipConfig = {
   playwright: {
     entry: ['tests/**/*.@(integ|e2e).ts'],
   },
-  // Binaries to ignore during analysis
-  ignoreBinaries: [
-    'production', // False positive raised with dotenv-cli
-  ],
   // Exported module API + zod input types are kept even before they're imported
   // elsewhere; don't fail the build on those for the MVP.
   rules: {

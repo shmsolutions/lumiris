@@ -158,16 +158,23 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
  * Sem chave configurada, aceita (modo dev) e registra um aviso.
  */
 export const verifyWebhookSignature = (rawBody: string, signature: string | null): boolean => {
-  const publicKey = Env.WOOVI_WEBHOOK_PUBLIC_KEY;
-  if (!publicKey) {
+  const rawKey = Env.WOOVI_WEBHOOK_PUBLIC_KEY;
+  if (!rawKey) {
     logger.warn('WOOVI_WEBHOOK_PUBLIC_KEY ausente — webhook aceito sem validação de assinatura');
     return true;
   }
   if (!signature) {
     return false;
   }
-  const verifier = createVerify('RSA-SHA256');
-  verifier.update(rawBody);
-  verifier.end();
-  return verifier.verify(publicKey, signature, 'base64');
+  // Vercel/CI guardam o PEM com `\n` literal; converte de volta em quebras reais.
+  const publicKey = rawKey.includes('\\n') ? rawKey.replaceAll('\\n', '\n') : rawKey;
+  try {
+    const verifier = createVerify('RSA-SHA256');
+    verifier.update(rawBody);
+    verifier.end();
+    return verifier.verify(publicKey, signature, 'base64');
+  } catch (error) {
+    logger.error(`Falha ao validar assinatura do webhook Woovi: ${(error as Error).message}`);
+    return false;
+  }
 };

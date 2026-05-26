@@ -5,7 +5,11 @@ import { Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { routing } from '@/libs/I18nRouting';
 import { AppConfig } from '@/utils/AppConfig';
+import { getBaseUrl } from '@/utils/Helpers';
 import '@/styles/global.css';
+
+const description =
+  'O prontuário inteligente para terapeutas ocupacionais. Anamnese estruturada, evolução por áudio com IA e relatório trimestral em minutos.';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,12 +18,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getBaseUrl()),
   title: {
     default: `${AppConfig.name} — ${AppConfig.tagline}`,
     template: `%s · ${AppConfig.name}`,
   },
-  description:
-    'O prontuário inteligente para terapeutas ocupacionais. Anamnese estruturada, evolução por áudio com IA e relatório trimestral em minutos.',
+  description,
+  applicationName: AppConfig.name,
+  openGraph: {
+    type: 'website',
+    siteName: AppConfig.name,
+    title: `${AppConfig.name} — ${AppConfig.tagline}`,
+    description,
+    locale: 'pt_BR',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${AppConfig.name} — ${AppConfig.tagline}`,
+    description,
+  },
   icons: [
     { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
     { rel: 'icon', type: 'image/png', sizes: '32x32', url: '/favicon-32x32.png' },
