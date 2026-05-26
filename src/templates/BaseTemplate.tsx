@@ -1,57 +1,36 @@
 import { useTranslations } from 'next-intl';
-import { AppConfig } from '@/utils/AppConfig';
 
-export const BaseTemplate = (props: {
-  leftNav: React.ReactNode;
-  rightNav?: React.ReactNode;
+type BaseTemplateProps = {
+  header: React.ReactNode;
   children: React.ReactNode;
-}) => {
+  footer?: React.ReactNode;
+};
+
+/**
+ * Minimal app shell with a sticky header and an optional footer.
+ * Used by dashboard and marketing layouts.
+ */
+export const BaseTemplate = (props: BaseTemplateProps) => {
   const t = useTranslations('BaseTemplate');
 
   return (
-    <div className="w-full px-1 text-gray-700 antialiased">
-      <div className="mx-auto max-w-3xl">
-        <header className="border-b border-gray-300">
-          <div className="pt-16 pb-8">
-            <h1 className="text-3xl font-bold text-gray-900">{AppConfig.name}</h1>
-            <h2 className="text-xl">{t('description')}</h2>
-          </div>
+    <div className="flex min-h-dvh flex-col">
+      <header
+        className="sticky top-0 z-40 border-b border-ink-200/70 bg-surface/85 backdrop-blur"
+        aria-label={t('main_navigation_label')}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          {props.header}
+        </div>
+      </header>
 
-          <div className="flex justify-between">
-            <nav aria-label={t('main_navigation_label')}>
-              <ul className="flex flex-wrap gap-x-5 text-xl">{props.leftNav}</ul>
-            </nav>
+      <main className="flex-1">{props.children}</main>
 
-            <nav>
-              <ul className="flex flex-wrap gap-x-5 text-xl">{props.rightNav}</ul>
-            </nav>
-          </div>
-        </header>
-
-        <main>{props.children}</main>
-
-        <footer className="border-t border-gray-300 py-8 text-center text-sm">
-          {t.rich('footer_text', {
-            year: new Date().getFullYear(),
-            name: AppConfig.name,
-            author: () => (
-              <a
-                href="https://nextjs-boilerplate.com"
-                className="text-blue-700 hover:border-b-2 hover:border-blue-700"
-              >
-                Next.js Boilerplate
-              </a>
-            ),
-          })}
-
-          {/*
-           * PLEASE READ THIS SECTION
-           * I'm an indie maker with limited resources and funds, I'll really appreciate if you could have a link to my website.
-           * The link doesn't need to appear on every pages, one link on one page is enough.
-           * For example, in the `About` page. Thank you for your support, it'll mean a lot to me.
-           */}
+      {props.footer ? (
+        <footer className="border-t border-ink-200/70 bg-surface">
+          <div className="mx-auto max-w-6xl px-6 py-10 text-sm text-ink-500">{props.footer}</div>
         </footer>
-      </div>
+      ) : null}
     </div>
   );
 };

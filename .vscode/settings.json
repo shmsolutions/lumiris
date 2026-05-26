@@ -71,5 +71,6 @@
   // JSON Schema
   "json.schemaDownload.trustedDomains": {
     "https://ui.shadcn.com": true
-  }
+  },
+  "i18n-ally.sourceLanguage": "pt-BR"
 }

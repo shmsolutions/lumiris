@@ -6,6 +6,22 @@ export const Env = createEnv({
     ARCJET_KEY: z.string().startsWith('ajkey_').optional(),
     CLERK_SECRET_KEY: z.string().min(1),
     DATABASE_URL: z.string().min(1),
+    OPENAI_API_KEY: z.string().optional(),
+    LUME_AI_MOCK: z
+      .enum(['true', 'false'])
+      .optional()
+      .default('false')
+      .transform((v) => v === 'true'),
+    // Woovi (pagamentos) — App ID é a chave da API enviada no header Authorization.
+    WOOVI_APP_ID: z.string().optional(),
+    WOOVI_BASE_URL: z.string().optional(),
+    // Chave pública (PEM) do Woovi pra validar a assinatura dos webhooks.
+    WOOVI_WEBHOOK_PUBLIC_KEY: z.string().optional(),
+    LUME_BILLING_MOCK: z
+      .enum(['true', 'false'])
+      .optional()
+      .default('false')
+      .transform((v) => v === 'true'),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().optional(),
@@ -21,11 +37,16 @@ export const Env = createEnv({
   shared: {
     NODE_ENV: z.enum(['test', 'development', 'production']).optional(),
   },
-  // You need to destructure all the keys manually
   runtimeEnv: {
     ARCJET_KEY: process.env.ARCJET_KEY,
     CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
     DATABASE_URL: process.env.DATABASE_URL,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    LUME_AI_MOCK: process.env.LUME_AI_MOCK,
+    WOOVI_APP_ID: process.env.WOOVI_APP_ID,
+    WOOVI_BASE_URL: process.env.WOOVI_BASE_URL,
+    WOOVI_WEBHOOK_PUBLIC_KEY: process.env.WOOVI_WEBHOOK_PUBLIC_KEY,
+    LUME_BILLING_MOCK: process.env.LUME_BILLING_MOCK,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_LOGGING_LEVEL: process.env.NEXT_PUBLIC_LOGGING_LEVEL,

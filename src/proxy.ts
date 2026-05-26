@@ -8,7 +8,18 @@ import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/:locale/dashboard(.*)']);
+const isApiRoute = createRouteMatcher(['/api/(.*)']);
+
+// Webhooks são chamadas server-to-server (Woovi) — não passam pelo Arcjet bot
+// detection nem pela autenticação.
+const isWebhookRoute = createRouteMatcher(['/api/billing/webhook']);
+
+const isProtectedRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/:locale/dashboard(.*)',
+  '/onboarding(.*)',
+  '/:locale/onboarding(.*)',
+]);
 
 const isAuthPage = createRouteMatcher([
   '/sign-in(.*)',
@@ -21,19 +32,17 @@ const isAuthPage = createRouteMatcher([
 const aj = arcjet.withRule(
   detectBot({
     mode: 'LIVE',
-    // Block all bots except the following
-    allow: [
-      // See https://docs.arcjet.com/bot-protection/identifying-bots
-      'CATEGORY:SEARCH_ENGINE', // Allow search engines
-      'CATEGORY:PREVIEW', // Allow preview links to show OG images
-      'CATEGORY:MONITOR', // Allow uptime monitoring services
-    ],
+    allow: ['CATEGORY:SEARCH_ENGINE', 'CATEGORY:PREVIEW', 'CATEGORY:MONITOR'],
   }),
 );
 
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // Webhooks externos passam direto, sem Arcjet nem Clerk.
+  if (isWebhookRoute(request)) {
+    return NextResponse.next();
+  }
+
   // Verify the request with Arcjet
-  // Use `process.env` instead of Env to reduce bundle size in middleware
   if (process.env.ARCJET_KEY) {
     const decision = await aj.protect(request);
 
@@ -42,14 +51,19 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     }
   }
 
-  // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
+  // API routes need Clerk middleware so `auth()` works in route handlers — but
+  // they bypass i18n routing.
+  if (isApiRoute(request)) {
+    // oxlint-disable-next-line typescript/return-await
+    return clerkMiddleware()(request, event);
+  }
+
+  // Clerk keyless mode doesn't work with i18n, so we run it conditionally.
   if (isAuthPage(request) || isProtectedRoute(request)) {
-    // Match Clerk's documented middleware composition pattern, `return await` is not necessary.
     // oxlint-disable-next-line typescript/return-await
     return clerkMiddleware(async (auth, req) => {
       if (isProtectedRoute(req)) {
         const locale = req.nextUrl.pathname.match(/(\/.*)\/dashboard/u)?.at(1) ?? '';
-
         const signInUrl = new URL(`${locale}/sign-in`, req.url);
 
         await auth.protect({
@@ -68,5 +82,7 @@ export const config = {
   // Match all pathnames except for
   // - … if they start with `/_next`, `/_vercel` or `monitoring`
   // - … the ones containing a dot (e.g. `favicon.ico`)
-  matcher: '/((?!_next|_vercel|monitoring|api|.*\\..*).*)',
+  // Note: `/api` is NOT excluded — Clerk middleware needs to run on it for
+  // `auth()` to work in route handlers.
+  matcher: '/((?!_next|_vercel|monitoring|.*\\..*).*)',
 };

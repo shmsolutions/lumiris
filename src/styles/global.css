@@ -1,3 +1,130 @@
-@layer theme, base, clerk, components, utilities; /* Ensure Clerk is compatible with Tailwind CSS v4 */
+@layer theme, base, clerk, components, utilities;
 
 @import 'tailwindcss';
+@import 'react-day-picker/style.css' layer(components);
+
+@theme {
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --color-brand-50: #fef7ed;
+  --color-brand-100: #fdedd3;
+  --color-brand-200: #fbd8a5;
+  --color-brand-300: #f7bc74;
+  --color-brand-400: #f09f43;
+  --color-brand-500: #e8923c;
+  --color-brand-600: #c7741f;
+  --color-brand-700: #9e5816;
+  --color-brand-800: #7a4313;
+  --color-brand-900: #5c3210;
+
+  --color-ink-50: #fafaf7;
+  --color-ink-100: #f4f3ee;
+  --color-ink-200: #e6e5de;
+  --color-ink-300: #c9c7bc;
+  --color-ink-400: #9a988c;
+  --color-ink-500: #6e6d63;
+  --color-ink-600: #4f4e47;
+  --color-ink-700: #373730;
+  --color-ink-800: #21211d;
+  --color-ink-900: #0f0f0d;
+
+  --color-accent-50: #f0fdfa;
+  --color-accent-500: #0d9488;
+  --color-accent-600: #0f766e;
+  --color-accent-700: #115e59;
+
+  --color-surface: #fdfcf8;
+  --color-surface-elevated: #ffffff;
+
+  --color-success: #15803d;
+  --color-warning: #b45309;
+  --color-danger: #b91c1c;
+  --color-info: #0369a1;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-surface);
+    color: var(--color-ink-700);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-200);
+    color: var(--color-ink-900);
+  }
+}
+
+/* react-day-picker — Lume brand styling */
+.rdp-root {
+  --rdp-accent-color: var(--color-brand-600);
+  --rdp-accent-background-color: var(--color-brand-50);
+  --rdp-background-color: var(--color-surface-elevated);
+  --rdp-day-height: 2.25rem;
+  --rdp-day-width: 2.25rem;
+  --rdp-day_button-border-radius: 0.5rem;
+  --rdp-day_button-height: 2.25rem;
+  --rdp-day_button-width: 2.25rem;
+  --rdp-selected-border: 0;
+  --rdp-today-color: var(--color-brand-700);
+  --rdp-weekday-text-transform: capitalize;
+  --rdp-weekday-padding: 0.5rem 0;
+  --rdp-weekday-opacity: 1;
+  --rdp-nav_button-height: 1.75rem;
+  --rdp-nav_button-width: 1.75rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-700);
+}
+
+.rdp-month_caption {
+  font-weight: 600;
+  color: var(--color-ink-900);
+  text-transform: capitalize;
+}
+
+.rdp-weekday {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-ink-500);
+  letter-spacing: 0.025em;
+}
+
+.rdp-day_button:hover:not([disabled]):not(.rdp-selected .rdp-day_button) {
+  background-color: var(--color-ink-100);
+}
+
+.rdp-selected .rdp-day_button {
+  background-color: var(--color-brand-500);
+  color: white;
+}
+
+.rdp-selected .rdp-day_button:hover {
+  background-color: var(--color-brand-600);
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  font-weight: 600;
+  color: var(--color-brand-700);
+  box-shadow: inset 0 0 0 1px var(--color-brand-200);
+}
+
+.rdp-outside .rdp-day_button {
+  color: var(--color-ink-300);
+}
+
+.rdp-button_previous,
+.rdp-button_next {
+  color: var(--color-ink-500);
+}
+
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background-color: var(--color-ink-100);
+  color: var(--color-ink-900);
+}

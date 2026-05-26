@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "treatment_plan_patient_idx" ON "treatment_plan" USING btree ("patient_id");

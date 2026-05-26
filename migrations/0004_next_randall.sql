@@ -1,0 +1,1 @@
+ALTER TABLE "session_note" ADD COLUMN "intercorrencia" text;

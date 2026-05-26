@@ -1,9 +1,10 @@
-import { SignOutButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { Link } from '@/libs/I18nNavigation';
-import { BaseTemplate } from '@/templates/BaseTemplate';
+import { redirect } from 'next/navigation';
+import { MobileBottomNav } from '@/components/dashboard/MobileBottomNav';
+import { Sidebar } from '@/components/dashboard/Sidebar';
+import { getUserProfile } from '@/libs/UserProfile';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -12,11 +13,7 @@ type DashboardLayoutProps = {
 
 export async function generateMetadata(props: DashboardLayoutProps): Promise<Metadata> {
   const { locale } = await props.params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'DashboardLayout',
-  });
-
+  const t = await getTranslations({ locale, namespace: 'DashboardLayout' });
   return {
     title: t('meta_title'),
     description: t('meta_description'),
@@ -26,47 +23,22 @@ export async function generateMetadata(props: DashboardLayoutProps): Promise<Met
 export default async function DashboardLayout(props: DashboardLayoutProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
-  const t = await getTranslations({
-    locale,
-    namespace: 'DashboardLayout',
-  });
+
+  // Gate: send users who haven't finished onboarding to the wizard.
+  // Reads from our DB (via auth() userId) — resilient to Clerk API outages.
+  const { userId } = await auth();
+  if (userId) {
+    const profile = await getUserProfile(userId);
+    if (!profile.onboarded) {
+      redirect('/onboarding');
+    }
+  }
 
   return (
-    <BaseTemplate
-      leftNav={
-        <>
-          <li>
-            <Link href="/dashboard/" className="border-none text-gray-700 hover:text-gray-900">
-              {t('dashboard_link')}
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/dashboard/user-profile/"
-              className="border-none text-gray-700 hover:text-gray-900"
-            >
-              {t('user_profile_link')}
-            </Link>
-          </li>
-        </>
-      }
-      rightNav={
-        <>
-          <li>
-            <SignOutButton>
-              <button className="border-none text-gray-700 hover:text-gray-900" type="button">
-                {t('sign_out')}
-              </button>
-            </SignOutButton>
-          </li>
-
-          <li>
-            <LocaleSwitcher />
-          </li>
-        </>
-      }
-    >
-      {props.children}
-    </BaseTemplate>
+    <div className="min-h-dvh bg-ink-50/40">
+      <Sidebar />
+      <div className="pb-20 lg:pb-0 lg:pl-60">{props.children}</div>
+      <MobileBottomNav />
+    </div>
   );
 }
