@@ -22,4 +22,8 @@ export const SessionNoteCreateValidation = z.object({
 
 export const SessionNoteUpdateValidation = SessionNoteCreateValidation.partial();
 
+export const DraftFromTextValidation = z.object({
+  text: z.string().optional().default(''),
+});
+
 export type SessionNoteCreateInput = z.infer<typeof SessionNoteCreateValidation>;

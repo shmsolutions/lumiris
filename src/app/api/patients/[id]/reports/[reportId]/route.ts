@@ -15,6 +15,27 @@ const scoped = (reportId: string, patientId: string, userId: string) =>
     eq(reportSchema.ownerId, userId),
   );
 
+export const GET = async (_request: Request, context: RouteContext) => {
+  const { userId } = await auth();
+  const { id, reportId } = await context.params;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
+
+  const [report] = await db
+    .select()
+    .from(reportSchema)
+    .where(scoped(reportId, id, userId))
+    .limit(1);
+
+  if (!report) {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 });
+  }
+
+  return NextResponse.json({ report });
+};
+
 export const PATCH = async (request: Request, context: RouteContext) => {
   const { userId } = await auth();
   const { id, reportId } = await context.params;

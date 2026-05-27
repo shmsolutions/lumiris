@@ -61,7 +61,11 @@ export const GET = async (request: Request, context: RouteContext) => {
     user?.primaryEmailAddress?.emailAddress ||
     '';
 
-  const content = ReportContentValidation.parse(row.report.content);
+  const parsedContent = ReportContentValidation.safeParse(row.report.content);
+  if (!parsedContent.success) {
+    return NextResponse.json({ error: 'invalid_content' }, { status: 422 });
+  }
+  const content = parsedContent.data;
 
   const fmtDate = (d: string) =>
     new Intl.DateTimeFormat(locale, {

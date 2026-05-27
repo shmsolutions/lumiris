@@ -1,10 +1,12 @@
 import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
+import * as z from 'zod';
 import { buildDraftFromAudio, buildDraftFromText } from '@/libs/AI';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
 import { patientSchema } from '@/models/Schema';
+import { DraftFromTextValidation } from '@/validations/SessionNoteValidation';
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -51,8 +53,11 @@ export const POST = async (request: Request, context: RouteContext) => {
       return NextResponse.json({ draft });
     }
 
-    const body = (await request.json()) as { text?: string };
-    const draft = await buildDraftFromText(body.text ?? '');
+    const parse = DraftFromTextValidation.safeParse(await request.json());
+    if (!parse.success) {
+      return NextResponse.json(z.treeifyError(parse.error), { status: 422 });
+    }
+    const draft = await buildDraftFromText(parse.data.text);
     return NextResponse.json({ draft });
   } catch (error) {
     if ((error as Error).message === 'transcription_failed') {

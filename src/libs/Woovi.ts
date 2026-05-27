@@ -155,12 +155,17 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
 
 /**
  * Valida a assinatura do webhook contra a chave pública do Woovi (RSA-SHA256).
- * Sem chave configurada, aceita (modo dev) e registra um aviso.
+ * Em produção real (não-mock), a chave é obrigatória: sem ela, rejeita. Em
+ * dev/mock, aceita sem validar e registra um aviso.
  */
 export const verifyWebhookSignature = (rawBody: string, signature: string | null): boolean => {
   const rawKey = Env.WOOVI_WEBHOOK_PUBLIC_KEY;
   if (!rawKey) {
-    logger.warn('WOOVI_WEBHOOK_PUBLIC_KEY ausente — webhook aceito sem validação de assinatura');
+    if (Env.NODE_ENV === 'production' && !isBillingMockMode) {
+      logger.error('WOOVI_WEBHOOK_PUBLIC_KEY ausente em produção — webhook rejeitado');
+      return false;
+    }
+    logger.warn('WOOVI_WEBHOOK_PUBLIC_KEY ausente — webhook aceito sem validação (dev/mock)');
     return true;
   }
   if (!signature) {
