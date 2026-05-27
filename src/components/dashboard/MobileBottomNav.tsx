@@ -205,7 +205,6 @@ type SheetItemProps = {
   label: string;
   Icon: React.ComponentType<{ size?: number; className?: string }>;
   pathname: string;
-  badge?: string;
 };
 
 const SheetItem = (props: SheetItemProps) => {
@@ -220,11 +219,6 @@ const SheetItem = (props: SheetItemProps) => {
       >
         <props.Icon size={20} className={active ? 'text-brand-600' : 'text-ink-400'} />
         <span className="flex-1">{props.label}</span>
-        {props.badge ? (
-          <span className="rounded-full bg-ink-100 px-2 py-0.5 text-[9px] font-semibold tracking-wider text-ink-500 uppercase">
-            {props.badge}
-          </span>
-        ) : null}
       </Link>
     </li>
   );

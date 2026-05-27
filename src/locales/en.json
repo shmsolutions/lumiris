@@ -249,7 +249,6 @@
   "DashboardNav": {
     "section_workspace": "Workspace",
     "section_account": "Account",
-    "badge_soon": "Soon",
     "upgrade_tagline": "Want voice notes and automatic reports? See the plans.",
     "upgrade_cta": "See plans",
     "item_home": "Home",
@@ -333,8 +332,7 @@
     "tab_notes": "Notes",
     "tab_reports": "Reports",
     "tab_attachments": "Attachments",
-    "tab_edit": "Edit",
-    "badge_soon": "Soon"
+    "tab_edit": "Edit"
   },
   "PatientReportsList": {
     "title": "Reports",

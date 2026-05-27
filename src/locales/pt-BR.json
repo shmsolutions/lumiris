@@ -249,7 +249,6 @@
   "DashboardNav": {
     "section_workspace": "Workspace",
     "section_account": "Conta",
-    "badge_soon": "Em breve",
     "upgrade_tagline": "Quer evolução por áudio e relatório automático? Veja os planos.",
     "upgrade_cta": "Ver planos",
     "item_home": "Início",
@@ -333,8 +332,7 @@
     "tab_notes": "Evoluções",
     "tab_reports": "Relatórios",
     "tab_attachments": "Anexos",
-    "tab_edit": "Editar",
-    "badge_soon": "Em breve"
+    "tab_edit": "Editar"
   },
   "PatientReportsList": {
     "title": "Relatórios",

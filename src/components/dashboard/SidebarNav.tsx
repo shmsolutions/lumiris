@@ -77,11 +77,6 @@ export const SidebarNav = () => {
                 >
                   <item.Icon className={active ? 'text-brand-600' : 'text-ink-400'} size={18} />
                   <span className="flex-1">{t(`item_${item.key}` as 'item_home')}</span>
-                  {'badge' in item && item.badge === 'soon' ? (
-                    <span className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider text-ink-500 uppercase">
-                      {t('badge_soon')}
-                    </span>
-                  ) : null}
                 </Link>
               </li>
             );
