@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 
-type Item = { key: 'a' | 'b' | 'c'; icon: React.ReactNode; hasBadge?: boolean };
+type Item = { key: 'a' | 'b' | 'c'; icon: React.ReactNode };
 
 const items: Item[] = [
   {
@@ -19,7 +19,6 @@ const items: Item[] = [
   },
   {
     key: 'b',
-    hasBadge: true,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
         <rect x="9" y="3" width="6" height="12" rx="3" stroke="currentColor" strokeWidth="1.6" />
@@ -34,7 +33,6 @@ const items: Item[] = [
   },
   {
     key: 'c',
-    hasBadge: true,
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
         <path
@@ -71,16 +69,9 @@ export const Solution = () => {
               <div className="inline-flex size-11 items-center justify-center rounded-lg bg-brand-50 text-brand-600 ring-1 ring-brand-200/70">
                 {item.icon}
               </div>
-              <div className="mt-5 flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-ink-900">
-                  {t(`solution_${item.key}_title` as 'solution_a_title')}
-                </h3>
-                {item.hasBadge ? (
-                  <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-medium tracking-wider text-accent-700 uppercase">
-                    {t(`solution_${item.key}_badge` as 'solution_b_badge')}
-                  </span>
-                ) : null}
-              </div>
+              <h3 className="mt-5 text-lg font-semibold text-ink-900">
+                {t(`solution_${item.key}_title` as 'solution_a_title')}
+              </h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-600">
                 {t(`solution_${item.key}_body` as 'solution_a_body')}
               </p>

@@ -58,10 +58,8 @@
     "solution_a_body": "Modelo CREFITO com identificação, história clínica, hábitos, desenvolvimento, antecedentes familiares e avaliação inicial — tudo em um lugar, exportável em PDF.",
     "solution_b_title": "Evolução por áudio + IA",
     "solution_b_body": "Você fala, o Lume transcreve e organiza a evolução automaticamente — subjetivo, objetivo, avaliação e conduta. De 10 minutos pra 2.",
-    "solution_b_badge": "Em breve",
     "solution_c_title": "Relatório trimestral automático",
     "solution_c_body": "O Lume lê todas as evoluções do período, cruza com os objetivos do plano terapêutico e devolve um relatório pronto pro plano de saúde.",
-    "solution_c_badge": "Em breve",
     "preview_eyebrow": "Por dentro do produto",
     "preview_title": "Tudo num lugar só. Sem mais Word, WhatsApp e caderno.",
     "preview_subtitle": "O painel que você abre toda manhã. Pacientes, próximas sessões, alertas de relatório — tudo onde deveria estar.",
@@ -226,7 +224,7 @@
     "back_home": "Voltar para a home",
     "headline": "Menos papelada, mais presença com seus pacientes.",
     "subtitle": "O prontuário inteligente para terapeutas ocupacionais — anamnese, evolução e relatório num só lugar.",
-    "bullet_audio": "Evolução por áudio com IA, estruturada em SOAP.",
+    "bullet_audio": "Evolução por áudio com IA, organizada por tópicos.",
     "bullet_crefito": "Anamnese e documentos no padrão CREFITO.",
     "bullet_reports": "Relatório trimestral gerado em minutos.",
     "footer": "Feito por uma T.O., para terapeutas ocupacionais."
@@ -283,13 +281,7 @@
     "recent_view_all": "Ver todos",
     "recent_empty_title": "Comece cadastrando seu primeiro paciente",
     "recent_empty_description": "O Lume fica útil quando tem gente pra cuidar. Cadastra o primeiro e a partir daí tudo flui.",
-    "recent_no_diagnosis": "Sem diagnóstico registrado",
-    "overview_killer_title": "Evolução por áudio + IA chegando",
-    "overview_killer_description": "Em breve, você grava o áudio no fim da consulta e o Lume estrutura em SOAP automaticamente. Vai economizar horas toda semana.",
-    "overview_killer_bullet_a": "Transcrição em segundos com Groq Whisper",
-    "overview_killer_bullet_b": "Rascunho em formato SOAP gerado por IA",
-    "overview_killer_bullet_c": "Você revisa, ajusta e salva — controle clínico continua seu",
-    "overview_killer_eta": "Previsão: próxima leva do MVP."
+    "recent_no_diagnosis": "Sem diagnóstico registrado"
   },
   "DashboardLayout": {
     "meta_title": "Painel — Lume",
@@ -554,13 +546,13 @@
     "description": "Histórico de sessões deste paciente.",
     "new_note": "Nova evolução",
     "empty_title": "Sem evoluções ainda",
-    "empty_description": "Registre a primeira sessão por áudio ou texto. O Lume estrutura em SOAP automaticamente.",
+    "empty_description": "Registre a primeira sessão por áudio ou texto. O Lume organiza a evolução automaticamente.",
     "no_content": "Sem conteúdo registrado"
   },
   "NewNotePage": {
     "back": "Voltar às evoluções",
     "title": "Nova evolução",
-    "description": "Grave o áudio da sessão ou digite o texto livre. A IA estrutura em SOAP pra você revisar."
+    "description": "Grave o áudio da sessão ou digite o texto livre. A IA organiza a evolução pra você revisar."
   },
   "NoteDetailPage": {
     "back": "Voltar às evoluções",
@@ -599,7 +591,7 @@
     "mode_audio": "Áudio",
     "mode_text": "Texto",
     "text_label": "Anotações da sessão",
-    "text_placeholder": "Escreva como se estivesse contando a sessão pra um colega. O Lume estrutura em SOAP.",
+    "text_placeholder": "Escreva como se estivesse contando a sessão pra um colega. O Lume organiza em tópicos.",
     "structure": "Estruturar com IA",
     "processing": "Processando…",
     "processing_hint": "Pode levar alguns segundos. A gente avisa quando estiver pronto.",
@@ -607,11 +599,11 @@
     "error_draft": "Não foi possível gerar o rascunho. Tente de novo.",
     "error_save": "Não foi possível salvar. Tente de novo.",
     "review_structured_title": "Rascunho pronto pra revisão",
-    "review_structured_hint": "A IA estruturou em SOAP. Revise, ajuste o que precisar e salve.",
-    "review_unstructured_title": "Transcrição pronta, SOAP em branco",
+    "review_structured_hint": "A IA organizou a evolução. Revise, ajuste o que precisar e salve.",
+    "review_unstructured_title": "Transcrição pronta, campos em branco",
     "review_unstructured_hint": "A estruturação automática falhou. Preencha os 4 campos manualmente — sua transcrição está salva acima.",
     "review_ai_locked_title": "IA disponível nos planos pagos",
-    "review_ai_locked_hint": "Preencha o SOAP manualmente abaixo, ou faça upgrade para estruturar por IA. Sua nota será salva normalmente.",
+    "review_ai_locked_hint": "Preencha os campos manualmente abaixo, ou faça upgrade para organizar por IA. Sua nota será salva normalmente.",
     "field_session_date": "Data da sessão",
     "transcript_title": "Transcrição original",
     "save": "Salvar evolução",
@@ -637,14 +629,6 @@
     "intercorrencia_label": "Intercorrência",
     "intercorrencia_hint": "Algum evento fora do esperado durante a sessão? CREFITO pede.",
     "intercorrencia_placeholder": "Deixe em branco se a sessão correu sem incidentes."
-  },
-  "PatientReportsPage": {
-    "title": "Relatório trimestral automático chegando",
-    "description": "Você escolhe o período, o Lume cruza todas as evoluções, anamnese e objetivos, e devolve um PDF pronto pra revisão. De 2-3h pra 20 minutos.",
-    "bullet_a": "Modelos CREFITO + planos de saúde mais comuns",
-    "bullet_b": "Rascunho com queixa, evolução por objetivo, sugestões",
-    "bullet_c": "Exportação em PDF formatado",
-    "eta": "Previsão: leva depois das evoluções."
   },
   "SchedulePage": {
     "meta_title": "Agenda",
@@ -694,7 +678,7 @@
     "title": "Evoluções",
     "description": "Linha do tempo com as últimas evoluções de todos os seus pacientes.",
     "empty_title": "Nenhuma evolução registrada ainda",
-    "empty_description": "Abra um paciente e crie a primeira evolução. Por áudio ou texto, a IA estrutura em SOAP.",
+    "empty_description": "Abra um paciente e crie a primeira evolução. Por áudio ou texto, a IA organiza a evolução.",
     "cta_go_patients": "Ir para pacientes",
     "no_content": "Sem conteúdo registrado"
   },
@@ -704,14 +688,7 @@
     "description": "Todos os relatórios gerados, de todos os seus pacientes.",
     "empty_title": "Nenhum relatório gerado ainda",
     "empty_description": "Abra um paciente com evoluções e gere o primeiro relatório trimestral com IA.",
-    "cta_go_patients": "Ir para pacientes",
-    "coming_title": "Central de relatórios",
-    "coming_description": "Aqui ficam todos os relatórios trimestrais gerados, com filtro por paciente e plano de saúde. Alertas de prazo aparecem automaticamente.",
-    "bullet_a": "Geração automática a partir das evoluções",
-    "bullet_b": "Modelos pra CREFITO + planos de saúde",
-    "bullet_c": "Alertas D-15 antes do prazo",
-    "bullet_d": "Versões anteriores arquivadas",
-    "eta": "Previsão: depois da evolução por áudio."
+    "cta_go_patients": "Ir para pacientes"
   },
   "SettingsPage": {
     "meta_title": "Configurações",
