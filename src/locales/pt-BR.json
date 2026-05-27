@@ -385,6 +385,7 @@
     "conclusion": "Conclusão"
   },
   "ReportDetail": {
+    "ai_disclaimer": "Relatório estruturado pela IA a partir das suas evoluções. A revisão clínica é sua.",
     "save": "Salvar alterações",
     "saving": "Salvando…",
     "saved_at": "Salvo às {time}",
@@ -630,6 +631,7 @@
     "intercorrencia_placeholder": "Deixe em branco se a sessão correu sem incidentes."
   },
   "NoteDetail": {
+    "ai_disclaimer": "Evolução organizada pela IA. A revisão clínica é sua.",
     "transcript_title": "Transcrição original",
     "save": "Salvar alterações",
     "saving": "Salvando…",

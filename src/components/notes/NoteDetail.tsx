@@ -68,6 +68,12 @@ export const NoteDetail = (props: NoteDetailProps) => {
   return (
     <div className="space-y-6">
       {props.initialValues.transcript ? (
+        <p className="rounded-lg bg-accent-50 px-4 py-2.5 text-xs text-accent-700">
+          {t('ai_disclaimer')}
+        </p>
+      ) : null}
+
+      {props.initialValues.transcript ? (
         <details className="rounded-xl border border-ink-200 bg-surface-elevated">
           <summary className="cursor-pointer list-none px-5 py-3 text-xs font-semibold tracking-wider text-ink-500 uppercase">
             {t('transcript_title')}

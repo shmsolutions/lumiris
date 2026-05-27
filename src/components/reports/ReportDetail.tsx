@@ -57,6 +57,10 @@ export const ReportDetail = (props: ReportDetailProps) => {
 
   return (
     <div className="space-y-6">
+      <p className="rounded-lg bg-accent-50 px-4 py-2.5 text-xs text-accent-700">
+        {t('ai_disclaimer')}
+      </p>
+
       <ReportEditor value={content} onChange={setContent} disabled={saving || deleting} />
 
       {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}

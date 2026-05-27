@@ -385,6 +385,7 @@
     "conclusion": "Conclusion"
   },
   "ReportDetail": {
+    "ai_disclaimer": "Report structured by AI from your notes. Clinical review is yours.",
     "save": "Save changes",
     "saving": "Saving…",
     "saved_at": "Saved at {time}",
@@ -630,6 +631,7 @@
     "intercorrencia_placeholder": "Leave blank if the session went without incidents."
   },
   "NoteDetail": {
+    "ai_disclaimer": "Note organized by AI. Clinical review is yours.",
     "transcript_title": "Original transcript",
     "save": "Save changes",
     "saving": "Saving…",
