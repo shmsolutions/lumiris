@@ -125,7 +125,7 @@ export const MobileBottomNav = () => {
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t('close_menu')}
             onClick={() => {
               setSheetOpen(false);
             }}
@@ -145,7 +145,7 @@ export const MobileBottomNav = () => {
                   setSheetOpen(false);
                 }}
                 className="inline-flex size-8 items-center justify-center rounded-md text-ink-500 transition hover:bg-ink-100 hover:text-ink-900"
-                aria-label="Close"
+                aria-label={t('close')}
               >
                 <CloseIcon size={18} />
               </button>

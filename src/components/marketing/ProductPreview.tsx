@@ -68,37 +68,26 @@ export const ProductPreview = () => {
 
                 <div className="mt-6 overflow-hidden rounded-lg border border-ink-200">
                   {[
-                    {
-                      name: 'Helena R., 7 anos',
-                      diag: 'TEA — apoio leve a moderado',
-                      date: 'há 2 dias',
-                      tag: 'ativo',
-                    },
-                    {
-                      name: 'Pedro A., 5 anos',
-                      diag: 'Disfunção de integração sensorial',
-                      date: 'há 4 dias',
-                      tag: 'relatório',
-                    },
-                    {
-                      name: 'Marina B., 9 anos',
-                      diag: 'TDAH + dispraxia',
-                      date: 'há 1 sem',
-                      tag: 'ativo',
-                    },
+                    { key: 'a', reportDue: false },
+                    { key: 'b', reportDue: true },
+                    { key: 'c', reportDue: false },
                   ].map((row, i) => (
                     <div
-                      key={row.name}
+                      key={row.key}
                       className={`flex items-center justify-between px-4 py-3 text-sm ${
                         i > 0 ? 'border-t border-ink-200' : ''
                       }`}
                     >
                       <div>
-                        <div className="font-medium text-ink-900">{row.name}</div>
-                        <div className="mt-0.5 text-xs text-ink-500">{row.diag}</div>
+                        <div className="font-medium text-ink-900">
+                          {t(`preview_row_${row.key}_name` as 'preview_row_a_name')}
+                        </div>
+                        <div className="mt-0.5 text-xs text-ink-500">
+                          {t(`preview_row_${row.key}_diag` as 'preview_row_a_diag')}
+                        </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        {row.tag === 'relatório' ? (
+                        {row.reportDue ? (
                           <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-medium tracking-wider text-brand-700 uppercase">
                             {t('preview_tag_report_due')}
                           </span>
@@ -107,7 +96,9 @@ export const ProductPreview = () => {
                             {t('preview_tag_active')}
                           </span>
                         )}
-                        <span className="text-xs text-ink-400">{row.date}</span>
+                        <span className="text-xs text-ink-400">
+                          {t(`preview_row_${row.key}_date` as 'preview_row_a_date')}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -121,7 +112,9 @@ export const ProductPreview = () => {
                     <div className="mt-2 text-sm font-semibold text-ink-900">
                       {t('preview_card_next_session_value')}
                     </div>
-                    <div className="mt-1 text-xs text-ink-500">Helena R.</div>
+                    <div className="mt-1 text-xs text-ink-500">
+                      {t('preview_card_next_session_patient')}
+                    </div>
                   </div>
                   <div className="rounded-lg border border-brand-200 bg-brand-50/60 p-4">
                     <div className="text-xs font-medium tracking-wider text-brand-700 uppercase">
@@ -130,7 +123,9 @@ export const ProductPreview = () => {
                     <div className="mt-2 text-sm font-semibold text-ink-900">
                       {t('preview_card_alert_value')}
                     </div>
-                    <div className="mt-1 text-xs text-ink-500">Pedro A. — D-12</div>
+                    <div className="mt-1 text-xs text-ink-500">
+                      {t('preview_card_alert_patient')}
+                    </div>
                   </div>
                 </div>
               </div>
