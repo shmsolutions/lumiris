@@ -363,7 +363,7 @@ export const PatientForm = (props: PatientFormProps) => {
             type="button"
             onClick={archive}
             disabled={archiving || form.formState.isSubmitting}
-            className="text-xs text-danger transition hover:underline disabled:opacity-50"
+            className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
           >
             {archiving ? t('archiving') : t('archive')}
           </button>

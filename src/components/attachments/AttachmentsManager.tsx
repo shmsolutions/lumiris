@@ -173,7 +173,7 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
                   await remove(att.id);
                 }}
                 disabled={deletingId === att.id}
-                className="text-xs text-danger transition hover:underline disabled:opacity-50"
+                className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
               >
                 {deletingId === att.id ? t('deleting') : t('delete')}
               </button>

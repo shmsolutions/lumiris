@@ -85,7 +85,7 @@ export const ReportDetail = (props: ReportDetailProps) => {
           type="button"
           onClick={remove}
           disabled={saving || deleting}
-          className="text-xs text-danger transition hover:underline disabled:opacity-50"
+          className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
         >
           {deleting ? t('deleting') : t('delete')}
         </button>

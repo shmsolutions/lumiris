@@ -227,7 +227,7 @@ export const PlanForm = (props: PlanFormProps) => {
                       onClick={() => {
                         objectives.remove(index);
                       }}
-                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-danger"
+                      className="inline-flex size-11 shrink-0 items-center justify-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-danger"
                       aria-label={t('objective_remove')}
                     >
                       <CloseIcon size={16} />

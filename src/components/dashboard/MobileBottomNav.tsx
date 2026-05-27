@@ -145,7 +145,7 @@ export const MobileBottomNav = () => {
                 onClick={() => {
                   setSheetOpen(false);
                 }}
-                className="inline-flex size-8 items-center justify-center rounded-md text-ink-500 transition hover:bg-ink-100 hover:text-ink-900"
+                className="inline-flex size-11 items-center justify-center rounded-md text-ink-500 transition hover:bg-ink-100 hover:text-ink-900"
                 aria-label={t('close')}
               >
                 <CloseIcon size={18} />
