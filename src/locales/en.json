@@ -1,6 +1,5 @@
 {
   "RootLayout": {
-    "home_link": "Home",
     "features_link": "Features",
     "how_it_works_link": "How it works",
     "pricing_link": "Pricing",
@@ -9,8 +8,7 @@
   },
   "BaseTemplate": {
     "main_navigation_label": "Main navigation",
-    "footer_text": "© {year} Lume. Clinical care, illuminated.",
-    "footer_built_with": "Built with care by people who see tired therapists every day."
+    "footer_text": "© {year} Lume. Clinical care, illuminated."
   },
   "Footer": {
     "tagline": "The chart that grows with you. For therapists who care for people.",
@@ -761,25 +759,7 @@
     "saved_at": "Saved at {time}",
     "error_save": "Could not save. Try again."
   },
-  "PatientDetailPage": {
-    "meta_title": "Patient",
-    "back": "Back to patients",
-    "open_anamnesis": "Open intake",
-    "field_birth_date": "Date of birth",
-    "field_guardian": "Guardian",
-    "field_guardian_relation": "Relation",
-    "field_contact_phone": "Phone",
-    "field_contact_email": "Email",
-    "field_cid": "ICD",
-    "field_main_complaint": "Main complaint",
-    "field_school": "School",
-    "field_other_professionals": "Other professionals",
-    "field_notes": "Notes"
-  },
   "AnamnesisPage": {
-    "meta_title": "Intake",
-    "title": "Intake",
-    "back": "Back to patient",
     "export_pdf": "Export assessment (PDF)"
   },
   "PatientForm": {

@@ -1,6 +1,5 @@
 {
   "RootLayout": {
-    "home_link": "Início",
     "features_link": "Funcionalidades",
     "how_it_works_link": "Como funciona",
     "pricing_link": "Preços",
@@ -9,8 +8,7 @@
   },
   "BaseTemplate": {
     "main_navigation_label": "Navegação principal",
-    "footer_text": "© {year} Lume. Cuidado clínico iluminado.",
-    "footer_built_with": "Feito com cuidado por quem vê terapeuta cansada todo dia."
+    "footer_text": "© {year} Lume. Cuidado clínico iluminado."
   },
   "Footer": {
     "tagline": "O prontuário que evolui com você. Para terapeutas que cuidam de gente.",
@@ -761,25 +759,7 @@
     "saved_at": "Salvo às {time}",
     "error_save": "Não foi possível salvar. Tente de novo."
   },
-  "PatientDetailPage": {
-    "meta_title": "Paciente",
-    "back": "Voltar aos pacientes",
-    "open_anamnesis": "Abrir anamnese",
-    "field_birth_date": "Data de nascimento",
-    "field_guardian": "Responsável",
-    "field_guardian_relation": "Parentesco",
-    "field_contact_phone": "Telefone",
-    "field_contact_email": "E-mail",
-    "field_cid": "CID",
-    "field_main_complaint": "Queixa principal",
-    "field_school": "Escola",
-    "field_other_professionals": "Outros profissionais",
-    "field_notes": "Observações"
-  },
   "AnamnesisPage": {
-    "meta_title": "Anamnese",
-    "title": "Anamnese",
-    "back": "Voltar ao paciente",
     "export_pdf": "Exportar avaliação (PDF)"
   },
   "PatientForm": {
