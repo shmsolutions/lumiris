@@ -96,7 +96,7 @@ export const ProductPreview = () => {
                             {t('preview_tag_active')}
                           </span>
                         )}
-                        <span className="text-xs text-ink-400">
+                        <span className="text-xs text-ink-500">
                           {t(`preview_row_${row.key}_date` as 'preview_row_a_date')}
                         </span>
                       </div>

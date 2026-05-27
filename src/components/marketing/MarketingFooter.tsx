@@ -1,5 +1,6 @@
 import { useTranslations } from 'next-intl';
 import { Logo } from '@/components/brand/Logo';
+import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { Link } from '@/libs/I18nNavigation';
 
 export const MarketingFooter = () => {
@@ -87,8 +88,9 @@ export const MarketingFooter = () => {
         </ul>
       </div>
 
-      <div className="border-t border-ink-200 pt-6 text-xs text-ink-500 md:col-span-4">
-        {tBase('footer_text', { year: new Date().getFullYear() })}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink-200 pt-6 text-xs text-ink-500 md:col-span-4">
+        <span>{tBase('footer_text', { year: new Date().getFullYear() })}</span>
+        <LocaleSwitcher />
       </div>
     </div>
   );

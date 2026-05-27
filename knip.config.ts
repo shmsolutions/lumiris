@@ -2,11 +2,7 @@ import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
   // Files to exclude from Knip analysis
-  ignore: [
-    'src/libs/I18n.ts',
-    'src/types/I18n.ts',
-    'src/components/LocaleSwitcher.tsx', // Kept for future locale switching UI
-  ],
+  ignore: ['src/libs/I18n.ts', 'src/types/I18n.ts'],
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     '@clerk/shared',
