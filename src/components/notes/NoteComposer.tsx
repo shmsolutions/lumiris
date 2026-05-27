@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { FileIcon, MicIcon, SparkIcon } from '@/components/dashboard/Icons';
+import { FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { SoapEditor } from '@/components/notes/SoapEditor';
 import type { SoapValues } from '@/components/notes/SoapEditor';
@@ -372,7 +372,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
           disabled={!canProceed || phase === 'processing'}
           className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
         >
-          <SparkIcon size={14} />
+          {phase === 'processing' ? <Spinner size={14} /> : <SparkIcon size={14} />}
           {phase === 'processing' ? t('processing') : t('structure')}
         </button>
         <p className="text-xs text-ink-500">{t('processing_hint')}</p>

@@ -98,6 +98,12 @@ export const SparkIcon = (props: IconProps) => (
   </svg>
 );
 
+export const Spinner = (props: IconProps) => (
+  <svg {...base(props.size)} className={`animate-spin ${props.className ?? ''}`}>
+    <path d="M12 3a9 9 0 1 0 9 9" />
+  </svg>
+);
+
 export const FlameIcon = (props: IconProps) => (
   <svg {...base(props.size)} className={props.className}>
     <path d="M12 3c2 3 5 5 5 9a5 5 0 1 1-10 0c0-1.7.7-3 1.6-4.2.4 1 1.2 1.6 2 1.6.6 0 1-.4 1-1 0-1-.4-2-.4-3.2 0-1.6.8-2.8 1.8-3.2Z" />

@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { SparkIcon } from '@/components/dashboard/Icons';
+import { SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { ReportEditor } from '@/components/reports/ReportEditor';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { ReportContent } from '@/validations/ReportValidation';
@@ -182,7 +182,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
           disabled={phase === 'generating'}
           className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
         >
-          <SparkIcon size={14} />
+          {phase === 'generating' ? <Spinner size={14} /> : <SparkIcon size={14} />}
           {phase === 'generating' ? t('generating') : t('generate')}
         </button>
         <p className="text-xs text-ink-500">{t('generate_hint')}</p>
