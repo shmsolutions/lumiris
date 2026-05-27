@@ -82,6 +82,7 @@ export const MobileBottomNav = () => {
               <li key={tab.key}>
                 <Link
                   href={tab.href}
+                  aria-current={active ? 'page' : undefined}
                   className={`flex flex-col items-center justify-center gap-1 px-2 py-2.5 text-[11px] font-medium transition ${
                     active ? 'text-brand-700' : 'text-ink-500'
                   }`}
@@ -213,6 +214,7 @@ const SheetItem = (props: SheetItemProps) => {
     <li>
       <Link
         href={props.href}
+        aria-current={active ? 'page' : undefined}
         className={`flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium transition ${
           active ? 'bg-brand-50 text-brand-700' : 'text-ink-700 hover:bg-ink-100'
         }`}

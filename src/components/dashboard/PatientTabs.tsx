@@ -37,6 +37,7 @@ export const PatientTabs = (props: PatientTabsProps) => {
           <Link
             key={tab.key}
             href={href}
+            aria-current={active ? 'page' : undefined}
             className={`inline-flex items-center border-b-2 px-3 py-3 text-sm font-medium whitespace-nowrap transition ${
               active
                 ? 'border-brand-500 text-brand-700'

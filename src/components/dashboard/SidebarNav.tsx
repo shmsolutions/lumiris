@@ -69,6 +69,7 @@ export const SidebarNav = () => {
               <li key={item.key}>
                 <Link
                   href={item.href}
+                  aria-current={active ? 'page' : undefined}
                   className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
                     active
                       ? 'bg-brand-50 text-brand-700'
@@ -90,6 +91,7 @@ export const SidebarNav = () => {
           <li>
             <Link
               href="/dashboard/settings/"
+              aria-current={isActive(pathname, '/dashboard/settings/', false) ? 'page' : undefined}
               className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${
                 isActive(pathname, '/dashboard/settings/', false)
                   ? 'bg-brand-50 text-brand-700'

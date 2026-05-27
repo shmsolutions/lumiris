@@ -147,6 +147,7 @@ export const PatientForm = (props: PatientFormProps) => {
                 <button
                   key={type}
                   type="button"
+                  aria-pressed={patientType === type}
                   onClick={() => {
                     changePatientType(type);
                   }}
