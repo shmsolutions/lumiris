@@ -11,7 +11,7 @@ export const TopBar = (props: TopBarProps) => (
     <div className="min-w-0 flex-1">
       {props.breadcrumb ? <div className="text-xs text-ink-500">{props.breadcrumb}</div> : null}
       {props.title ? (
-        <h1 className="truncate text-sm font-semibold text-ink-900 sm:text-base">{props.title}</h1>
+        <p className="truncate text-sm font-semibold text-ink-900 sm:text-base">{props.title}</p>
       ) : null}
     </div>
 

@@ -158,7 +158,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
               }}
               className="rounded-md bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600"
             >
-              OK
+              {tCommon('done')}
             </button>
           </div>
         </div>

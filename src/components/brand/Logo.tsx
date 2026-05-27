@@ -26,7 +26,7 @@ export const Logo = (props: LogoProps) => {
     <span className={`inline-flex items-center gap-2 ${props.className ?? ''}`}>
       <Image
         src="/assets/images/lume-mark.png"
-        alt="Lume"
+        alt={props.variant === 'mark' ? 'Lume' : ''}
         width={size.mark}
         height={size.mark}
         className="object-contain"
