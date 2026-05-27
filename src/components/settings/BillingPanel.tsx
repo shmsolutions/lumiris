@@ -34,7 +34,12 @@ export const BillingPanel = (props: BillingPanelProps) => {
       setErrorMessage(t('error_checkout'));
       return;
     }
-    const { checkoutUrl } = (await response.json()) as { checkoutUrl: string };
+    const { checkoutUrl } = (await response.json()) as { checkoutUrl?: string };
+    if (!checkoutUrl) {
+      setLoadingPlan(null);
+      setErrorMessage(t('error_checkout'));
+      return;
+    }
     window.location.href = checkoutUrl;
   };
 

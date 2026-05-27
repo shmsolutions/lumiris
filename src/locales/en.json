@@ -584,7 +584,7 @@
     "recording_subtitle": "Recording. Tap to stop when done.",
     "recorded_title": "Audio captured",
     "record_again": "Record again",
-    "error_prefix": "Error:"
+    "error_mic": "Could not access the microphone. Check your browser permission."
   },
   "SoapEditor": {
     "letter_subjective": "S",

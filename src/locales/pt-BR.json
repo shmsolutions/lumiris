@@ -584,7 +584,7 @@
     "recording_subtitle": "Gravando. Toque pra parar quando terminar.",
     "recorded_title": "Áudio gravado",
     "record_again": "Refazer",
-    "error_prefix": "Erro:"
+    "error_mic": "Não foi possível acessar o microfone. Verifique a permissão do navegador."
   },
   "SoapEditor": {
     "letter_subjective": "S",

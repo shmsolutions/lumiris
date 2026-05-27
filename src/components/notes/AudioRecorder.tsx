@@ -91,9 +91,8 @@ export const AudioRecorder = (props: AudioRecorderProps) => {
       intervalRef.current = setInterval(() => {
         setSeconds((s) => s + 1);
       }, 1000);
-    } catch (error) {
-      const { message } = error as Error;
-      setErrorMessage(message);
+    } catch {
+      setErrorMessage(t('error_mic'));
       setPhase('error');
     }
   };
@@ -178,11 +177,7 @@ export const AudioRecorder = (props: AudioRecorderProps) => {
             <p className="mt-1 text-sm text-ink-500">{t('recording_subtitle')}</p>
           </>
         ) : null}
-        {phase === 'error' ? (
-          <p className="text-sm text-danger">
-            {t('error_prefix')} {errorMessage}
-          </p>
-        ) : null}
+        {phase === 'error' ? <p className="text-sm text-danger">{errorMessage}</p> : null}
       </div>
     </div>
   );

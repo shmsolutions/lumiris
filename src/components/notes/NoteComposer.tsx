@@ -121,8 +121,8 @@ export const NoteComposer = (props: NoteComposerProps) => {
         structured: data.draft.structured,
       });
       setPhase('review');
-    } catch (error) {
-      setErrorMessage((error as Error).message);
+    } catch {
+      setErrorMessage(t('error_draft'));
       setPhase('capture');
     }
   };
