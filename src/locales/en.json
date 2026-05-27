@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "cancel": "Cancel"
+  },
   "RootLayout": {
     "features_link": "Features",
     "how_it_works_link": "How it works",

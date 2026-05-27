@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "cancel": "Cancelar"
+  },
   "RootLayout": {
     "features_link": "Funcionalidades",
     "how_it_works_link": "Como funciona",

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { SoapEditor } from '@/components/notes/SoapEditor';
 import type { SoapValues } from '@/components/notes/SoapEditor';
 import { useRouter } from '@/libs/I18nNavigation';
@@ -17,6 +18,7 @@ const intercorrenciaClass =
 
 export const NoteDetail = (props: NoteDetailProps) => {
   const t = useTranslations('NoteDetail');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
 
   const [soap, setSoap] = useState<SoapValues>({
@@ -49,9 +51,6 @@ export const NoteDetail = (props: NoteDetailProps) => {
   };
 
   const remove = async () => {
-    if (!confirm(t('confirm_delete'))) {
-      return;
-    }
     setDeleting(true);
     const response = await fetch(`/api/patients/${props.patientId}/notes/${props.noteId}`, {
       method: 'DELETE',
@@ -126,14 +125,17 @@ export const NoteDetail = (props: NoteDetailProps) => {
           ) : null}
         </div>
 
-        <button
-          type="button"
-          onClick={remove}
+        <ConfirmDialog
+          title={t('confirm_delete')}
+          confirmLabel={t('delete')}
+          cancelLabel={tCommon('cancel')}
+          onConfirm={remove}
+          triggerLabel={t('delete')}
+          busyLabel={t('deleting')}
+          busy={deleting}
           disabled={saving || deleting}
-          className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
-        >
-          {deleting ? t('deleting') : t('delete')}
-        </button>
+          triggerClassName="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
+        />
       </div>
     </div>
   );

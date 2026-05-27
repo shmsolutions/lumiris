@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { FileIcon, PlusIcon } from '@/components/dashboard/Icons';
 import { useRouter } from '@/libs/I18nNavigation';
 
@@ -32,6 +33,7 @@ const formatSize = (bytes: number) => {
 
 export const AttachmentsManager = (props: AttachmentsManagerProps) => {
   const t = useTranslations('AttachmentsManager');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [category, setCategory] = useState<(typeof categories)[number]>('laudo');
@@ -71,9 +73,6 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
   };
 
   const remove = async (attachmentId: string) => {
-    if (!confirm(t('confirm_delete'))) {
-      return;
-    }
     setDeletingId(attachmentId);
     const response = await fetch(`/api/patients/${props.patientId}/attachments/${attachmentId}`, {
       method: 'DELETE',
@@ -167,16 +166,18 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
                   <span>{formatSize(att.sizeBytes)}</span>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={async () => {
-                  await remove(att.id);
+              <ConfirmDialog
+                title={t('confirm_delete')}
+                confirmLabel={t('delete')}
+                cancelLabel={tCommon('cancel')}
+                onConfirm={() => {
+                  void remove(att.id);
                 }}
-                disabled={deletingId === att.id}
-                className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
-              >
-                {deletingId === att.id ? t('deleting') : t('delete')}
-              </button>
+                triggerLabel={t('delete')}
+                busyLabel={t('deleting')}
+                busy={deletingId === att.id}
+                triggerClassName="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
+              />
             </li>
           ))}
         </ul>

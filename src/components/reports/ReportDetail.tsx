@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { ReportEditor } from '@/components/reports/ReportEditor';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { ReportContent } from '@/validations/ReportValidation';
@@ -14,6 +15,7 @@ type ReportDetailProps = {
 
 export const ReportDetail = (props: ReportDetailProps) => {
   const t = useTranslations('ReportDetail');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
   const [content, setContent] = useState<ReportContent>(props.initialContent);
   const [saving, setSaving] = useState(false);
@@ -39,9 +41,6 @@ export const ReportDetail = (props: ReportDetailProps) => {
   };
 
   const remove = async () => {
-    if (!confirm(t('confirm_delete'))) {
-      return;
-    }
     setDeleting(true);
     const response = await fetch(`/api/patients/${props.patientId}/reports/${props.reportId}`, {
       method: 'DELETE',
@@ -81,14 +80,17 @@ export const ReportDetail = (props: ReportDetailProps) => {
             </span>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={remove}
+        <ConfirmDialog
+          title={t('confirm_delete')}
+          confirmLabel={t('delete')}
+          cancelLabel={tCommon('cancel')}
+          onConfirm={remove}
+          triggerLabel={t('delete')}
+          busyLabel={t('deleting')}
+          busy={deleting}
           disabled={saving || deleting}
-          className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
-        >
-          {deleting ? t('deleting') : t('delete')}
-        </button>
+          triggerClassName="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
+        />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useRouter } from '@/libs/I18nNavigation';
 import { PatientCreateValidation } from '@/validations/PatientValidation';
 
@@ -62,6 +63,7 @@ const blankValues: PatientFormValues = {
 
 export const PatientForm = (props: PatientFormProps) => {
   const t = useTranslations('PatientForm');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
   const mode = props.mode ?? 'create';
   const isEdit = mode === 'edit';
@@ -122,7 +124,7 @@ export const PatientForm = (props: PatientFormProps) => {
   });
 
   const archive = async () => {
-    if (!props.patientId || !confirm(t('confirm_archive'))) {
+    if (!props.patientId) {
       return;
     }
     setArchiving(true);
@@ -359,14 +361,17 @@ export const PatientForm = (props: PatientFormProps) => {
         </button>
 
         {isEdit ? (
-          <button
-            type="button"
-            onClick={archive}
+          <ConfirmDialog
+            title={t('confirm_archive')}
+            confirmLabel={t('archive')}
+            cancelLabel={tCommon('cancel')}
+            onConfirm={archive}
+            triggerLabel={t('archive')}
+            busyLabel={t('archiving')}
+            busy={archiving}
             disabled={archiving || form.formState.isSubmitting}
-            className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
-          >
-            {archiving ? t('archiving') : t('archive')}
-          </button>
+            triggerClassName="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
+          />
         ) : null}
       </div>
     </form>

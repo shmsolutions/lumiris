@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateTimePicker } from '@/components/forms/DateTimePicker';
 import { useRouter } from '@/libs/I18nNavigation';
 import { AppointmentCreateValidation } from '@/validations/AppointmentValidation';
@@ -39,6 +40,7 @@ const buildDefaultDateTime = () => {
 
 export const AppointmentForm = (props: AppointmentFormProps) => {
   const t = useTranslations('AppointmentForm');
+  const tCommon = useTranslations('Common');
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
@@ -81,7 +83,7 @@ export const AppointmentForm = (props: AppointmentFormProps) => {
   });
 
   const deleteAppointment = async () => {
-    if (!props.editingId || !confirm(t('confirm_delete'))) {
+    if (!props.editingId) {
       return;
     }
     setDeleting(true);
@@ -221,14 +223,17 @@ export const AppointmentForm = (props: AppointmentFormProps) => {
         </button>
 
         {isEditing ? (
-          <button
-            type="button"
-            onClick={deleteAppointment}
+          <ConfirmDialog
+            title={t('confirm_delete')}
+            confirmLabel={t('delete')}
+            cancelLabel={tCommon('cancel')}
+            onConfirm={deleteAppointment}
+            triggerLabel={t('delete')}
+            busyLabel={t('deleting')}
+            busy={deleting}
             disabled={deleting || form.formState.isSubmitting}
-            className="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
-          >
-            {deleting ? t('deleting') : t('delete')}
-          </button>
+            triggerClassName="inline-flex min-h-11 items-center text-xs text-danger transition hover:underline disabled:opacity-50"
+          />
         ) : null}
       </div>
     </form>
