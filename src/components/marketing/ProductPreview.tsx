@@ -8,7 +8,7 @@ export const ProductPreview = () => {
   const t = useTranslations('Landing');
 
   return (
-    <section className="border-b border-ink-200/60 bg-surface">
+    <section className="overflow-x-clip border-b border-ink-200/60 bg-surface">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-medium tracking-wider text-brand-700 uppercase">
