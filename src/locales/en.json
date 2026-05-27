@@ -217,6 +217,15 @@
     "finishing": "Saving…",
     "error_generic": "Could not save. Try again."
   },
+  "AuthLayout": {
+    "back_home": "Back to home",
+    "headline": "Less paperwork, more presence with your patients.",
+    "subtitle": "The smart chart for occupational therapists — intake, progress notes and reports in one place.",
+    "bullet_audio": "AI audio progress notes, structured as SOAP.",
+    "bullet_crefito": "Intake and documents in the CREFITO standard.",
+    "bullet_reports": "Quarterly report generated in minutes.",
+    "footer": "Built by an OT, for occupational therapists."
+  },
   "SignIn": {
     "meta_title": "Sign in to Lume",
     "meta_description": "Access your Lume account."

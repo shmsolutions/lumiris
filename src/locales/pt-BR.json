@@ -217,6 +217,15 @@
     "finishing": "Salvando…",
     "error_generic": "Não foi possível salvar. Tente de novo."
   },
+  "AuthLayout": {
+    "back_home": "Voltar para a home",
+    "headline": "Menos papelada, mais presença com seus pacientes.",
+    "subtitle": "O prontuário inteligente para terapeutas ocupacionais — anamnese, evolução e relatório num só lugar.",
+    "bullet_audio": "Evolução por áudio com IA, estruturada em SOAP.",
+    "bullet_crefito": "Anamnese e documentos no padrão CREFITO.",
+    "bullet_reports": "Relatório trimestral gerado em minutos.",
+    "footer": "Feito por uma T.O., para terapeutas ocupacionais."
+  },
   "SignIn": {
     "meta_title": "Entrar no Lume",
     "meta_description": "Acesse sua conta Lume."
