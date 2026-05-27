@@ -28,7 +28,7 @@ export const SoapEditor = (props: SoapEditorProps) => {
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       {sections.map((key) => (
-        <div key={key} className={key === 'plan' || key === 'assessment' ? '' : ''}>
+        <div key={key}>
           <label className={labelClass} htmlFor={`soap-${key}`}>
             <span className="inline-flex size-5 items-center justify-center rounded-md bg-brand-100 text-[10px] font-bold text-brand-700">
               {t(`letter_${key}` as 'letter_subjective')}

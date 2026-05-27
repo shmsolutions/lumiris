@@ -4,11 +4,7 @@ import { logger } from '@/libs/Logger';
 
 /** Text model used for structuring (SOAP) and report generation. */
 const TEXT_MODEL = 'gpt-4.1-mini';
-/**
- * Speech-to-text model. `whisper-1` is the most tolerant with webm/opus from
- * MediaRecorder. The newer `gpt-4o-mini-transcribe` is cheaper but currently
- * flaky with webm (intermittent 500s), so we default to whisper-1.
- */
+/** Speech-to-text model used to transcribe session audio (webm/opus from MediaRecorder). */
 const STT_MODEL = 'gpt-4o-mini-transcribe';
 
 /** Extract a readable detail from an OpenAI/SDK error for logging. */
@@ -82,8 +78,6 @@ const MOCK_DRAFT: DraftResult = {
 };
 
 const isMockMode = () => Env.LUME_AI_MOCK || !Env.OPENAI_API_KEY;
-
-const isReportMockMode = () => Env.LUME_AI_MOCK || !Env.OPENAI_API_KEY;
 
 let openaiClient: OpenAI | null = null;
 
@@ -202,7 +196,6 @@ export const buildDraftFromAudio = async (audio: File): Promise<DraftResult> => 
   try {
     transcript = await transcribeWithOpenAI(audio);
   } catch (error) {
-    console.error('Error during transcription:', error);
     logger.error(
       `Transcription failed [${audio.type || 'unknown'} · ${audio.size} bytes]: ${describeError(error)}`,
     );
@@ -275,7 +268,7 @@ const MOCK_REPORT: ReportContent = {
  * Mock mode returns a realistic fixed report.
  */
 export const generateReport = async (source: ReportSource): Promise<ReportContent> => {
-  if (isReportMockMode()) {
+  if (isMockMode()) {
     return {
       ...MOCK_REPORT,
       objectiveProgress:
