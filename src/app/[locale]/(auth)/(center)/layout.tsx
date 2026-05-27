@@ -1,5 +1,4 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import Image from 'next/image';
 import { Logo } from '@/components/brand/Logo';
 import { Link } from '@/libs/I18nNavigation';
 
@@ -41,15 +40,7 @@ export default async function CenteredLayout(props: {
         />
 
         <Link href="/" className="relative inline-flex w-fit" aria-label="Lume">
-          <span className="inline-flex rounded-2xl bg-white p-2.5 shadow-sm">
-            <Image
-              src="/assets/images/lume-logo.png"
-              alt="Lume"
-              width={44}
-              height={44}
-              className="object-contain"
-            />
-          </span>
+          <Logo size="lg" tone="light" />
         </Link>
 
         <div className="relative max-w-md space-y-6">
