@@ -373,6 +373,7 @@
     "saving": "Saving…",
     "back_to_period": "Back and change period",
     "error_generate": "Could not generate. Try again.",
+    "error_period": "Period start can't be after the end.",
     "error_save": "Could not save. Try again.",
     "error_ai_locked": "AI reports are available on the Student and Pro plans. Upgrade in settings."
   },
@@ -794,6 +795,7 @@
     "archiving": "Archiving…",
     "confirm_archive": "Archive this patient? They leave your list but session notes remain accessible in the timeline.",
     "error_full_name": "Full name is required",
+    "error_contact_email": "Invalid email.",
     "error_generic": "Could not save. Try again.",
     "error_archive": "Could not archive. Try again.",
     "error_plan_limit": "You reached your plan's limit of {limit} patients. Upgrade to add more."

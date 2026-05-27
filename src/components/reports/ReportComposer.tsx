@@ -49,6 +49,10 @@ export const ReportComposer = (props: ReportComposerProps) => {
 
   const generate = async () => {
     setErrorMessage(null);
+    if (periodStart > periodEnd) {
+      setErrorMessage(t('error_period'));
+      return;
+    }
     setPhase('generating');
     const response = await fetch(`/api/patients/${props.patientId}/reports/generate`, {
       method: 'POST',

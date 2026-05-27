@@ -222,6 +222,9 @@ export const PatientForm = (props: PatientFormProps) => {
               className={inputClass}
               {...form.register('contactEmail')}
             />
+            {form.formState.errors.contactEmail ? (
+              <p className="mt-1.5 text-xs text-danger">{t('error_contact_email')}</p>
+            ) : null}
           </div>
 
           <div>

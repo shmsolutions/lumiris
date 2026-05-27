@@ -374,6 +374,7 @@
     "back_to_period": "Voltar e mudar período",
     "error_ai_locked": "Relatório com IA está disponível nos planos Estudante e Profissional. Faça upgrade nas configurações.",
     "error_generate": "Não foi possível gerar. Tente de novo.",
+    "error_period": "O início do período não pode ser depois do fim.",
     "error_save": "Não foi possível salvar. Tente de novo."
   },
   "ReportEditor": {
@@ -794,6 +795,7 @@
     "archiving": "Arquivando…",
     "confirm_archive": "Arquivar este paciente? Ele sai da sua lista mas as evoluções continuam acessíveis na linha do tempo.",
     "error_full_name": "Nome completo é obrigatório",
+    "error_contact_email": "E-mail inválido.",
     "error_generic": "Não foi possível salvar. Tente de novo.",
     "error_archive": "Não foi possível arquivar. Tente de novo.",
     "error_plan_limit": "Você atingiu o limite de {limit} pacientes do seu plano. Faça upgrade para adicionar mais."
