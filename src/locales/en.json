@@ -875,6 +875,7 @@
     "confirm_archive": "Archive this patient? They leave your list but session notes remain accessible in the timeline.",
     "error_full_name": "Full name is required",
     "error_contact_email": "Invalid email.",
+    "consent_label": "I confirm I have a legal basis to record this patient's health data, in line with the <priv>Privacy Policy</priv> and the LGPD.",
     "error_generic": "Could not save. Try again.",
     "error_archive": "Could not archive. Try again.",
     "error_plan_limit": "You reached your plan's limit of {limit} patients. Upgrade to add more."

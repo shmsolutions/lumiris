@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { useRouter } from '@/libs/I18nNavigation';
+import { Link, useRouter } from '@/libs/I18nNavigation';
 import { PatientCreateValidation } from '@/validations/PatientValidation';
 
 const inputClass =
@@ -68,6 +68,7 @@ export const PatientForm = (props: PatientFormProps) => {
   const mode = props.mode ?? 'create';
   const isEdit = mode === 'edit';
   const [archiving, setArchiving] = useState(false);
+  const [consent, setConsent] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(PatientCreateValidation),
@@ -350,10 +351,35 @@ export const PatientForm = (props: PatientFormProps) => {
         <p className="text-sm text-danger">{form.formState.errors.root.message}</p>
       ) : null}
 
+      {isEdit ? null : (
+        <label className="flex items-start gap-3 rounded-lg border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(event) => {
+              setConsent(event.target.checked);
+            }}
+            className="mt-0.5 size-4 rounded border-ink-300 text-brand-500 focus:ring-brand-300"
+          />
+          <span>
+            {t.rich('consent_label', {
+              priv: (chunks) => (
+                <Link
+                  href="/privacy/"
+                  className="text-brand-600 underline-offset-4 hover:underline"
+                >
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </span>
+        </label>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-3">
         <button
           type="submit"
-          disabled={form.formState.isSubmitting || archiving}
+          disabled={form.formState.isSubmitting || archiving || (!isEdit && !consent)}
           className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
         >
           {form.formState.isSubmitting

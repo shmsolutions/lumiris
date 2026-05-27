@@ -875,6 +875,7 @@
     "confirm_archive": "Arquivar este paciente? Ele sai da sua lista mas as evoluções continuam acessíveis na linha do tempo.",
     "error_full_name": "Nome completo é obrigatório",
     "error_contact_email": "E-mail inválido.",
+    "consent_label": "Confirmo que tenho base legal para registrar os dados de saúde deste paciente, conforme a <priv>Política de Privacidade</priv> e a LGPD.",
     "error_generic": "Não foi possível salvar. Tente de novo.",
     "error_archive": "Não foi possível arquivar. Tente de novo.",
     "error_plan_limit": "Você atingiu o limite de {limit} pacientes do seu plano. Faça upgrade para adicionar mais."
