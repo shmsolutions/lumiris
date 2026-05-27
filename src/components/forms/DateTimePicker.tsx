@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { ptBR } from 'react-day-picker/locale';
@@ -51,6 +51,7 @@ const formatTrigger = (value: string, locale: string) => {
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
   const locale = useLocale();
+  const tCommon = useTranslations('Common');
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { date: parsedDate, time: parsedTime } = parseValue(props.value);
@@ -64,9 +65,16 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
         setOpen(false);
       }
     };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handler);
+    document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('mousedown', handler);
+      document.removeEventListener('keydown', onKey);
     };
   }, [open]);
 
@@ -119,6 +127,8 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
         <div
           className="absolute top-full left-0 z-30 mt-2 w-fit max-w-[calc(100vw-2rem)] min-w-[19rem] rounded-xl border border-ink-200 bg-surface-elevated shadow-xl"
           role="dialog"
+          aria-modal
+          aria-label={tCommon('calendar')}
         >
           <div className="p-2">
             <DayPicker

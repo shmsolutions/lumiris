@@ -1,6 +1,7 @@
 {
   "Common": {
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "calendar": "Calendário"
   },
   "RootLayout": {
     "features_link": "Funcionalidades",

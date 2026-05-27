@@ -52,11 +52,21 @@ export const MobileBottomNav = () => {
     setSheetOpen(false);
   }, [pathname]);
 
-  // Lock body scroll while sheet is open.
+  // Lock body scroll and close on Escape while the sheet is open.
   useEffect(() => {
-    document.body.style.overflow = sheetOpen ? 'hidden' : '';
+    if (!sheetOpen) {
+      return;
+    }
+    document.body.style.overflow = 'hidden';
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSheetOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
     };
   }, [sheetOpen]);
 
