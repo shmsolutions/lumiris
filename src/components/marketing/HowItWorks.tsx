@@ -6,7 +6,7 @@ export const HowItWorks = () => {
   const t = useTranslations('Landing');
 
   return (
-    <section id="how-it-works" className="border-b border-ink-200/60 bg-surface">
+    <section id="how-it-works" className="scroll-mt-20 border-b border-ink-200/60 bg-surface">
       <div className="mx-auto max-w-6xl px-6 py-20">
         <p className="text-xs font-medium tracking-wider text-brand-700 uppercase">
           {t('how_eyebrow')}

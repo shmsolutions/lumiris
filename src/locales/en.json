@@ -4,7 +4,9 @@
     "how_it_works_link": "How it works",
     "pricing_link": "Pricing",
     "sign_in_link": "Sign in",
-    "sign_up_link": "Create account"
+    "sign_up_link": "Create account",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
   },
   "BaseTemplate": {
     "main_navigation_label": "Main navigation",

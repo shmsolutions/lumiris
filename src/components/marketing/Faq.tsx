@@ -6,7 +6,7 @@ export const Faq = () => {
   const t = useTranslations('Landing');
 
   return (
-    <section id="faq" className="border-b border-ink-200/60 bg-ink-50">
+    <section id="faq" className="scroll-mt-20 border-b border-ink-200/60 bg-ink-50">
       <div className="mx-auto max-w-3xl px-6 py-20">
         <div className="text-center">
           <p className="text-xs font-medium tracking-wider text-brand-700 uppercase">

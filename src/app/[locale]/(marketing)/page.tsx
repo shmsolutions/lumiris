@@ -35,7 +35,7 @@ export default async function IndexPage(props: IndexPageProps) {
       <Solution />
       <ProductPreview />
       <HowItWorks />
-      <div id="features">
+      <div id="features" className="scroll-mt-20">
         <Features />
       </div>
       <Comparison />

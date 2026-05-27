@@ -18,27 +18,33 @@ export const Comparison = () => {
           <p className="mt-3 text-base text-ink-600">{t('compare_subtitle')}</p>
         </div>
 
-        <div className="mx-auto mt-12 overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
-          <div className="grid grid-cols-[1.6fr_1fr_1fr] gap-px bg-ink-200 text-sm">
-            <div className="bg-surface-elevated px-6 py-4 text-xs font-medium tracking-wider text-ink-500 uppercase">
+        <div className="mx-auto mt-12 overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated text-sm">
+          <div className="grid gap-px bg-ink-200 md:grid-cols-[1.6fr_1fr_1fr]">
+            <div className="hidden bg-surface-elevated px-6 py-4 text-xs font-medium tracking-wider text-ink-500 uppercase md:block">
               {t('compare_col_topic')}
             </div>
-            <div className="bg-surface-elevated px-6 py-4 text-xs font-medium tracking-wider text-ink-500 uppercase">
+            <div className="hidden bg-surface-elevated px-6 py-4 text-xs font-medium tracking-wider text-ink-500 uppercase md:block">
               {t('compare_col_old')}
             </div>
-            <div className="bg-brand-50/60 px-6 py-4 text-xs font-medium tracking-wider text-brand-700 uppercase">
+            <div className="hidden bg-brand-50/60 px-6 py-4 text-xs font-medium tracking-wider text-brand-700 uppercase md:block">
               {t('compare_col_lume')}
             </div>
 
             {rows.map((row) => (
-              <div key={row} className="contents">
-                <div className="bg-surface-elevated px-6 py-4 font-medium text-ink-900">
+              <div key={row} className="md:contents">
+                <div className="bg-surface-elevated px-4 py-4 font-medium text-ink-900 sm:px-6">
                   {t(`compare_row_${row}_topic` as 'compare_row_a_topic')}
                 </div>
-                <div className="bg-surface-elevated px-6 py-4 text-ink-500">
+                <div className="bg-surface-elevated px-4 py-4 text-ink-500 sm:px-6">
+                  <span className="mb-1 block text-[10px] font-medium tracking-wider text-ink-400 uppercase md:hidden">
+                    {t('compare_col_old')}
+                  </span>
                   {t(`compare_row_${row}_old` as 'compare_row_a_old')}
                 </div>
-                <div className="bg-brand-50/40 px-6 py-4 text-ink-900">
+                <div className="bg-brand-50/40 px-4 py-4 text-ink-900 sm:px-6">
+                  <span className="mb-1 block text-[10px] font-medium tracking-wider text-brand-700 uppercase md:hidden">
+                    {t('compare_col_lume')}
+                  </span>
                   <span className="inline-flex items-start gap-2">
                     <span aria-hidden className="mt-0.5 text-brand-600">
                       ✓

@@ -4,7 +4,9 @@
     "how_it_works_link": "Como funciona",
     "pricing_link": "Preços",
     "sign_in_link": "Entrar",
-    "sign_up_link": "Criar conta"
+    "sign_up_link": "Criar conta",
+    "menu_open": "Abrir menu",
+    "menu_close": "Fechar menu"
   },
   "BaseTemplate": {
     "main_navigation_label": "Navegação principal",
