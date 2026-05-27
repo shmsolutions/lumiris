@@ -72,6 +72,21 @@ export const PatientForm = (props: PatientFormProps) => {
     defaultValues: { ...blankValues, ...props.initialValues },
   });
 
+  // Crianças/adolescentes não têm estado civil nem profissão — o formulário se
+  // adapta ao tipo de paciente. Em edição, inferimos pelo que já está preenchido.
+  const [patientType, setPatientType] = useState<'child' | 'adult'>(
+    props.initialValues?.maritalStatus || props.initialValues?.profession ? 'adult' : 'child',
+  );
+  const isAdult = patientType === 'adult';
+
+  const changePatientType = (type: 'child' | 'adult') => {
+    setPatientType(type);
+    if (type === 'child') {
+      form.setValue('maritalStatus', '');
+      form.setValue('profession', '');
+    }
+  };
+
   const onSubmit = form.handleSubmit(async (data) => {
     const url = isEdit && props.patientId ? `/api/patients/${props.patientId}` : '/api/patients';
     const method = isEdit ? 'PATCH' : 'POST';
@@ -125,6 +140,28 @@ export const PatientForm = (props: PatientFormProps) => {
     <form onSubmit={onSubmit} className="max-w-3xl space-y-8">
       <section className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <span className={labelClass}>{t('label_patient_type')}</span>
+            <div className="mt-1.5 inline-flex rounded-md border border-ink-200 bg-surface p-0.5">
+              {(['child', 'adult'] as const).map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() => {
+                    changePatientType(type);
+                  }}
+                  className={`rounded px-4 py-1.5 text-sm font-medium transition ${
+                    patientType === type
+                      ? 'bg-brand-500 text-white shadow-sm'
+                      : 'text-ink-600 hover:text-ink-900'
+                  }`}
+                >
+                  {t(type === 'child' ? 'type_child' : 'type_adult')}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="sm:col-span-2">
             <label className={labelClass} htmlFor="fullName">
               {t('label_full_name')}
@@ -191,12 +228,18 @@ export const PatientForm = (props: PatientFormProps) => {
             <input id="gender" className={inputClass} {...form.register('gender')} />
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor="maritalStatus">
-              {t('label_marital_status')}
-            </label>
-            <input id="maritalStatus" className={inputClass} {...form.register('maritalStatus')} />
-          </div>
+          {isAdult ? (
+            <div>
+              <label className={labelClass} htmlFor="maritalStatus">
+                {t('label_marital_status')}
+              </label>
+              <input
+                id="maritalStatus"
+                className={inputClass}
+                {...form.register('maritalStatus')}
+              />
+            </div>
+          ) : null}
 
           <div>
             <label className={labelClass} htmlFor="naturality">
@@ -205,12 +248,14 @@ export const PatientForm = (props: PatientFormProps) => {
             <input id="naturality" className={inputClass} {...form.register('naturality')} />
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor="profession">
-              {t('label_profession')}
-            </label>
-            <input id="profession" className={inputClass} {...form.register('profession')} />
-          </div>
+          {isAdult ? (
+            <div>
+              <label className={labelClass} htmlFor="profession">
+                {t('label_profession')}
+              </label>
+              <input id="profession" className={inputClass} {...form.register('profession')} />
+            </div>
+          ) : null}
 
           <div className="sm:col-span-2">
             <label className={labelClass} htmlFor="residentialAddress">

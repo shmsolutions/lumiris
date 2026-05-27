@@ -791,6 +791,9 @@
     "export_pdf": "Export assessment (PDF)"
   },
   "PatientForm": {
+    "label_patient_type": "Patient type",
+    "type_child": "Child / Teen",
+    "type_adult": "Adult",
     "label_full_name": "Full name",
     "label_birth_date": "Date of birth",
     "label_guardian_name": "Guardian name",

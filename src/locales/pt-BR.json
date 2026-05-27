@@ -791,6 +791,9 @@
     "export_pdf": "Exportar avaliação (PDF)"
   },
   "PatientForm": {
+    "label_patient_type": "Tipo de paciente",
+    "type_child": "Criança / Adolescente",
+    "type_adult": "Adulto",
     "label_full_name": "Nome completo",
     "label_birth_date": "Data de nascimento",
     "label_guardian_name": "Nome do responsável",
