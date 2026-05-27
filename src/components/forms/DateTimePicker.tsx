@@ -117,7 +117,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
 
       {open ? (
         <div
-          className="absolute top-full left-0 z-30 mt-2 w-fit min-w-[19rem] rounded-xl border border-ink-200 bg-surface-elevated shadow-xl"
+          className="absolute top-full left-0 z-30 mt-2 w-fit max-w-[calc(100vw-2rem)] min-w-[19rem] rounded-xl border border-ink-200 bg-surface-elevated shadow-xl"
           role="dialog"
         >
           <div className="p-2">

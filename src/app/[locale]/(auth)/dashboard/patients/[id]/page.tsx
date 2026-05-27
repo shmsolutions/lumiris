@@ -18,9 +18,9 @@ type PatientOverviewPageProps = {
 };
 
 const FieldRow = (props: { label: string; value: React.ReactNode }) => (
-  <div className="grid grid-cols-[140px_1fr] gap-4 border-b border-ink-200/70 px-5 py-3 last:border-b-0">
+  <div className="grid grid-cols-1 gap-0.5 border-b border-ink-200/70 px-5 py-3 last:border-b-0 sm:grid-cols-[140px_1fr] sm:gap-4">
     <div className="text-xs font-medium tracking-wider text-ink-500 uppercase">{props.label}</div>
-    <div className="text-sm text-ink-800">{props.value}</div>
+    <div className="min-w-0 text-sm break-words text-ink-800">{props.value}</div>
   </div>
 );
 
