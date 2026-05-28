@@ -8,6 +8,14 @@ import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
 
+// Behind Traefik, req.url carries the internal host (0.0.0.0:3000). Build the
+// public origin from the forwarded headers so redirects point at the real domain.
+const publicOrigin = (req: NextRequest) => {
+  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
+  const proto = req.headers.get('x-forwarded-proto') ?? 'https';
+  return host ? `${proto}://${host}` : req.nextUrl.origin;
+};
+
 const isApiRoute = createRouteMatcher(['/api/(.*)']);
 
 // Webhooks são chamadas server-to-server (Woovi) — não passam pelo Arcjet bot
@@ -64,7 +72,7 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     return clerkMiddleware(async (auth, req) => {
       if (isProtectedRoute(req)) {
         const locale = req.nextUrl.pathname.match(/(\/.*)\/dashboard/u)?.at(1) ?? '';
-        const signInUrl = new URL(`${locale}/sign-in`, req.url);
+        const signInUrl = new URL(`${locale}/sign-in`, publicOrigin(req));
 
         await auth.protect({
           unauthenticatedUrl: signInUrl.toString(),
