@@ -12,9 +12,18 @@ type BillingPanelProps = {
   subscriptionStatus: string | null;
   periodEndLabel: string | null;
   justPaid: boolean;
+  initialTaxId: string | null;
 };
 
+/** Conta os dígitos do CPF/CNPJ; 11 (CPF) ou 14 (CNPJ) é válido. */
+const taxIdDigits = (value: string) => value.replaceAll(/\D/g, '');
+
 const paidPlans: PaidPlanId[] = ['student', 'pro'];
+const recommendedPlan: PaidPlanId = 'pro';
+
+const Spinner = () => (
+  <span className="size-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+);
 
 export const BillingPanel = (props: BillingPanelProps) => {
   const t = useTranslations('BillingPage');
@@ -24,6 +33,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [canceling, setCanceling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [taxId, setTaxId] = useState(props.initialTaxId ?? '');
 
   const isPaid = props.currentPlan !== 'free';
 
@@ -41,11 +51,16 @@ export const BillingPanel = (props: BillingPanelProps) => {
 
   const startCheckout = async (plan: PaidPlanId) => {
     setErrorMessage(null);
+    const digits = taxIdDigits(taxId);
+    if (digits.length !== 11 && digits.length !== 14) {
+      setErrorMessage(t('error_tax_id'));
+      return;
+    }
     setLoadingPlan(plan);
     const response = await fetch('/api/billing/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan, taxId: digits }),
     });
     if (!response.ok) {
       setLoadingPlan(null);
@@ -113,40 +128,93 @@ export const BillingPanel = (props: BillingPanelProps) => {
         {cancelError ? <p className="mt-3 text-xs text-danger">{cancelError}</p> : null}
       </div>
 
+      {isPaid ? null : (
+        <div className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
+          <label
+            htmlFor="taxId"
+            className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
+          >
+            {t('label_tax_id')}
+          </label>
+          <input
+            id="taxId"
+            inputMode="numeric"
+            className="mt-1.5 w-full max-w-xs rounded-md border border-ink-200 bg-surface px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+            placeholder={t('placeholder_tax_id')}
+            value={taxId}
+            onChange={(e) => {
+              setTaxId(e.target.value);
+            }}
+          />
+          <p className="mt-1.5 text-xs text-ink-500">{t('hint_tax_id')}</p>
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
         {paidPlans.map((plan) => {
           const isCurrent = props.currentPlan === plan;
+          const isRecommended = plan === recommendedPlan;
+          const features = t.raw(`plan_${plan}_features`) as string[];
           return (
             <div
               key={plan}
-              className={`flex flex-col rounded-xl border p-5 ${
-                isCurrent
-                  ? 'border-brand-400 bg-brand-50/40 ring-1 ring-brand-200'
+              className={`relative flex flex-col rounded-2xl border p-6 transition ${
+                isRecommended
+                  ? 'border-brand-300 bg-gradient-to-b from-brand-50/70 to-surface-elevated shadow-sm'
                   : 'border-ink-200 bg-surface-elevated'
-              }`}
+              } ${isCurrent ? 'ring-2 ring-brand-300' : ''}`}
             >
-              <div className="flex items-center gap-2">
-                <span className="inline-flex size-8 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
-                  <SparkIcon size={16} />
+              {isRecommended ? (
+                <span className="absolute -top-2.5 right-5 inline-flex items-center gap-1 rounded-full bg-brand-500 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
+                  <SparkIcon size={11} />
+                  {t('recommended')}
                 </span>
-                <span className="text-sm font-semibold text-ink-900">
+              ) : null}
+
+              <div className="flex items-center gap-2">
+                <span className="inline-flex size-9 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+                  <SparkIcon size={18} />
+                </span>
+                <span className="text-base font-semibold text-ink-900">
                   {t(`plan_${plan}_name` as 'plan_student_name')}
                 </span>
-                <span className="ml-auto text-sm font-semibold text-brand-700">
-                  {t(`plan_${plan}_price` as 'plan_student_price')}
-                </span>
               </div>
-              <p className="mt-2 text-xs text-ink-600">
+
+              <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-3xl font-bold tracking-tight text-ink-900">
+                  {t(`plan_${plan}_amount` as 'plan_student_amount')}
+                </span>
+                <span className="text-sm font-medium text-ink-500">{t('per_month')}</span>
+              </div>
+
+              <p className="mt-2 text-sm text-ink-600">
                 {t(`plan_${plan}_desc` as 'plan_student_desc')}
               </p>
+
+              <ul className="mt-5 space-y-2.5">
+                {features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-ink-700">
+                    <span className="mt-0.5 inline-flex size-4 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
+                      <CheckIcon size={11} />
+                    </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
               <button
                 type="button"
                 onClick={() => {
                   void startCheckout(plan);
                 }}
                 disabled={isCurrent || loadingPlan !== null}
-                className="mt-4 inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+                className={`mt-6 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed ${
+                  isCurrent
+                    ? 'bg-ink-100 text-ink-500'
+                    : 'bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-60'
+                }`}
               >
+                {loadingPlan === plan ? <Spinner /> : null}
                 {isCurrent
                   ? t('button_current')
                   : (loadingPlan === plan

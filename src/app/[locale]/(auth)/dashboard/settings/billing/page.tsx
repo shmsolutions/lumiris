@@ -40,6 +40,7 @@ export default async function BillingPage(props: BillingPageProps) {
         plan: 'free' as const,
         subscriptionStatus: null,
         currentPeriodEnd: null,
+        taxId: null,
       };
 
   const periodEndLabel = profile.currentPeriodEnd
@@ -80,6 +81,7 @@ export default async function BillingPage(props: BillingPageProps) {
             subscriptionStatus={profile.subscriptionStatus}
             periodEndLabel={periodEndLabel}
             justPaid={paid === '1'}
+            initialTaxId={profile.taxId}
           />
         </div>
 

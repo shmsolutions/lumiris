@@ -12,11 +12,12 @@ export const Env = createEnv({
       .optional()
       .default('false')
       .transform((v) => v === 'true'),
-    // Woovi (pagamentos) — App ID é a chave da API enviada no header Authorization.
-    WOOVI_APP_ID: z.string().optional(),
-    WOOVI_BASE_URL: z.string().optional(),
-    // Chave pública (PEM) do Woovi pra validar a assinatura dos webhooks.
-    WOOVI_WEBHOOK_PUBLIC_KEY: z.string().optional(),
+    // Asaas (pagamentos) — chave da API enviada no header `access_token`.
+    ASAAS_API_KEY: z.string().optional(),
+    // Base da API: sandbox por padrão (https://api-sandbox.asaas.com/v3).
+    ASAAS_BASE_URL: z.string().optional(),
+    // Token compartilhado configurado no webhook do Asaas (header asaas-access-token).
+    ASAAS_WEBHOOK_TOKEN: z.string().optional(),
     LUME_BILLING_MOCK: z
       .enum(['true', 'false'])
       .optional()
@@ -46,9 +47,9 @@ export const Env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     LUME_AI_MOCK: process.env.LUME_AI_MOCK,
-    WOOVI_APP_ID: process.env.WOOVI_APP_ID,
-    WOOVI_BASE_URL: process.env.WOOVI_BASE_URL,
-    WOOVI_WEBHOOK_PUBLIC_KEY: process.env.WOOVI_WEBHOOK_PUBLIC_KEY,
+    ASAAS_API_KEY: process.env.ASAAS_API_KEY,
+    ASAAS_BASE_URL: process.env.ASAAS_BASE_URL,
+    ASAAS_WEBHOOK_TOKEN: process.env.ASAAS_WEBHOOK_TOKEN,
     LUME_BILLING_MOCK: process.env.LUME_BILLING_MOCK,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,

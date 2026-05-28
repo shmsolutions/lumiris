@@ -1,19 +1,22 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { cancelSubscription } from '@/libs/Asaas';
 import { notifyPlanCanceled } from '@/libs/Email';
-import { upsertUserProfile } from '@/libs/UserProfile';
+import { getUserProfile, upsertUserProfile } from '@/libs/UserProfile';
 
 /**
- * Cancela o plano do usuário: derruba pro Free imediatamente. Como a cobrança
- * no Woovi é avulsa (não recorrente automática), não há recorrência a desligar
- * — basta liberar o estado local. Se um dia adotarmos recorrência de verdade,
- * aqui também desativaríamos a assinatura no Woovi.
+ * Cancela a assinatura recorrente no Asaas e derruba o usuário pro Free.
+ * O cancelamento no Asaas é best-effort: se a API falhar, o estado local ainda
+ * é liberado (o webhook de estorno/cancelamento reconcilia depois, se vier).
  */
 export const POST = async () => {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+
+  const profile = await getUserProfile(userId);
+  await cancelSubscription(profile.asaasSubscriptionId);
 
   await upsertUserProfile(userId, {
     plan: 'free',

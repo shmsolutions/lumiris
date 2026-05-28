@@ -17,6 +17,7 @@ export const PATCH = async (request: Request) => {
   }
 
   await upsertUserProfile(userId, {
+    therapistName: parse.data.therapistName ?? null,
     crefito: parse.data.crefito ?? null,
     studentName: parse.data.studentName ?? null,
   });

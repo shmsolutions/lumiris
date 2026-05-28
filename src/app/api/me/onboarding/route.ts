@@ -17,10 +17,9 @@ export const POST = async (request: Request) => {
   }
 
   // Planos pagos só são liberados após confirmação de pagamento (webhook do
-  // Woovi). No onboarding a conta começa no free; o cliente segue pro checkout.
+  // Asaas). No onboarding a conta começa no free; o cliente segue pro checkout.
   await upsertUserProfile(userId, {
-    crefito: parse.data.crefito ?? null,
-    studentName: parse.data.studentName ?? null,
+    therapistName: parse.data.therapistName,
     plan: 'free',
     onboarded: true,
   });

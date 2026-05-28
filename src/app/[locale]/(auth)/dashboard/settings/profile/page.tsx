@@ -22,7 +22,9 @@ export default async function TherapistProfilePage(props: ProfilePageProps) {
   const tSettings = await getTranslations({ locale, namespace: 'SettingsPage' });
 
   const { userId } = await auth();
-  const profile = userId ? await getUserProfile(userId) : { crefito: '', studentName: '' };
+  const profile = userId
+    ? await getUserProfile(userId)
+    : { therapistName: '', crefito: '', studentName: '' };
 
   return (
     <>
@@ -43,6 +45,7 @@ export default async function TherapistProfilePage(props: ProfilePageProps) {
         <div className="mt-8">
           <TherapistProfileForm
             initialValues={{
+              therapistName: profile.therapistName ?? '',
               crefito: profile.crefito ?? '',
               studentName: profile.studentName ?? '',
             }}

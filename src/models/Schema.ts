@@ -20,11 +20,17 @@ import {
  */
 export const userProfileSchema = pgTable('user_profile', {
   userId: varchar('user_id', { length: 64 }).primaryKey(),
+  therapistName: varchar('therapist_name', { length: 200 }),
   crefito: varchar('crefito', { length: 40 }),
   studentName: varchar('student_name', { length: 120 }),
   plan: varchar('plan', { length: 16 }).default('free').notNull(),
   onboarded: boolean('onboarded').default(false).notNull(),
-  // Billing (Woovi) — preenchido na Wave 3.
+  // CPF/CNPJ do cliente — exigido pelo Asaas pra criar a assinatura.
+  taxId: varchar('tax_id', { length: 20 }),
+  // Billing (Asaas) — cliente e assinatura recorrente.
+  asaasCustomerId: varchar('asaas_customer_id', { length: 64 }),
+  asaasSubscriptionId: varchar('asaas_subscription_id', { length: 64 }),
+  // Legado Woovi — mantido pra não exigir migração destrutiva; não é mais usado.
   wooviSubscriptionId: varchar('woovi_subscription_id', { length: 120 }),
   subscriptionStatus: varchar('subscription_status', { length: 32 }),
   currentPeriodEnd: timestamp('current_period_end', { mode: 'date' }),
@@ -221,15 +227,18 @@ export const sessionNoteSchema = pgTable('session_note', {
 });
 
 /**
- * Histórico de cobranças do Woovi. Uma row por charge criado; o status muda
- * via webhook (pago/cancelado). Alimenta a lista de pagamentos no billing.
+ * Histórico de cobranças do Asaas. Uma row por cobrança gerada (inclusive
+ * renovações da assinatura); o status muda via webhook (pago/cancelado).
+ * Alimenta a lista de pagamentos no billing.
  */
 export const paymentSchema = pgTable('payment', {
   id: uuid('id').defaultRandom().primaryKey(),
   ownerId: varchar('owner_id', { length: 64 }).notNull(),
-  /** Nosso correlationID único enviado ao Woovi — chave pra mapear o webhook. */
+  /** id da cobrança no Asaas (pay_xxx) — chave única pra mapear o webhook. */
   correlationId: varchar('correlation_id', { length: 120 }).notNull().unique(),
-  /** globalID/id da cobrança no Woovi, pra rastreio. */
+  /** id da assinatura no Asaas (sub_xxx) que gerou esta cobrança. */
+  asaasSubscriptionId: varchar('asaas_subscription_id', { length: 64 }),
+  /** Legado Woovi — mantido pra evitar migração destrutiva; não é mais usado. */
   wooviChargeId: varchar('woovi_charge_id', { length: 120 }),
   plan: varchar('plan', { length: 16 }).notNull(),
   valueCents: integer('value_cents').notNull(),

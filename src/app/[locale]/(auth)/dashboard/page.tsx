@@ -144,7 +144,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
           actions={
             <Link
               href="/dashboard/patients/"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold whitespace-nowrap text-ink-700 transition hover:border-ink-300"
             >
               {t('quick_view_patients')}
               <ArrowRightIcon size={14} />

@@ -1,6 +1,12 @@
 import * as z from 'zod';
 
 export const TherapistProfileValidation = z.object({
+  therapistName: z
+    .string()
+    .trim()
+    .max(200)
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
   crefito: z
     .string()
     .trim()

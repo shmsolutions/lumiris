@@ -18,7 +18,7 @@ const publicOrigin = (req: NextRequest) => {
 
 const isApiRoute = createRouteMatcher(['/api/(.*)']);
 
-// Webhooks são chamadas server-to-server (Woovi) — não passam pelo Arcjet bot
+// Webhooks são chamadas server-to-server (Asaas) — não passam pelo Arcjet bot
 // detection nem pela autenticação.
 const isWebhookRoute = createRouteMatcher(['/api/billing/webhook']);
 

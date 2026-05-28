@@ -9,6 +9,7 @@ import { TherapistProfileValidation } from '@/validations/TherapistProfileValida
 
 type TherapistProfileFormProps = {
   initialValues: {
+    therapistName: string;
     crefito: string;
     studentName: string;
   };
@@ -49,6 +50,19 @@ export const TherapistProfileForm = (props: TherapistProfileFormProps) => {
         <p className="text-xs text-ink-500">{t('description')}</p>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <label className={labelClass} htmlFor="therapistName">
+              {t('label_name')}
+            </label>
+            <input
+              id="therapistName"
+              className={inputClass}
+              placeholder={t('placeholder_name')}
+              {...form.register('therapistName')}
+            />
+            <p className="mt-1.5 text-xs text-ink-500">{t('hint_name')}</p>
+          </div>
+
           <div>
             <label className={labelClass} htmlFor="crefito">
               {t('label_crefito')}

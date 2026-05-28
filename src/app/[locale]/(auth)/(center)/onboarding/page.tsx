@@ -30,11 +30,12 @@ export default async function OnboardingPage(props: OnboardingPageProps) {
   // First name is cosmetic — falls back gracefully if Clerk is unreachable.
   const user = await currentUser().catch(() => null);
   const firstName = user?.firstName ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? '';
+  const clerkFullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
 
   return (
     <OnboardingWizard
       firstName={firstName}
-      initial={{ crefito: profile.crefito, studentName: profile.studentName }}
+      initial={{ therapistName: profile.therapistName || clerkFullName }}
     />
   );
 }

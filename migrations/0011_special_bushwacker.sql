@@ -1,0 +1,1 @@
+ALTER TABLE "user_profile" ADD COLUMN "therapist_name" varchar(200);

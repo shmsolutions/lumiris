@@ -74,7 +74,7 @@ export default async function PatientsPage(props: PatientsPageProps) {
               <PatientSearch />
               <Link
                 href="/dashboard/patients/new/"
-                className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold whitespace-nowrap text-white shadow-sm transition hover:bg-brand-600"
               >
                 <PlusIcon size={14} />
                 {t('new_patient')}
@@ -99,7 +99,7 @@ export default async function PatientsPage(props: PatientsPageProps) {
                 action={
                   <Link
                     href="/dashboard/patients/new/"
-                    className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                    className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold whitespace-nowrap text-white shadow-sm transition hover:bg-brand-600"
                   >
                     <PlusIcon size={14} />
                     {t('new_patient')}

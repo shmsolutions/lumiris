@@ -18,7 +18,7 @@ export const PLAN_PRICE_CENTS: Record<PlanId, number> = {
   pro: 8900,
 };
 
-/** Planos pagos (geram cobrança no Woovi). */
+/** Planos pagos (geram assinatura no Asaas). */
 export const PAID_PLAN_IDS = ['student', 'pro'] as const;
 
 export type PaidPlanId = (typeof PAID_PLAN_IDS)[number];

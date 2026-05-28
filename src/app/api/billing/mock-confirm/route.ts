@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { isBillingMockMode } from '@/libs/Asaas';
 import { upsertUserProfile } from '@/libs/UserProfile';
-import { isBillingMockMode } from '@/libs/Woovi';
 import { isPaidPlan } from '@/utils/Plans';
 import type { PlanId } from '@/utils/Plans';
 
@@ -14,7 +14,7 @@ const oneMonthFromNow = () => {
 
 /**
  * Confirmação simulada de pagamento — só existe em modo mock. Libera o plano
- * escolhido na hora pra permitir testar o fluxo sem a chave real do Woovi.
+ * escolhido na hora pra permitir testar o fluxo sem a chave real do Asaas.
  */
 export const GET = async (request: Request) => {
   if (!isBillingMockMode) {

@@ -6,43 +6,41 @@ import type { PaidPlanId } from '@/utils/Plans';
 export type PaymentRecord = typeof paymentSchema.$inferSelect;
 
 /**
- * Persiste uma cobrança criada no Woovi. Idempotente por correlationId:
- * se já existir (ex: clique duplo durante a reconciliação), apenas atualiza
- * os campos voláteis sem duplicar a linha.
+ * Persiste uma cobrança do Asaas. Idempotente pelo id da cobrança (correlationId):
+ * se já existir (ex: webhook reentregue), apenas atualiza os campos voláteis sem
+ * duplicar a linha. `status` é opcional — renovações chegam direto como 'paid'.
  */
 export const recordPayment = async (input: {
   ownerId: string;
   correlationId: string;
-  wooviChargeId: string;
+  asaasSubscriptionId: string;
   plan: PaidPlanId;
   valueCents: number;
-  paymentLinkUrl: string;
+  paymentLinkUrl: string | null;
+  status?: 'pending' | 'paid';
 }) => {
+  const status = input.status ?? 'pending';
   await db
     .insert(paymentSchema)
     .values({
       ownerId: input.ownerId,
       correlationId: input.correlationId,
-      wooviChargeId: input.wooviChargeId,
+      asaasSubscriptionId: input.asaasSubscriptionId,
       plan: input.plan,
       valueCents: input.valueCents,
       paymentLinkUrl: input.paymentLinkUrl,
-      status: 'pending',
+      status,
+      paidAt: status === 'paid' ? new Date() : null,
     })
     .onConflictDoUpdate({
       target: paymentSchema.correlationId,
       set: {
-        wooviChargeId: input.wooviChargeId,
+        asaasSubscriptionId: input.asaasSubscriptionId,
         paymentLinkUrl: input.paymentLinkUrl,
+        status,
+        paidAt: status === 'paid' ? new Date() : null,
       },
     });
-};
-
-export const markPaymentPaid = async (correlationId: string) => {
-  await db
-    .update(paymentSchema)
-    .set({ status: 'paid', paidAt: new Date() })
-    .where(eq(paymentSchema.correlationId, correlationId));
 };
 
 export const markPaymentCanceled = async (correlationId: string) => {

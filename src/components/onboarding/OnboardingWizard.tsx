@@ -8,7 +8,7 @@ import type { PlanId } from '@/utils/Plans';
 
 type OnboardingWizardProps = {
   firstName: string;
-  initial: { crefito: string; studentName: string };
+  initial: { therapistName: string };
 };
 
 const inputClass =
@@ -22,9 +22,9 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
   const router = useRouter();
 
   const [step, setStep] = useState(0);
-  const [crefito, setCrefito] = useState(props.initial.crefito);
-  const [studentName, setStudentName] = useState(props.initial.studentName);
+  const [therapistName, setTherapistName] = useState(props.initial.therapistName);
   const [plan, setPlan] = useState<PlanId>('free');
+  const nameTrimmed = therapistName.trim();
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -34,7 +34,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
     const response = await fetch('/api/me/onboarding', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ crefito, studentName, plan }),
+      body: JSON.stringify({ therapistName: nameTrimmed, plan }),
     });
     if (!response.ok) {
       setSubmitting(false);
@@ -42,21 +42,10 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
       return;
     }
 
-    // Plano pago: dispara o checkout do Woovi e manda pra URL de pagamento.
+    // Plano pago: leva pro billing pra coletar CPF/CNPJ e concluir a assinatura.
     if (plan !== 'free') {
-      const checkout = await fetch('/api/billing/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      });
-      if (checkout.ok) {
-        const { checkoutUrl } = (await checkout.json()) as { checkoutUrl: string };
-        // Pagamento em nova aba; manda o usuário pro dashboard enquanto isso.
-        window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-        router.push('/dashboard/');
-        return;
-      }
-      // Falha no checkout: entra no app mesmo assim (free) e avisa nas configurações.
+      router.push(`/dashboard/settings/billing/?plan=${plan}`);
+      return;
     }
 
     router.push('/dashboard/');
@@ -85,44 +74,30 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
 
           <div className="mt-6 space-y-5 rounded-xl border border-ink-200 bg-surface-elevated p-6">
             <div>
-              <label className={labelClass} htmlFor="crefito">
-                {t('label_crefito')}
+              <label className={labelClass} htmlFor="therapistName">
+                {t('label_name')}
               </label>
               <input
-                id="crefito"
+                id="therapistName"
                 className={inputClass}
-                placeholder={t('placeholder_crefito')}
-                value={crefito}
+                placeholder={t('placeholder_name')}
+                value={therapistName}
                 onChange={(e) => {
-                  setCrefito(e.target.value);
+                  setTherapistName(e.target.value);
                 }}
               />
-              <p className="mt-1.5 text-xs text-ink-500">{t('hint_crefito')}</p>
-            </div>
-            <div>
-              <label className={labelClass} htmlFor="studentName">
-                {t('label_student')}
-              </label>
-              <input
-                id="studentName"
-                className={inputClass}
-                placeholder={t('placeholder_student')}
-                value={studentName}
-                onChange={(e) => {
-                  setStudentName(e.target.value);
-                }}
-              />
-              <p className="mt-1.5 text-xs text-ink-500">{t('hint_student')}</p>
+              <p className="mt-1.5 text-xs text-ink-500">{t('hint_name')}</p>
             </div>
           </div>
 
           <div className="mt-6 flex justify-end">
             <button
               type="button"
+              disabled={nameTrimmed.length === 0}
               onClick={() => {
                 setStep(1);
               }}
-              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('continue')}
             </button>

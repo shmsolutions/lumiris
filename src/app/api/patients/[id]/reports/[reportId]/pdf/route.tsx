@@ -57,6 +57,7 @@ export const GET = async (request: Request, context: RouteContext) => {
   }
   const user = await currentUser().catch(() => null);
   const therapistName =
+    profile.therapistName ||
     [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
     user?.primaryEmailAddress?.emailAddress ||
     '';
