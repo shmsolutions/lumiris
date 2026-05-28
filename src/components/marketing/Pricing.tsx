@@ -1,6 +1,5 @@
-import { auth } from '@clerk/nextjs/server';
-import { getTranslations } from 'next-intl/server';
-import { PlanCta } from '@/components/marketing/PlanCta';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/libs/I18nNavigation';
 
 type PlanKey = 'free' | 'student' | 'pro';
 
@@ -29,10 +28,8 @@ const plans: Plan[] = [
   },
 ];
 
-export const Pricing = async () => {
-  const t = await getTranslations('Landing');
-  const { userId } = await auth();
-  const isAuthenticated = Boolean(userId);
+export const Pricing = () => {
+  const t = useTranslations('Landing');
 
   return (
     <section id="pricing" className="scroll-mt-20 border-b border-ink-200/60 bg-surface">
@@ -102,16 +99,29 @@ export const Pricing = async () => {
                 </ul>
 
                 <div className="mt-auto pt-8">
-                  <PlanCta
-                    plan={plan.key}
-                    isAuthenticated={isAuthenticated}
-                    label={t(`pricing_${plan.key}_cta` as 'pricing_free_cta')}
-                    className={`inline-flex w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-semibold shadow-sm transition ${
-                      isFeatured
-                        ? 'bg-brand-500 text-white hover:bg-brand-600'
-                        : 'border border-ink-200 bg-surface-elevated text-ink-800 hover:border-ink-300'
-                    }`}
-                  />
+                  {plan.key === 'free' ? (
+                    <Link
+                      href="/sign-up/"
+                      className={`inline-flex w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-semibold shadow-sm transition ${
+                        isFeatured
+                          ? 'bg-brand-500 text-white hover:bg-brand-600'
+                          : 'border border-ink-200 bg-surface-elevated text-ink-800 hover:border-ink-300'
+                      }`}
+                    >
+                      {t(`pricing_${plan.key}_cta` as 'pricing_free_cta')}
+                    </Link>
+                  ) : (
+                    <a
+                      href={`/api/billing/checkout?plan=${plan.key}`}
+                      className={`inline-flex w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-semibold shadow-sm transition ${
+                        isFeatured
+                          ? 'bg-brand-500 text-white hover:bg-brand-600'
+                          : 'border border-ink-200 bg-surface-elevated text-ink-800 hover:border-ink-300'
+                      }`}
+                    >
+                      {t(`pricing_${plan.key}_cta` as 'pricing_free_cta')}
+                    </a>
+                  )}
                   <p className="mt-3 text-xs text-ink-500">
                     {t(`pricing_${plan.key}_note` as 'pricing_free_note')}
                   </p>
