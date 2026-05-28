@@ -570,10 +570,7 @@
     "transcript": "Transcrição original",
     "transcript_disclaimer": "Anexo informativo — não é parte oficial do prontuário",
     "empty": "Sem registro.",
-    "no_intercorrencia": "Sem intercorrências.",
-    "soap_subjective_label": "Relato do paciente / família:",
-    "soap_assessment_label": "Análise clínica:",
-    "soap_plan_label": "Conduta proposta:"
+    "no_intercorrencia": "Sem intercorrências."
   },
   "PatientOverview": {
     "section_personal": "Dados pessoais",
@@ -668,19 +665,13 @@
     "record_again": "Refazer",
     "error_mic": "Não foi possível acessar o microfone. Verifique a permissão do navegador."
   },
-  "SoapEditor": {
-    "letter_subjective": "S",
-    "letter_objective": "O",
-    "letter_assessment": "A",
-    "letter_plan": "P",
-    "label_subjective": "Subjetivo",
-    "label_objective": "Objetivo",
-    "label_assessment": "Avaliação",
-    "label_plan": "Plano",
-    "placeholder_subjective": "Relatos do paciente ou família, queixas, sensações…",
-    "placeholder_objective": "Atividades realizadas, técnicas, observações clínicas…",
-    "placeholder_assessment": "Análise clínica da sessão, evolução, hipóteses…",
-    "placeholder_plan": "O que será feito na próxima sessão…"
+  "EvolutionEditor": {
+    "label_procedimento": "Procedimento",
+    "label_intercorrencia": "Intercorrência",
+    "label_evolucao": "Evolução do estado de saúde",
+    "placeholder_procedimento": "Atividades, técnicas e condutas realizadas na sessão…",
+    "placeholder_intercorrencia": "Algum evento fora do esperado? (recusa, crise sensorial, queda…). Deixe \"Sem intercorrências\" se correu tudo bem.",
+    "placeholder_evolucao": "Resposta e progresso do paciente: o que evoluiu, o que persiste, hipóteses e direcionamento…"
   },
   "NoteComposer": {
     "mode_audio": "Áudio",
@@ -696,7 +687,7 @@
     "review_structured_title": "Rascunho pronto pra revisão",
     "review_structured_hint": "A IA organizou a evolução. Revise, ajuste o que precisar e salve.",
     "review_unstructured_title": "Transcrição pronta, campos em branco",
-    "review_unstructured_hint": "A estruturação automática falhou. Preencha os 4 campos manualmente — sua transcrição está salva acima.",
+    "review_unstructured_hint": "A estruturação automática falhou. Preencha os campos manualmente — sua transcrição está salva acima.",
     "review_ai_locked_title": "IA disponível nos planos pagos",
     "review_ai_locked_hint": "Preencha os campos manualmente abaixo, ou faça upgrade para organizar por IA. Sua nota será salva normalmente.",
     "field_session_date": "Data da sessão",
@@ -706,10 +697,7 @@
     "discard": "Descartar rascunho",
     "appointment_linked_banner": "Evolução vinculada ao atendimento de {appointment}.",
     "objectives_title": "Objetivos trabalhados nesta sessão",
-    "objectives_hint": "Marque o que foi abordado. Vai pesar no relatório trimestral.",
-    "intercorrencia_label": "Intercorrência",
-    "intercorrencia_hint": "Algum evento fora do esperado? (recusa, crise sensorial, queda, etc). CREFITO pede.",
-    "intercorrencia_placeholder": "Deixe em branco se a sessão correu sem incidentes."
+    "objectives_hint": "Marque o que foi abordado. Vai pesar no relatório trimestral."
   },
   "NoteDetail": {
     "ai_disclaimer": "Evolução organizada pela IA. A revisão clínica é sua.",
@@ -721,10 +709,7 @@
     "deleting": "Excluindo…",
     "confirm_delete": "Excluir esta evolução? Essa ação não pode ser desfeita.",
     "error_save": "Não foi possível salvar. Tente de novo.",
-    "error_delete": "Não foi possível excluir. Tente de novo.",
-    "intercorrencia_label": "Intercorrência",
-    "intercorrencia_hint": "Algum evento fora do esperado durante a sessão? CREFITO pede.",
-    "intercorrencia_placeholder": "Deixe em branco se a sessão correu sem incidentes."
+    "error_delete": "Não foi possível excluir. Tente de novo."
   },
   "SchedulePage": {
     "meta_title": "Agenda",

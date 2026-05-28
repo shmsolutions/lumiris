@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
-import { SoapEditor } from '@/components/notes/SoapEditor';
-import type { SoapValues } from '@/components/notes/SoapEditor';
+import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
+import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
 import { useRouter } from '@/libs/I18nNavigation';
 
 type LinkableObjective = {
@@ -26,20 +26,16 @@ type Phase = 'capture' | 'processing' | 'review' | 'saving';
 
 type Draft = {
   transcript: string;
-  soap: SoapValues;
+  evolution: EvolutionValues;
   structured: boolean;
 };
 
-const intercorrenciaInputClass =
-  'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
-
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
-const emptySoap: SoapValues = {
-  subjective: '',
-  objective: '',
-  assessment: '',
-  plan: '',
+const emptyEvolution: EvolutionValues = {
+  procedimento: '',
+  intercorrencia: '',
+  evolucao: '',
 };
 
 export const NoteComposer = (props: NoteComposerProps) => {
@@ -55,7 +51,6 @@ export const NoteComposer = (props: NoteComposerProps) => {
   const [sessionDate, setSessionDate] = useState(todayIso());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [linkedObjectiveIds, setLinkedObjectiveIds] = useState<string[]>([]);
-  const [intercorrencia, setIntercorrencia] = useState('');
   const [aiLocked, setAiLocked] = useState(false);
 
   const toggleObjective = (id: string) => {
@@ -96,7 +91,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
           setAiLocked(true);
           setDraft({
             transcript: mode === 'text' ? textInput : '',
-            soap: emptySoap,
+            evolution: emptyEvolution,
             structured: false,
           });
           setPhase('review');
@@ -112,12 +107,12 @@ export const NoteComposer = (props: NoteComposerProps) => {
       }
 
       const data = (await response.json()) as {
-        draft: { transcript: string; soap: SoapValues; structured: boolean };
+        draft: { transcript: string; evolution: EvolutionValues; structured: boolean };
       };
 
       setDraft({
         transcript: data.draft.transcript ?? '',
-        soap: data.draft.soap ?? emptySoap,
+        evolution: data.draft.evolution ?? emptyEvolution,
         structured: data.draft.structured,
       });
       setPhase('review');
@@ -143,8 +138,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
         transcript: draft.transcript,
         rawText: mode === 'text' ? textInput : '',
         linkedObjectives: linkedObjectiveIds,
-        intercorrencia,
-        ...draft.soap,
+        ...draft.evolution,
       }),
     });
 
@@ -214,32 +208,12 @@ export const NoteComposer = (props: NoteComposerProps) => {
           </details>
         ) : null}
 
-        <SoapEditor
-          value={draft.soap}
-          onChange={(soap) => {
-            setDraft({ ...draft, soap });
+        <EvolutionEditor
+          value={draft.evolution}
+          onChange={(evolution) => {
+            setDraft({ ...draft, evolution });
           }}
         />
-
-        <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
-          <label
-            className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
-            htmlFor="intercorrencia"
-          >
-            {t('intercorrencia_label')}
-          </label>
-          <p className="mt-1 text-xs text-ink-500">{t('intercorrencia_hint')}</p>
-          <textarea
-            id="intercorrencia"
-            rows={2}
-            value={intercorrencia}
-            onChange={(event) => {
-              setIntercorrencia(event.target.value);
-            }}
-            placeholder={t('intercorrencia_placeholder')}
-            className={intercorrenciaInputClass}
-          />
-        </section>
 
         {props.objectives && props.objectives.length > 0 ? (
           <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">

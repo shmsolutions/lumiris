@@ -570,10 +570,7 @@
     "transcript": "Original transcript",
     "transcript_disclaimer": "Informational attachment — not an official part of the record",
     "empty": "No record.",
-    "no_intercorrencia": "No incidents.",
-    "soap_subjective_label": "Patient / family report:",
-    "soap_assessment_label": "Clinical analysis:",
-    "soap_plan_label": "Proposed plan:"
+    "no_intercorrencia": "No incidents."
   },
   "PatientOverview": {
     "section_personal": "Personal data",
@@ -668,19 +665,13 @@
     "record_again": "Record again",
     "error_mic": "Could not access the microphone. Check your browser permission."
   },
-  "SoapEditor": {
-    "letter_subjective": "S",
-    "letter_objective": "O",
-    "letter_assessment": "A",
-    "letter_plan": "P",
-    "label_subjective": "Subjective",
-    "label_objective": "Objective",
-    "label_assessment": "Assessment",
-    "label_plan": "Plan",
-    "placeholder_subjective": "Patient or family reports, complaints, sensations…",
-    "placeholder_objective": "Activities performed, techniques, clinical observations…",
-    "placeholder_assessment": "Clinical analysis of the session, progress, hypotheses…",
-    "placeholder_plan": "What will be done in the next session…"
+  "EvolutionEditor": {
+    "label_procedimento": "Procedure",
+    "label_intercorrencia": "Incident",
+    "label_evolucao": "Health status progress",
+    "placeholder_procedimento": "Activities, techniques and procedures performed in the session…",
+    "placeholder_intercorrencia": "Any unexpected event? (refusal, sensory crisis, fall…). Leave \"No incidents\" if it went fine.",
+    "placeholder_evolucao": "Patient response and progress: what improved, what persists, hypotheses and direction…"
   },
   "NoteComposer": {
     "mode_audio": "Audio",
@@ -696,7 +687,7 @@
     "review_structured_title": "Draft ready for review",
     "review_structured_hint": "AI organized the note. Review, adjust what you need, and save.",
     "review_unstructured_title": "Transcript ready, fields empty",
-    "review_unstructured_hint": "Automatic structuring failed. Fill the 4 fields manually — your transcript is saved above.",
+    "review_unstructured_hint": "Automatic structuring failed. Fill the fields manually — your transcript is saved above.",
     "review_ai_locked_title": "AI available on paid plans",
     "review_ai_locked_hint": "Fill in the fields manually below, or upgrade to organize with AI. Your note will be saved normally.",
     "field_session_date": "Session date",
@@ -706,10 +697,7 @@
     "discard": "Discard draft",
     "appointment_linked_banner": "Note linked to the appointment of {appointment}.",
     "objectives_title": "Objectives addressed in this session",
-    "objectives_hint": "Check the ones worked on. They feed into the quarterly report.",
-    "intercorrencia_label": "Incident",
-    "intercorrencia_hint": "Any unexpected event? (refusal, sensory crisis, fall, etc). Required by CREFITO.",
-    "intercorrencia_placeholder": "Leave blank if the session went without incidents."
+    "objectives_hint": "Check the ones worked on. They feed into the quarterly report."
   },
   "NoteDetail": {
     "ai_disclaimer": "Note organized by AI. Clinical review is yours.",
@@ -721,10 +709,7 @@
     "deleting": "Deleting…",
     "confirm_delete": "Delete this note? This action can't be undone.",
     "error_save": "Could not save. Try again.",
-    "error_delete": "Could not delete. Try again.",
-    "intercorrencia_label": "Incident",
-    "intercorrencia_hint": "Any unexpected event during the session? Required by CREFITO.",
-    "intercorrencia_placeholder": "Leave blank if the session went without incidents."
+    "error_delete": "Could not delete. Try again."
   },
   "SchedulePage": {
     "meta_title": "Schedule",

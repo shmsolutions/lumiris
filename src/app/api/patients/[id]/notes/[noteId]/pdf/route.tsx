@@ -19,30 +19,6 @@ const slug = (name: string) =>
     .replaceAll(/^-+|-+$/g, '')
     .toLowerCase() || 'paciente';
 
-/**
- * Compose the "Evolução do estado de saúde" narrative from SOAP fields.
- * The CREFITO template asks for a single narrative, so we concat the
- * Subjective, Assessment and Plan with line breaks.
- */
-const composeEvolution = (
-  subjective: string,
-  assessment: string,
-  plan: string,
-  labels: { subjective: string; assessment: string; plan: string },
-) => {
-  const parts: string[] = [];
-  if (subjective.trim()) {
-    parts.push(`${labels.subjective}\n${subjective.trim()}`);
-  }
-  if (assessment.trim()) {
-    parts.push(`${labels.assessment}\n${assessment.trim()}`);
-  }
-  if (plan.trim()) {
-    parts.push(`${labels.plan}\n${plan.trim()}`);
-  }
-  return parts.join('\n\n');
-};
-
 export const GET = async (request: Request, context: RouteContext) => {
   const { userId } = await auth();
   const { id, noteId } = await context.params;
@@ -102,17 +78,6 @@ export const GET = async (request: Request, context: RouteContext) => {
     minute: '2-digit',
   }).format(new Date());
 
-  const evolution = composeEvolution(
-    row.note.subjective ?? '',
-    row.note.assessment ?? '',
-    row.note.plan ?? '',
-    {
-      subjective: tPdf('soap_subjective_label'),
-      assessment: tPdf('soap_assessment_label'),
-      plan: tPdf('soap_plan_label'),
-    },
-  );
-
   const pdfBuffer = await renderToBuffer(
     <SessionNotePDF
       patientName={row.patient.fullName}
@@ -121,9 +86,9 @@ export const GET = async (request: Request, context: RouteContext) => {
       cid={row.patient.cid}
       sessionDateLabel={sessionDateLabel}
       generatedAtLabel={tPdf('generated_at', { datetime: generatedAt })}
-      procedures={row.note.objective ?? ''}
+      procedures={row.note.procedimento ?? ''}
       intercorrencia={row.note.intercorrencia ?? ''}
-      evolution={evolution}
+      evolution={row.note.evolucao ?? ''}
       transcript={row.note.transcript}
       therapistName={therapistName}
       therapistCrefito={profile.crefito}

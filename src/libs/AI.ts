@@ -16,11 +16,10 @@ const describeError = (error: unknown): string => {
   return (error as Error)?.message ?? String(error);
 };
 
-export type SoapDraft = {
-  subjective: string;
-  objective: string;
-  assessment: string;
-  plan: string;
+export type EvolutionDraft = {
+  procedimento: string;
+  intercorrencia: string;
+  evolucao: string;
 };
 
 export type ReportObjectiveProgress = { title: string; progress: string };
@@ -42,10 +41,9 @@ export type ReportSource = {
   objectives: { title: string; description: string; status: string }[];
   notes: {
     date: string;
-    objective: string;
-    assessment: string;
-    plan: string;
+    procedimento: string;
     intercorrencia: string;
+    evolucao: string;
     linkedObjectiveTitles: string[];
   }[];
   periodStart: string;
@@ -54,24 +52,22 @@ export type ReportSource = {
 
 export type DraftResult = {
   transcript: string;
-  soap: SoapDraft;
+  evolution: EvolutionDraft;
   /** Source of the transcript ('audio' = Whisper, 'text' = passthrough, 'mock' = local mock). */
   transcriptSource: 'audio' | 'text' | 'mock';
-  /** Did the model actually structure SOAP, or did we fall back to empty fields? */
+  /** Did the model actually structure the fields, or did we fall back to empty ones? */
   structured: boolean;
 };
 
 const MOCK_DRAFT: DraftResult = {
   transcript:
     'Hoje a Helena chegou disposta. Trabalhamos integração sensorial com circuito de obstáculos. Boa coordenação motora grossa, ainda com dificuldade em motricidade fina, principalmente no uso da pinça superior. Mãe relatou melhora na rotina escolar nas últimas duas semanas. Para a próxima, vou focar em atividades de recorte e colagem para reforçar pinça e atenção sustentada.',
-  soap: {
-    subjective:
-      'Mãe relatou melhora na rotina escolar nas últimas duas semanas. Paciente chegou disposta para a sessão.',
-    objective:
-      'Realizado circuito de obstáculos para integração sensorial. Coordenação motora grossa preservada. Dificuldade observada em motricidade fina, especialmente no uso de pinça superior.',
-    assessment:
-      'Evolução positiva em integração sensorial e atenção sustentada. Mantém déficit em motricidade fina compatível com a queixa inicial.',
-    plan: 'Próxima sessão: atividades de recorte e colagem para reforço de pinça superior e atenção sustentada. Manter trabalho com integração sensorial em formato de circuito.',
+  evolution: {
+    procedimento:
+      'Realizado circuito de obstáculos para integração sensorial, com atividades de coordenação motora grossa e estímulo de motricidade fina (uso da pinça superior).',
+    intercorrencia: 'Sem intercorrências.',
+    evolucao:
+      'Paciente chegou disposta e participativa. Coordenação motora grossa preservada; mantém dificuldade em motricidade fina, especialmente no uso da pinça superior. Mãe relatou melhora na rotina escolar nas últimas duas semanas. Evolução positiva em integração sensorial e atenção sustentada. Próximo foco: recorte e colagem para reforço de pinça e atenção sustentada.',
   },
   transcriptSource: 'mock',
   structured: true,
@@ -89,15 +85,14 @@ const getOpenAI = () => {
   return openaiClient;
 };
 
-const SOAP_SYSTEM_PROMPT = `Você é um assistente clínico que ajuda Terapeutas Ocupacionais (TOs) brasileiras a estruturar evoluções de sessão em formato SOAP a partir de transcrições de áudio ou texto livre.
+const STRUCTURE_SYSTEM_PROMPT = `Você é um assistente clínico que ajuda Terapeutas Ocupacionais (TOs) brasileiras a estruturar evoluções de sessão para o prontuário (padrão CREFITO), a partir de transcrições de áudio ou texto livre.
 
 Diretrizes:
-- Use o padrão SOAP: Subjetivo, Objetivo, Avaliação, Plano.
-- Subjetivo: relatos do paciente ou família, sensações, queixas. Frases curtas, em terceira pessoa.
-- Objetivo: o que foi observado e realizado na sessão. Atividades, técnicas, resposta motora/cognitiva/sensorial. Linguagem técnica de TO.
-- Avaliação: análise clínica da TO sobre a sessão. Evolução, dificuldades, hipóteses. Não inventar dados.
-- Plano: o que será feito na próxima sessão. Concreto e acionável.
-- Não invente informação que não está na transcrição. Se um campo não tem base, escreva "Sem registro nesta sessão."
+- Estruture em três campos: Procedimento, Intercorrência e Evolução do estado de saúde.
+- Procedimento: o que foi realizado na sessão — atividades, técnicas e condutas aplicadas. Linguagem técnica de TO, objetiva.
+- Intercorrência: qualquer evento atípico durante a sessão (recusa, mal-estar, alteração de comportamento, evento clínico). Se não houve, escreva "Sem intercorrências".
+- Evolução do estado de saúde: análise clínica da TO sobre a resposta e o progresso do paciente — o que evoluiu, o que persiste, hipóteses e direcionamento.
+- Não invente informação que não está na transcrição. Se um campo não tem base, escreva "Sem registro nesta sessão." (a Intercorrência usa "Sem intercorrências").
 - Português brasileiro, tom profissional clínico, sem floreios.
 - Respeite a fala da TO: se ela usou um termo técnico específico, mantenha.`;
 
@@ -125,7 +120,7 @@ const transcribeWithOpenAI = async (audio: File): Promise<string> => {
   return response.text;
 };
 
-const structureWithOpenAI = async (transcript: string): Promise<SoapDraft> => {
+const structureWithOpenAI = async (transcript: string): Promise<EvolutionDraft> => {
   const client = getOpenAI();
   if (!client) {
     throw new Error('OPENAI_API_KEY not configured');
@@ -134,27 +129,26 @@ const structureWithOpenAI = async (transcript: string): Promise<SoapDraft> => {
   const completion = await client.chat.completions.create({
     model: TEXT_MODEL,
     messages: [
-      { role: 'system', content: SOAP_SYSTEM_PROMPT },
+      { role: 'system', content: STRUCTURE_SYSTEM_PROMPT },
       {
         role: 'user',
-        content: `Estruture a seguinte transcrição em formato SOAP:\n\n${transcript}`,
+        content: `Estruture a seguinte transcrição em Procedimento, Intercorrência e Evolução do estado de saúde:\n\n${transcript}`,
       },
     ],
     response_format: {
       type: 'json_schema',
       json_schema: {
-        name: 'soap_note',
+        name: 'evolution_note',
         strict: true,
         schema: {
           type: 'object',
           additionalProperties: false,
           properties: {
-            subjective: { type: 'string' },
-            objective: { type: 'string' },
-            assessment: { type: 'string' },
-            plan: { type: 'string' },
+            procedimento: { type: 'string' },
+            intercorrencia: { type: 'string' },
+            evolucao: { type: 'string' },
           },
-          required: ['subjective', 'objective', 'assessment', 'plan'],
+          required: ['procedimento', 'intercorrencia', 'evolucao'],
         },
       },
     },
@@ -162,23 +156,21 @@ const structureWithOpenAI = async (transcript: string): Promise<SoapDraft> => {
 
   const content = completion.choices[0]?.message.content;
   if (!content) {
-    throw new Error('OpenAI did not return structured SOAP');
+    throw new Error('OpenAI did not return a structured evolution');
   }
 
-  const input = JSON.parse(content) as SoapDraft;
+  const input = JSON.parse(content) as EvolutionDraft;
   return {
-    subjective: input.subjective ?? '',
-    objective: input.objective ?? '',
-    assessment: input.assessment ?? '',
-    plan: input.plan ?? '',
+    procedimento: input.procedimento ?? '',
+    intercorrencia: input.intercorrencia ?? '',
+    evolucao: input.evolucao ?? '',
   };
 };
 
-const emptySoap = (): SoapDraft => ({
-  subjective: '',
-  objective: '',
-  assessment: '',
-  plan: '',
+const emptyEvolution = (): EvolutionDraft => ({
+  procedimento: '',
+  intercorrencia: '',
+  evolucao: '',
 });
 
 /**
@@ -205,20 +197,20 @@ export const buildDraftFromAudio = async (audio: File): Promise<DraftResult> => 
   if (!transcript.trim()) {
     return {
       transcript: '',
-      soap: emptySoap(),
+      evolution: emptyEvolution(),
       transcriptSource,
       structured: false,
     };
   }
 
   try {
-    const soap = await structureWithOpenAI(transcript);
-    return { transcript, soap, transcriptSource, structured: true };
+    const evolution = await structureWithOpenAI(transcript);
+    return { transcript, evolution, transcriptSource, structured: true };
   } catch (error) {
-    logger.error(`SOAP structuring failed: ${describeError(error)}`);
+    logger.error(`Evolution structuring failed: ${describeError(error)}`);
     return {
       transcript,
-      soap: emptySoap(),
+      evolution: emptyEvolution(),
       transcriptSource,
       structured: false,
     };
@@ -292,9 +284,8 @@ export const generateReport = async (source: ReportSource): Promise<ReportConten
     .map(
       (n) =>
         `Sessão ${n.date}${n.linkedObjectiveTitles.length ? ` (objetivos: ${n.linkedObjectiveTitles.join('; ')})` : ''}\n` +
-        `Procedimentos/observações: ${n.objective}\n` +
-        `Avaliação: ${n.assessment}\n` +
-        `Plano: ${n.plan}\n${n.intercorrencia ? `Intercorrência: ${n.intercorrencia}\n` : ''}`,
+        `Procedimento: ${n.procedimento}\n` +
+        `Evolução: ${n.evolucao}\n${n.intercorrencia ? `Intercorrência: ${n.intercorrencia}\n` : ''}`,
     )
     .join('\n---\n');
 
@@ -388,25 +379,25 @@ export const buildDraftFromText = async (text: string): Promise<DraftResult> => 
   if (!text.trim()) {
     return {
       transcript: '',
-      soap: emptySoap(),
+      evolution: emptyEvolution(),
       transcriptSource: 'text',
       structured: false,
     };
   }
 
   try {
-    const soap = await structureWithOpenAI(text);
+    const evolution = await structureWithOpenAI(text);
     return {
       transcript: text,
-      soap,
+      evolution,
       transcriptSource: 'text',
       structured: true,
     };
   } catch (error) {
-    logger.error(`SOAP structuring failed: ${describeError(error)}`);
+    logger.error(`Evolution structuring failed: ${describeError(error)}`);
     return {
       transcript: text,
-      soap: emptySoap(),
+      evolution: emptyEvolution(),
       transcriptSource: 'text',
       structured: false,
     };

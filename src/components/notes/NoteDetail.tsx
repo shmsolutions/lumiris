@@ -3,31 +3,26 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { SoapEditor } from '@/components/notes/SoapEditor';
-import type { SoapValues } from '@/components/notes/SoapEditor';
+import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
+import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
 import { useRouter } from '@/libs/I18nNavigation';
 
 type NoteDetailProps = {
   patientId: string;
   noteId: string;
-  initialValues: SoapValues & { transcript: string; intercorrencia: string };
+  initialValues: EvolutionValues & { transcript: string };
 };
-
-const intercorrenciaClass =
-  'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:bg-ink-50';
 
 export const NoteDetail = (props: NoteDetailProps) => {
   const t = useTranslations('NoteDetail');
   const tCommon = useTranslations('Common');
   const router = useRouter();
 
-  const [soap, setSoap] = useState<SoapValues>({
-    subjective: props.initialValues.subjective,
-    objective: props.initialValues.objective,
-    assessment: props.initialValues.assessment,
-    plan: props.initialValues.plan,
+  const [evolution, setEvolution] = useState<EvolutionValues>({
+    procedimento: props.initialValues.procedimento,
+    intercorrencia: props.initialValues.intercorrencia,
+    evolucao: props.initialValues.evolucao,
   });
-  const [intercorrencia, setIntercorrencia] = useState(props.initialValues.intercorrencia);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -39,7 +34,7 @@ export const NoteDetail = (props: NoteDetailProps) => {
     const response = await fetch(`/api/patients/${props.patientId}/notes/${props.noteId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...soap, intercorrencia }),
+      body: JSON.stringify(evolution),
     });
     setSaving(false);
     if (!response.ok) {
@@ -83,28 +78,7 @@ export const NoteDetail = (props: NoteDetailProps) => {
         </details>
       ) : null}
 
-      <SoapEditor value={soap} onChange={setSoap} disabled={saving || deleting} />
-
-      <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
-        <label
-          className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
-          htmlFor="intercorrencia"
-        >
-          {t('intercorrencia_label')}
-        </label>
-        <p className="mt-1 text-xs text-ink-500">{t('intercorrencia_hint')}</p>
-        <textarea
-          id="intercorrencia"
-          rows={2}
-          value={intercorrencia}
-          onChange={(event) => {
-            setIntercorrencia(event.target.value);
-          }}
-          disabled={saving || deleting}
-          placeholder={t('intercorrencia_placeholder')}
-          className={intercorrenciaClass}
-        />
-      </section>
+      <EvolutionEditor value={evolution} onChange={setEvolution} disabled={saving || deleting} />
 
       {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}
 

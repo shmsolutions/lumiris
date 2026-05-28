@@ -1,10 +1,9 @@
 import * as z from 'zod';
 
-export const SoapValidation = z.object({
-  subjective: z.string().default(''),
-  objective: z.string().default(''),
-  assessment: z.string().default(''),
-  plan: z.string().default(''),
+export const EvolutionValidation = z.object({
+  procedimento: z.string().default(''),
+  intercorrencia: z.string().default(''),
+  evolucao: z.string().default(''),
 });
 
 export const SessionNoteCreateValidation = z.object({
@@ -12,11 +11,9 @@ export const SessionNoteCreateValidation = z.object({
   appointmentId: z.uuid().optional().nullable(),
   transcript: z.string().optional().default(''),
   rawText: z.string().optional().default(''),
-  subjective: z.string().default(''),
-  objective: z.string().default(''),
-  assessment: z.string().default(''),
-  plan: z.string().default(''),
+  procedimento: z.string().default(''),
   intercorrencia: z.string().default(''),
+  evolucao: z.string().default(''),
   linkedObjectives: z.array(z.uuid()).default([]),
 });
 

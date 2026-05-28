@@ -130,12 +130,10 @@ export default async function NoteDetailPage(props: NoteDetailPageProps) {
         patientId={id}
         noteId={note.id}
         initialValues={{
-          subjective: note.subjective ?? '',
-          objective: note.objective ?? '',
-          assessment: note.assessment ?? '',
-          plan: note.plan ?? '',
-          transcript: note.transcript ?? '',
+          procedimento: note.procedimento ?? '',
           intercorrencia: note.intercorrencia ?? '',
+          evolucao: note.evolucao ?? '',
+          transcript: note.transcript ?? '',
         }}
       />
     </div>

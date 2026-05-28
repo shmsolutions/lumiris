@@ -13,8 +13,8 @@ type NotesPageProps = {
 };
 
 const previewText = (note: typeof sessionNoteSchema.$inferSelect) => {
-  const fields = [note.subjective, note.objective, note.assessment, note.plan].filter(
-    (s): s is string => Boolean(s?.trim()),
+  const fields = [note.procedimento, note.evolucao, note.intercorrencia].filter((s): s is string =>
+    Boolean(s?.trim()),
   );
   return fields[0]?.slice(0, 180) ?? '';
 };

@@ -99,10 +99,9 @@ export const POST = async (request: Request, context: RouteContext) => {
       const linkedIds = Array.isArray(n.linkedObjectives) ? (n.linkedObjectives as string[]) : [];
       return {
         date: n.sessionDate,
-        objective: n.objective ?? '',
-        assessment: n.assessment ?? '',
-        plan: n.plan ?? '',
+        procedimento: n.procedimento ?? '',
         intercorrencia: n.intercorrencia ?? '',
+        evolucao: n.evolucao ?? '',
         linkedObjectiveTitles: linkedIds
           .map((oid) => objectiveTitleById.get(oid))
           .filter((title): title is string => Boolean(title)),

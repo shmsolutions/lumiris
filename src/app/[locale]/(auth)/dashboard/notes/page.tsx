@@ -19,15 +19,14 @@ export async function generateMetadata(props: NotesPageProps): Promise<Metadata>
 }
 
 type PreviewableNote = {
-  subjective: string | null;
-  objective: string | null;
-  assessment: string | null;
-  plan: string | null;
+  procedimento: string | null;
+  intercorrencia: string | null;
+  evolucao: string | null;
 };
 
 const previewText = (note: PreviewableNote) => {
-  const fields = [note.subjective, note.objective, note.assessment, note.plan].filter(
-    (s): s is string => Boolean(s?.trim()),
+  const fields = [note.procedimento, note.evolucao, note.intercorrencia].filter((s): s is string =>
+    Boolean(s?.trim()),
   );
   return fields[0]?.slice(0, 200) ?? '';
 };
@@ -48,10 +47,9 @@ export default async function NotesTimelinePage(props: NotesPageProps) {
           patientName: patientSchema.fullName,
           sessionDate: sessionNoteSchema.sessionDate,
           createdAt: sessionNoteSchema.createdAt,
-          subjective: sessionNoteSchema.subjective,
-          objective: sessionNoteSchema.objective,
-          assessment: sessionNoteSchema.assessment,
-          plan: sessionNoteSchema.plan,
+          procedimento: sessionNoteSchema.procedimento,
+          intercorrencia: sessionNoteSchema.intercorrencia,
+          evolucao: sessionNoteSchema.evolucao,
           transcript: sessionNoteSchema.transcript,
           rawText: sessionNoteSchema.rawText,
           linkedObjectives: sessionNoteSchema.linkedObjectives,

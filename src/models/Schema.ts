@@ -209,11 +209,9 @@ export const sessionNoteSchema = pgTable('session_note', {
   sessionDate: date('session_date', { mode: 'string' }).notNull(),
   rawText: text('raw_text'),
   transcript: text('transcript'),
-  subjective: text('subjective'),
-  objective: text('objective'),
-  assessment: text('assessment'),
-  plan: text('plan'),
+  procedimento: text('procedimento'),
   intercorrencia: text('intercorrencia'),
+  evolucao: text('evolucao'),
   linkedObjectives: jsonb('linked_objectives').default(sql`'[]'::jsonb`),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
