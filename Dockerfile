@@ -29,15 +29,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build:next
 
-# ---- Migrator (one-shot) -------------------------------------------------
-# Small image that only applies migrations, then exits.
-FROM base AS migrator
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json ./package.json
-COPY migrations ./migrations
-COPY scripts/migrate.mjs ./scripts/migrate.mjs
-CMD ["node", "scripts/migrate.mjs"]
-
 # ---- Runner --------------------------------------------------------------
 FROM base AS runner
 ENV NODE_ENV=production
@@ -52,7 +43,10 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Migration runner (not part of the app import graph, so copied explicitly).
+COPY --chown=nextjs:nodejs scripts/migrate.mjs ./scripts/migrate.mjs
 
 USER nextjs
 EXPOSE 3000
-CMD ["node", "server.js"]
+# Apply pending migrations, then start the server.
+CMD ["sh", "-c", "node scripts/migrate.mjs && node server.js"]

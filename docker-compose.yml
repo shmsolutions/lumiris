@@ -14,17 +14,6 @@ services:
       timeout: 5s
       retries: 10
 
-  # Applies pending migrations, then exits. The app waits for it to succeed.
-  migrate:
-    build:
-      context: .
-      target: migrator
-    env_file: .env.production
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: 'no'
-
   app:
     build:
       context: .
@@ -35,9 +24,10 @@ services:
         NEXT_PUBLIC_SENTRY_DISABLED: ${NEXT_PUBLIC_SENTRY_DISABLED:-true}
     env_file: .env.production
     restart: unless-stopped
+    # The container applies pending migrations on startup (see Dockerfile CMD).
     depends_on:
-      migrate:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     expose:
       - '3000'
 

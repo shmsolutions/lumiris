@@ -18,7 +18,10 @@ const baseConfig: NextConfig = {
     browserToTerminal: process.env.BROWSER_TO_TERMINAL_DISABLED !== 'true',
   },
   outputFileTracingIncludes: {
-    '/': ['./migrations/**/*'],
+    // Ship migrations + the drizzle migrator/pg files into the standalone
+    // bundle so the container can self-apply migrations on startup (they
+    // aren't reachable from the app's import graph).
+    '/': ['./migrations/**/*', './node_modules/drizzle-orm/**/*', './node_modules/pg/**/*'],
   },
 };
 
