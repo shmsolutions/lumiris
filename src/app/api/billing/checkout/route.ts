@@ -4,16 +4,27 @@ import * as z from 'zod';
 import { logger } from '@/libs/Logger';
 import { upsertUserProfile } from '@/libs/UserProfile';
 import { createCharge } from '@/libs/Woovi';
+import type { CheckoutResult } from '@/libs/Woovi';
 import { isPaidPlan } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
 
+/** Woovi statuses that mean "this charge was already paid". */
+const PAID_STATUSES = new Set(['COMPLETED', 'CONFIRMED', 'PAID']);
+const isAlreadyPaid = (status: string) => PAID_STATUSES.has(status.toUpperCase());
+
+const oneMonthFromNow = () => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+};
+
 /**
- * Create the Woovi subscription for a user and persist its reference. The plan
- * is only unlocked once the payment webhook confirms it. Returns the checkout
- * URL, or null on failure.
+ * Cria/recupera a cobrança no Woovi e marca a assinatura como pendente.
+ * Devolve o resultado bruto (com status e URL) pra quem chamou decidir
+ * se mostra o checkout ou reconcilia um pagamento já feito.
  */
-const startCheckout = async (userId: string, plan: PaidPlanId): Promise<string | null> => {
+const startCheckout = async (userId: string, plan: PaidPlanId): Promise<CheckoutResult | null> => {
   const user = await currentUser().catch(() => null);
   const name =
     [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() || 'Terapeuta Lumiris';
@@ -35,7 +46,7 @@ const startCheckout = async (userId: string, plan: PaidPlanId): Promise<string |
     subscriptionStatus: 'pending',
   });
 
-  return charge.checkoutUrl;
+  return charge;
 };
 
 export const POST = async (request: Request) => {
@@ -50,12 +61,12 @@ export const POST = async (request: Request) => {
     return NextResponse.json(z.treeifyError(parse.error), { status: 422 });
   }
 
-  const checkoutUrl = await startCheckout(userId, parse.data.plan);
-  if (!checkoutUrl) {
+  const result = await startCheckout(userId, parse.data.plan);
+  if (!result) {
     return NextResponse.json({ error: 'checkout_failed' }, { status: 502 });
   }
 
-  return NextResponse.json({ checkoutUrl });
+  return NextResponse.json({ checkoutUrl: result.checkoutUrl, status: result.status });
 };
 
 /**
@@ -80,6 +91,23 @@ export const GET = async (request: Request) => {
     return redirectTo('/dashboard/');
   }
 
-  const checkoutUrl = await startCheckout(userId, plan);
-  return redirectTo(checkoutUrl ?? '/dashboard/settings/billing/');
+  const result = await startCheckout(userId, plan);
+  if (!result) {
+    return redirectTo('/dashboard/settings/billing/');
+  }
+
+  // The user already paid this charge — webhook clearly didn't reconcile
+  // (network, signature, missing setup). Activate the plan now and send
+  // them to the billing page, instead of dumping them on the Woovi paid
+  // receipt page again.
+  if (isAlreadyPaid(result.status)) {
+    await upsertUserProfile(userId, {
+      plan,
+      subscriptionStatus: 'active',
+      currentPeriodEnd: oneMonthFromNow(),
+    });
+    return redirectTo('/dashboard/settings/billing/?paid=1');
+  }
+
+  return redirectTo(result.checkoutUrl);
 };
