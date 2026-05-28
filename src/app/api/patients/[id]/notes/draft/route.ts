@@ -8,6 +8,10 @@ import { getEntitlements } from '@/libs/Entitlements';
 import { patientSchema } from '@/models/Schema';
 import { DraftFromTextValidation } from '@/validations/SessionNoteValidation';
 
+// Audio transcription (Whisper) + SOAP structuring are two sequential OpenAI
+// calls; longer recordings exceed the platform default timeout. Allow up to 60s.
+export const maxDuration = 60;
+
 type RouteContext = { params: Promise<{ id: string }> };
 
 const assertPatientOwned = async (patientId: string, userId: string) => {
