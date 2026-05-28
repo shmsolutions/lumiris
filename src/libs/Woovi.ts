@@ -209,6 +209,30 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
 };
 
 /**
+ * Aceita um PEM em qualquer formato que tenha sobrevivido a um campo de env:
+ * quebras reais, `\n` literais (Vercel/Coolify), ou tudo numa linha só com
+ * espaços (cole-direto sem escape). Reconstrói o bloco PEM canônico.
+ */
+const normalizePem = (raw: string): string => {
+  const withNewlines = raw.includes('\\n') ? raw.replaceAll('\\n', '\n') : raw;
+  if (withNewlines.includes('\n')) {
+    return withNewlines;
+  }
+  // Single-line PEM (Coolify-style): reconstrói os blocos a 64 chars por linha.
+  const match = withNewlines.match(/-----BEGIN ([A-Z ]+)-----\s*(.+?)\s*-----END \1-----/);
+  if (!match) {
+    return withNewlines;
+  }
+  const [, type, base64] = match;
+  const body =
+    (base64 ?? '')
+      .replaceAll(/\s+/g, '')
+      .match(/.{1,64}/g)
+      ?.join('\n') ?? base64;
+  return `-----BEGIN ${type}-----\n${body}\n-----END ${type}-----`;
+};
+
+/**
  * Valida a assinatura do webhook contra a chave pública do Woovi (RSA-SHA256).
  * Em produção real (não-mock), a chave é obrigatória: sem ela, rejeita. Em
  * dev/mock, aceita sem validar e registra um aviso.
@@ -226,8 +250,7 @@ export const verifyWebhookSignature = (rawBody: string, signature: string | null
   if (!signature) {
     return false;
   }
-  // Vercel/CI guardam o PEM com `\n` literal; converte de volta em quebras reais.
-  const publicKey = rawKey.includes('\\n') ? rawKey.replaceAll('\\n', '\n') : rawKey;
+  const publicKey = normalizePem(rawKey);
   try {
     const verifier = createVerify('RSA-SHA256');
     verifier.update(rawBody);
