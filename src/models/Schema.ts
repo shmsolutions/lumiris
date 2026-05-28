@@ -219,3 +219,23 @@ export const sessionNoteSchema = pgTable('session_note', {
     .notNull(),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+/**
+ * Histórico de cobranças do Woovi. Uma row por charge criado; o status muda
+ * via webhook (pago/cancelado). Alimenta a lista de pagamentos no billing.
+ */
+export const paymentSchema = pgTable('payment', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  ownerId: varchar('owner_id', { length: 64 }).notNull(),
+  /** Nosso correlationID único enviado ao Woovi — chave pra mapear o webhook. */
+  correlationId: varchar('correlation_id', { length: 120 }).notNull().unique(),
+  /** globalID/id da cobrança no Woovi, pra rastreio. */
+  wooviChargeId: varchar('woovi_charge_id', { length: 120 }),
+  plan: varchar('plan', { length: 16 }).notNull(),
+  valueCents: integer('value_cents').notNull(),
+  /** pending | paid | canceled | expired */
+  status: varchar('status', { length: 32 }).default('pending').notNull(),
+  paymentLinkUrl: text('payment_link_url'),
+  paidAt: timestamp('paid_at', { mode: 'date' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});

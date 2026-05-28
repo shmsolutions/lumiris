@@ -2,10 +2,11 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { logger } from '@/libs/Logger';
+import { markPaymentPaid, recordPayment } from '@/libs/Payments';
 import { upsertUserProfile } from '@/libs/UserProfile';
 import { createCharge } from '@/libs/Woovi';
 import type { CheckoutResult } from '@/libs/Woovi';
-import { isPaidPlan } from '@/utils/Plans';
+import { isPaidPlan, PLAN_PRICE_CENTS } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
 
@@ -41,10 +42,20 @@ const startCheckout = async (userId: string, plan: PaidPlanId): Promise<Checkout
     return null;
   }
 
-  await upsertUserProfile(userId, {
-    wooviSubscriptionId: charge.chargeId,
-    subscriptionStatus: 'pending',
-  });
+  await Promise.all([
+    upsertUserProfile(userId, {
+      wooviSubscriptionId: charge.chargeId,
+      subscriptionStatus: 'pending',
+    }),
+    recordPayment({
+      ownerId: userId,
+      correlationId: charge.correlationId,
+      wooviChargeId: charge.chargeId,
+      plan,
+      valueCents: PLAN_PRICE_CENTS[plan],
+      paymentLinkUrl: charge.checkoutUrl,
+    }),
+  ]);
 
   return charge;
 };
@@ -101,11 +112,14 @@ export const GET = async (request: Request) => {
   // them to the billing page, instead of dumping them on the Woovi paid
   // receipt page again.
   if (isAlreadyPaid(result.status)) {
-    await upsertUserProfile(userId, {
-      plan,
-      subscriptionStatus: 'active',
-      currentPeriodEnd: oneMonthFromNow(),
-    });
+    await Promise.all([
+      upsertUserProfile(userId, {
+        plan,
+        subscriptionStatus: 'active',
+        currentPeriodEnd: oneMonthFromNow(),
+      }),
+      markPaymentPaid(result.correlationId),
+    ]);
     return redirectTo('/dashboard/settings/billing/?paid=1');
   }
 

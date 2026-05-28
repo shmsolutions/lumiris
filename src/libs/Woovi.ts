@@ -44,6 +44,8 @@ type CheckoutCustomer = {
 
 export type CheckoutResult = {
   chargeId: string;
+  /** correlationID enviado ao Woovi — usado pra persistir e mapear o webhook. */
+  correlationId: string;
   checkoutUrl: string;
   status: string;
 };
@@ -92,6 +94,7 @@ const fetchExistingCharge = async (correlationID: string): Promise<CheckoutResul
 
   return {
     chargeId: charge.globalID ?? charge.id ?? correlationID,
+    correlationId: correlationID,
     checkoutUrl,
     status: charge.status ?? 'pending',
   };
@@ -114,6 +117,7 @@ export const createCharge = async (input: {
   if (isBillingMockMode) {
     return {
       chargeId: `mock_${input.plan}_${input.userId}`,
+      correlationId: correlationID,
       checkoutUrl: `/api/billing/mock-confirm?plan=${input.plan}`,
       status: 'mock',
     };
@@ -173,6 +177,7 @@ export const createCharge = async (input: {
 
   return {
     chargeId: charge.globalID ?? charge.id ?? correlationID,
+    correlationId: correlationID,
     checkoutUrl,
     status: charge.status ?? 'pending',
   };
@@ -192,6 +197,8 @@ export type BillingEvent = {
   kind: 'paid' | 'canceled' | 'unknown';
   userId: string | null;
   plan: PlanId | null;
+  /** correlationID do payload, usado pra atualizar a row de pagamento. */
+  correlationId: string | null;
 };
 
 type WooviWebhookPayload = {
@@ -208,18 +215,19 @@ type WooviWebhookPayload = {
 export const parseWebhookEvent = (raw: unknown): BillingEvent => {
   const payload = (raw ?? {}) as WooviWebhookPayload;
   const event = payload.event ?? '';
-  const correlationID = payload.charge?.correlationID ?? payload.subscription?.correlationID;
+  const correlationID =
+    payload.charge?.correlationID ?? payload.subscription?.correlationID ?? null;
   const userId = userIdFromCorrelationId(correlationID);
   const valueCents = payload.charge?.value ?? payload.subscription?.value ?? 0;
   const plan = getPlanByValueCents(valueCents);
 
   if (event.includes('COMPLETED') || event.includes('CONFIRMED') || event.includes('RECEIVED')) {
-    return { kind: 'paid', userId, plan };
+    return { kind: 'paid', userId, plan, correlationId: correlationID };
   }
   if (event.includes('EXPIRED') || event.includes('CANCEL') || event.includes('DELETE')) {
-    return { kind: 'canceled', userId, plan };
+    return { kind: 'canceled', userId, plan, correlationId: correlationID };
   }
-  return { kind: 'unknown', userId, plan };
+  return { kind: 'unknown', userId, plan, correlationId: correlationID };
 };
 
 /**

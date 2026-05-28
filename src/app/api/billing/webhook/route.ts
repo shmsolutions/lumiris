@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { logger } from '@/libs/Logger';
+import { markPaymentCanceled, markPaymentPaid } from '@/libs/Payments';
 import { upsertUserProfile } from '@/libs/UserProfile';
 import { parseWebhookEvent, verifyWebhookSignature } from '@/libs/Woovi';
 
@@ -41,12 +42,18 @@ export const POST = async (request: Request) => {
         subscriptionStatus: 'active',
         currentPeriodEnd: oneMonthFromNow(),
       });
+      if (event.correlationId) {
+        await markPaymentPaid(event.correlationId);
+      }
       logger.info(`Plano ${event.plan} liberado para ${event.userId} via Woovi`);
     } else if (event.kind === 'canceled') {
       await upsertUserProfile(event.userId, {
         plan: 'free',
         subscriptionStatus: 'canceled',
       });
+      if (event.correlationId) {
+        await markPaymentCanceled(event.correlationId);
+      }
       logger.info(`Assinatura cancelada/expirada para ${event.userId} — voltou pro free`);
     }
   } catch (error) {
