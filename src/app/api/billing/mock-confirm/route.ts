@@ -37,5 +37,10 @@ export const GET = async (request: Request) => {
     currentPeriodEnd: oneMonthFromNow(),
   });
 
-  return NextResponse.redirect(new URL('/dashboard/settings/billing/?paid=1', request.url));
+  // Relative redirect so the browser resolves it against the public domain,
+  // not the internal proxy host (0.0.0.0:3000) seen via request.url.
+  return new NextResponse(null, {
+    status: 302,
+    headers: { Location: '/dashboard/settings/billing/?paid=1' },
+  });
 };

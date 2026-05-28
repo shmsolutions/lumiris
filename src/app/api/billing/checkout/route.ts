@@ -63,17 +63,23 @@ export const POST = async (request: Request) => {
  * landing page has no Clerk context). Logged-out visitors are sent to sign-up;
  * logged-in ones go straight to the plan's checkout.
  */
+// A relative Location lets the browser resolve it against the public domain it
+// requested; building an absolute URL from request.url would leak the internal
+// proxy host (e.g. 0.0.0.0:3000) behind Traefik.
+const redirectTo = (location: string) =>
+  new NextResponse(null, { status: 302, headers: { Location: location } });
+
 export const GET = async (request: Request) => {
   const { userId } = await auth();
   const plan = new URL(request.url).searchParams.get('plan') as PlanId | null;
 
   if (!userId) {
-    return NextResponse.redirect(new URL('/sign-up/', request.url));
+    return redirectTo('/sign-up/');
   }
   if (!plan || !isPaidPlan(plan)) {
-    return NextResponse.redirect(new URL('/dashboard/', request.url));
+    return redirectTo('/dashboard/');
   }
 
   const checkoutUrl = await startCheckout(userId, plan);
-  return NextResponse.redirect(new URL(checkoutUrl ?? '/dashboard/settings/billing/', request.url));
+  return redirectTo(checkoutUrl ?? '/dashboard/settings/billing/');
 };
