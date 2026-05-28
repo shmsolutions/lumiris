@@ -10,7 +10,7 @@ import {
   ReportsIcon,
   ScheduleIcon,
   SettingsIcon,
-  SparkIcon,
+  StarIcon,
 } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
 import type { PlanId } from '@/utils/Plans';
@@ -116,11 +116,11 @@ export const SidebarNav = (props: SidebarNavProps) => {
       <div className="border-t border-ink-200 px-5 py-4">
         {isPaid ? (
           <Link
-            href="/dashboard/settings/billing/"
+            href="/dashboard/settings/?tab=plano"
             className="flex items-center gap-3 rounded-md bg-brand-50 px-3 py-2.5 text-xs transition hover:bg-brand-100"
           >
             <span className="inline-flex size-7 items-center justify-center rounded-md bg-brand-500 text-white">
-              <SparkIcon size={14} />
+              <StarIcon size={14} />
             </span>
             <span className="flex-1">
               <span className="block font-semibold text-brand-800">

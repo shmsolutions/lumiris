@@ -1,9 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { CheckIcon, SparkIcon } from '@/components/dashboard/Icons';
+import { CheckIcon, StarIcon } from '@/components/dashboard/Icons';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
@@ -17,6 +17,10 @@ type BillingPanelProps = {
 
 /** Conta os dígitos do CPF/CNPJ; 11 (CPF) ou 14 (CNPJ) é válido. */
 const taxIdDigits = (value: string) => value.replaceAll(/\D/g, '');
+const isValidTaxId = (value: string) => {
+  const digits = taxIdDigits(value);
+  return digits.length === 11 || digits.length === 14;
+};
 
 const paidPlans: PaidPlanId[] = ['student', 'pro'];
 const recommendedPlan: PaidPlanId = 'pro';
@@ -34,6 +38,9 @@ export const BillingPanel = (props: BillingPanelProps) => {
   const [canceling, setCanceling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [taxId, setTaxId] = useState(props.initialTaxId ?? '');
+  const [taxIdError, setTaxIdError] = useState<string | null>(null);
+  const [pendingPlan, setPendingPlan] = useState<PaidPlanId | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
 
   const isPaid = props.currentPlan !== 'free';
 
@@ -49,13 +56,8 @@ export const BillingPanel = (props: BillingPanelProps) => {
     router.refresh();
   };
 
-  const startCheckout = async (plan: PaidPlanId) => {
+  const checkout = async (plan: PaidPlanId, digits: string) => {
     setErrorMessage(null);
-    const digits = taxIdDigits(taxId);
-    if (digits.length !== 11 && digits.length !== 14) {
-      setErrorMessage(t('error_tax_id'));
-      return;
-    }
     setLoadingPlan(plan);
     const response = await fetch('/api/billing/checkout', {
       method: 'POST',
@@ -76,6 +78,28 @@ export const BillingPanel = (props: BillingPanelProps) => {
     // Abre em nova aba pra o usuário não perder o contexto do app.
     window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
     setLoadingPlan(null);
+  };
+
+  // Clicar em assinar: se já temos um CPF válido salvo, vai direto; senão pede.
+  const onSubscribe = (plan: PaidPlanId) => {
+    if (isValidTaxId(taxId)) {
+      void checkout(plan, taxIdDigits(taxId));
+      return;
+    }
+    setPendingPlan(plan);
+    setTaxIdError(null);
+    dialogRef.current?.showModal();
+  };
+
+  const confirmTaxId = () => {
+    if (!isValidTaxId(taxId)) {
+      setTaxIdError(t('error_tax_id'));
+      return;
+    }
+    dialogRef.current?.close();
+    if (pendingPlan) {
+      void checkout(pendingPlan, taxIdDigits(taxId));
+    }
   };
 
   return (
@@ -128,28 +152,6 @@ export const BillingPanel = (props: BillingPanelProps) => {
         {cancelError ? <p className="mt-3 text-xs text-danger">{cancelError}</p> : null}
       </div>
 
-      {isPaid ? null : (
-        <div className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
-          <label
-            htmlFor="taxId"
-            className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
-          >
-            {t('label_tax_id')}
-          </label>
-          <input
-            id="taxId"
-            inputMode="numeric"
-            className="mt-1.5 w-full max-w-xs rounded-md border border-ink-200 bg-surface px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
-            placeholder={t('placeholder_tax_id')}
-            value={taxId}
-            onChange={(e) => {
-              setTaxId(e.target.value);
-            }}
-          />
-          <p className="mt-1.5 text-xs text-ink-500">{t('hint_tax_id')}</p>
-        </div>
-      )}
-
       <div className="grid gap-4 sm:grid-cols-2">
         {paidPlans.map((plan) => {
           const isCurrent = props.currentPlan === plan;
@@ -166,21 +168,16 @@ export const BillingPanel = (props: BillingPanelProps) => {
             >
               {isRecommended ? (
                 <span className="absolute -top-2.5 right-5 inline-flex items-center gap-1 rounded-full bg-brand-500 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
-                  <SparkIcon size={11} />
+                  <StarIcon size={11} />
                   {t('recommended')}
                 </span>
               ) : null}
 
-              <div className="flex items-center gap-2">
-                <span className="inline-flex size-9 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
-                  <SparkIcon size={18} />
-                </span>
-                <span className="text-base font-semibold text-ink-900">
-                  {t(`plan_${plan}_name` as 'plan_student_name')}
-                </span>
-              </div>
+              <span className="text-base font-semibold text-ink-900">
+                {t(`plan_${plan}_name` as 'plan_student_name')}
+              </span>
 
-              <div className="mt-4 flex items-baseline gap-1">
+              <div className="mt-3 flex items-baseline gap-1">
                 <span className="text-3xl font-bold tracking-tight text-ink-900">
                   {t(`plan_${plan}_amount` as 'plan_student_amount')}
                 </span>
@@ -205,7 +202,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
               <button
                 type="button"
                 onClick={() => {
-                  void startCheckout(plan);
+                  onSubscribe(plan);
                 }}
                 disabled={isCurrent || loadingPlan !== null}
                 className={`mt-6 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed ${
@@ -229,6 +226,44 @@ export const BillingPanel = (props: BillingPanelProps) => {
       {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}
 
       <p className="text-xs text-ink-500">{t('pix_note')}</p>
+
+      <dialog
+        ref={dialogRef}
+        className="m-auto w-[calc(100vw-2rem)] max-w-sm rounded-xl border border-ink-200 bg-surface-elevated p-6 text-ink-800 shadow-xl backdrop:bg-ink-900/40"
+      >
+        <p className="text-sm font-semibold text-ink-900">{t('tax_id_dialog_title')}</p>
+        <p className="mt-1 text-xs text-ink-500">{t('hint_tax_id')}</p>
+        <input
+          inputMode="numeric"
+          aria-label={t('label_tax_id')}
+          className="mt-4 w-full rounded-md border border-ink-200 bg-surface px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+          placeholder={t('placeholder_tax_id')}
+          value={taxId}
+          onChange={(e) => {
+            setTaxId(e.target.value);
+            setTaxIdError(null);
+          }}
+        />
+        {taxIdError ? <p className="mt-2 text-xs text-danger">{taxIdError}</p> : null}
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              dialogRef.current?.close();
+            }}
+            className="inline-flex min-h-11 items-center rounded-md border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition hover:bg-ink-100"
+          >
+            {tCommon('cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={confirmTaxId}
+            className="inline-flex min-h-11 items-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600"
+          >
+            {t('tax_id_dialog_confirm')}
+          </button>
+        </div>
+      </dialog>
     </div>
   );
 };

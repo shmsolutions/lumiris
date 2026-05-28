@@ -100,5 +100,5 @@ export const GET = async (request: Request) => {
   if (!plan || !isPaidPlan(plan)) {
     return redirectTo('/dashboard/');
   }
-  return redirectTo(`/dashboard/settings/billing/?plan=${plan}`);
+  return redirectTo('/dashboard/settings/?tab=plano');
 };

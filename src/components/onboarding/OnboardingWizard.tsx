@@ -44,7 +44,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
 
     // Plano pago: leva pro billing pra coletar CPF/CNPJ e concluir a assinatura.
     if (plan !== 'free') {
-      router.push(`/dashboard/settings/billing/?plan=${plan}`);
+      router.push('/dashboard/settings/?tab=plano');
       return;
     }
 

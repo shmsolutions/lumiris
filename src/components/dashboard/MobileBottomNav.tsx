@@ -13,7 +13,7 @@ import {
   ReportsIcon,
   ScheduleIcon,
   SettingsIcon,
-  SparkIcon,
+  StarIcon,
 } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
 import type { PlanId } from '@/utils/Plans';
@@ -204,11 +204,11 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
               <div className="mt-5 px-3">
                 {isPaid ? (
                   <Link
-                    href="/dashboard/settings/billing/"
+                    href="/dashboard/settings/?tab=plano"
                     className="flex items-center gap-3 rounded-md bg-brand-50 px-3 py-3 text-sm transition hover:bg-brand-100"
                   >
                     <span className="inline-flex size-8 items-center justify-center rounded-md bg-brand-500 text-white">
-                      <SparkIcon size={14} />
+                      <StarIcon size={14} />
                     </span>
                     <span className="flex-1">
                       <span className="block font-semibold text-brand-800">
@@ -219,7 +219,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
                   </Link>
                 ) : (
                   <Link
-                    href="/dashboard/settings/billing/"
+                    href="/dashboard/settings/?tab=plano"
                     className="inline-flex w-full items-center justify-center rounded-md bg-brand-500 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600"
                   >
                     {t('upgrade_cta')}
