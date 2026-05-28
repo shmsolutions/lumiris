@@ -6,7 +6,11 @@ import { Logo } from '@/components/brand/Logo';
 import { CloseIcon, MenuIcon } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
 
-export const MarketingHeader = () => {
+type MarketingHeaderProps = {
+  isSignedIn?: boolean;
+};
+
+export const MarketingHeader = (props: MarketingHeaderProps) => {
   const t = useTranslations('RootLayout');
   const [open, setOpen] = useState(false);
   const close = () => {
@@ -32,18 +36,29 @@ export const MarketingHeader = () => {
       </nav>
 
       <div className="flex items-center gap-2">
-        <Link
-          href="/sign-in/"
-          className="hidden rounded-md px-3 py-2 text-sm font-medium text-ink-700 transition hover:text-ink-900 sm:inline-flex"
-        >
-          {t('sign_in_link')}
-        </Link>
-        <Link
-          href="/sign-up/"
-          className="inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
-        >
-          {t('sign_up_link')}
-        </Link>
+        {props.isSignedIn ? (
+          <Link
+            href="/dashboard/"
+            className="inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+          >
+            {t('dashboard_link')}
+          </Link>
+        ) : (
+          <>
+            <Link
+              href="/sign-in/"
+              className="hidden rounded-md px-3 py-2 text-sm font-medium text-ink-700 transition hover:text-ink-900 sm:inline-flex"
+            >
+              {t('sign_in_link')}
+            </Link>
+            <Link
+              href="/sign-up/"
+              className="inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+            >
+              {t('sign_up_link')}
+            </Link>
+          </>
+        )}
         <button
           type="button"
           onClick={() => {
@@ -85,13 +100,23 @@ export const MarketingHeader = () => {
             >
               {t('pricing_link')}
             </a>
-            <Link
-              href="/sign-in/"
-              onClick={close}
-              className="rounded-md px-3 py-3 font-medium transition hover:bg-ink-100 sm:hidden"
-            >
-              {t('sign_in_link')}
-            </Link>
+            {props.isSignedIn ? (
+              <Link
+                href="/dashboard/"
+                onClick={close}
+                className="rounded-md px-3 py-3 font-medium transition hover:bg-ink-100 sm:hidden"
+              >
+                {t('dashboard_link')}
+              </Link>
+            ) : (
+              <Link
+                href="/sign-in/"
+                onClick={close}
+                className="rounded-md px-3 py-3 font-medium transition hover:bg-ink-100 sm:hidden"
+              >
+                {t('sign_in_link')}
+              </Link>
+            )}
           </nav>
         </div>
       ) : null}

@@ -10,8 +10,10 @@ import {
   ReportsIcon,
   ScheduleIcon,
   SettingsIcon,
+  SparkIcon,
 } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
+import type { PlanId } from '@/utils/Plans';
 
 const navItems = [
   { href: '/dashboard/', key: 'home', Icon: HomeIcon, exact: true },
@@ -46,9 +48,15 @@ const isActive = (pathname: string, href: string, exact: boolean) => {
   return normalized === target || normalized.startsWith(`${target}/`);
 };
 
-export const SidebarNav = () => {
+type SidebarNavProps = {
+  plan: PlanId;
+};
+
+export const SidebarNav = (props: SidebarNavProps) => {
   const pathname = usePathname();
   const t = useTranslations('DashboardNav');
+  const tBilling = useTranslations('BillingPage');
+  const isPaid = props.plan !== 'free';
 
   return (
     <div className="flex h-full flex-col">
@@ -106,13 +114,32 @@ export const SidebarNav = () => {
       </nav>
 
       <div className="border-t border-ink-200 px-5 py-4">
-        <p className="text-xs text-ink-500">{t('upgrade_tagline')}</p>
-        <Link
-          href="/#pricing"
-          className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-600"
-        >
-          {t('upgrade_cta')}
-        </Link>
+        {isPaid ? (
+          <Link
+            href="/dashboard/settings/billing/"
+            className="flex items-center gap-3 rounded-md bg-brand-50 px-3 py-2.5 text-xs transition hover:bg-brand-100"
+          >
+            <span className="inline-flex size-7 items-center justify-center rounded-md bg-brand-500 text-white">
+              <SparkIcon size={14} />
+            </span>
+            <span className="flex-1">
+              <span className="block font-semibold text-brand-800">
+                {tBilling(`plan_${props.plan}_name` as 'plan_student_name')}
+              </span>
+              <span className="block text-[10px] text-brand-700/70">{t('plan_manage')}</span>
+            </span>
+          </Link>
+        ) : (
+          <>
+            <p className="text-xs text-ink-500">{t('upgrade_tagline')}</p>
+            <Link
+              href="/#pricing"
+              className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-600"
+            >
+              {t('upgrade_cta')}
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@
     "pricing_link": "Pricing",
     "sign_in_link": "Sign in",
     "sign_up_link": "Create account",
+    "dashboard_link": "Open dashboard",
     "menu_open": "Open menu",
     "menu_close": "Close menu"
   },
@@ -335,6 +336,7 @@
     "section_account": "Account",
     "upgrade_tagline": "Want voice notes and automatic reports? See the plans.",
     "upgrade_cta": "See plans",
+    "plan_manage": "Manage plan",
     "item_home": "Home",
     "item_patients": "Patients",
     "item_schedule": "Schedule",
@@ -807,7 +809,11 @@
     "button_loading": "Opening payment…",
     "error_checkout": "Could not open payment. Try again.",
     "paid_success": "Payment confirmed! Your plan is now active.",
-    "pix_note": "Recurring monthly Pix charge. You can cancel anytime."
+    "pix_note": "Recurring monthly Pix charge. You can cancel anytime.",
+    "cancel_button": "Cancel plan",
+    "cancel_confirm": "Are you sure? You'll return to the free plan and lose access to paid features.",
+    "cancel_busy": "Cancelling…",
+    "cancel_error": "Could not cancel now. Try again."
   },
   "TherapistProfilePage": {
     "meta_title": "Professional data",

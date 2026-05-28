@@ -2,7 +2,9 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { CheckIcon, SparkIcon } from '@/components/dashboard/Icons';
+import { useRouter } from '@/libs/I18nNavigation';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
 type BillingPanelProps = {
@@ -16,10 +18,26 @@ const paidPlans: PaidPlanId[] = ['student', 'pro'];
 
 export const BillingPanel = (props: BillingPanelProps) => {
   const t = useTranslations('BillingPage');
+  const tCommon = useTranslations('Common');
+  const router = useRouter();
   const [loadingPlan, setLoadingPlan] = useState<PaidPlanId | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [canceling, setCanceling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const isPaid = props.currentPlan !== 'free';
+
+  const cancelPlan = async () => {
+    setCanceling(true);
+    setCancelError(null);
+    const response = await fetch('/api/billing/cancel', { method: 'POST' });
+    setCanceling(false);
+    if (!response.ok) {
+      setCancelError(t('cancel_error'));
+      return;
+    }
+    router.refresh();
+  };
 
   const startCheckout = async (plan: PaidPlanId) => {
     setErrorMessage(null);
@@ -78,7 +96,21 @@ export const BillingPanel = (props: BillingPanelProps) => {
               </p>
             ) : null}
           </div>
+          {isPaid ? (
+            <ConfirmDialog
+              title={t('cancel_confirm')}
+              confirmLabel={t('cancel_button')}
+              cancelLabel={tCommon('cancel')}
+              onConfirm={cancelPlan}
+              triggerLabel={t('cancel_button')}
+              busyLabel={t('cancel_busy')}
+              busy={canceling}
+              disabled={canceling}
+              triggerClassName="text-xs font-medium text-danger transition hover:underline disabled:opacity-50"
+            />
+          ) : null}
         </div>
+        {cancelError ? <p className="mt-3 text-xs text-danger">{cancelError}</p> : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

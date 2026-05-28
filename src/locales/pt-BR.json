@@ -10,6 +10,7 @@
     "pricing_link": "Preços",
     "sign_in_link": "Entrar",
     "sign_up_link": "Criar conta",
+    "dashboard_link": "Ir pro painel",
     "menu_open": "Abrir menu",
     "menu_close": "Fechar menu"
   },
@@ -335,6 +336,7 @@
     "section_account": "Conta",
     "upgrade_tagline": "Quer evolução por áudio e relatório automático? Veja os planos.",
     "upgrade_cta": "Ver planos",
+    "plan_manage": "Gerenciar plano",
     "item_home": "Início",
     "item_patients": "Pacientes",
     "item_schedule": "Agenda",
@@ -807,7 +809,11 @@
     "button_loading": "Abrindo pagamento…",
     "error_checkout": "Não foi possível abrir o pagamento. Tente de novo.",
     "paid_success": "Pagamento confirmado! Seu plano já está ativo.",
-    "pix_note": "Cobrança recorrente mensal via Pix. Você pode cancelar a qualquer momento."
+    "pix_note": "Cobrança recorrente mensal via Pix. Você pode cancelar a qualquer momento.",
+    "cancel_button": "Cancelar plano",
+    "cancel_confirm": "Tem certeza? Você volta pro plano gratuito e perde acesso aos recursos pagos.",
+    "cancel_busy": "Cancelando…",
+    "cancel_error": "Não foi possível cancelar agora. Tente de novo."
   },
   "TherapistProfilePage": {
     "meta_title": "Dados profissionais",
