@@ -23,72 +23,15 @@ export const userIdFromCorrelationId = (correlationId: string | null | undefined
     ? correlationId.slice(CORRELATION_PREFIX.length)
     : null;
 
-type SubscriptionCustomer = {
+type CheckoutCustomer = {
   name: string;
   email: string;
 };
 
-export type CreateSubscriptionResult = {
-  subscriptionId: string;
+export type CheckoutResult = {
+  chargeId: string;
   checkoutUrl: string;
   status: string;
-};
-
-const baseUrl = () => (Env.WOOVI_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, '');
-
-/**
- * Cria uma assinatura recorrente (Pix) no Woovi e devolve a URL de checkout.
- * Em modo mock devolve uma URL local que confirma o pagamento na hora.
- */
-export const createSubscription = async (input: {
-  userId: string;
-  plan: PaidPlanId;
-  customer: SubscriptionCustomer;
-}): Promise<CreateSubscriptionResult> => {
-  const correlationID = correlationIdFor(input.userId);
-  const value = PLAN_PRICE_CENTS[input.plan];
-
-  if (isBillingMockMode) {
-    return {
-      subscriptionId: `mock_${input.plan}_${input.userId}`,
-      checkoutUrl: `/api/billing/mock-confirm?plan=${input.plan}`,
-      status: 'mock',
-    };
-  }
-
-  const response = await fetch(`${baseUrl()}/api/v1/subscriptions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: Env.WOOVI_APP_ID as string,
-    },
-    body: JSON.stringify({
-      value,
-      customer: { name: input.customer.name, email: input.customer.email },
-      correlationID,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => '');
-    logger.error(`Woovi createSubscription failed: status=${response.status} body=${detail}`);
-    throw new Error('woovi_subscription_failed');
-  }
-
-  const data = (await response.json()) as WooviSubscriptionResponse;
-  const subscription = data.subscription ?? data;
-  const checkoutUrl = extractCheckoutUrl(data);
-
-  if (!checkoutUrl) {
-    logger.error(`Woovi subscription created without checkout URL: ${JSON.stringify(data)}`);
-    throw new Error('woovi_no_checkout_url');
-  }
-
-  return {
-    subscriptionId: subscription.globalID ?? subscription.id ?? correlationID,
-    checkoutUrl,
-    status: subscription.status ?? 'pending',
-  };
 };
 
 type WooviCharge = {
@@ -100,6 +43,86 @@ type WooviCharge = {
   correlationID?: string;
 };
 
+type WooviChargeResponse = WooviCharge & {
+  charge?: WooviCharge;
+  paymentLinkUrl?: string;
+};
+
+const baseUrl = () => (Env.WOOVI_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, '');
+
+const extractCheckoutUrl = (data: WooviChargeResponse): string | null =>
+  data.charge?.paymentLinkUrl ?? data.paymentLinkUrl ?? null;
+
+/**
+ * Cria uma cobrança (Pix) no Woovi e devolve a URL de checkout com o link de
+ * pagamento. O charge é idempotente no correlationID: reenviar com o mesmo id
+ * devolve a cobrança existente, então não há erro de duplicado. Em modo mock
+ * devolve uma URL local que confirma o pagamento na hora.
+ */
+export const createCharge = async (input: {
+  userId: string;
+  plan: PaidPlanId;
+  customer: CheckoutCustomer;
+}): Promise<CheckoutResult> => {
+  const correlationID = correlationIdFor(input.userId);
+  const value = PLAN_PRICE_CENTS[input.plan];
+
+  if (isBillingMockMode) {
+    return {
+      chargeId: `mock_${input.plan}_${input.userId}`,
+      checkoutUrl: `/api/billing/mock-confirm?plan=${input.plan}`,
+      status: 'mock',
+    };
+  }
+
+  const url = `${baseUrl()}/api/v1/charge`;
+  const payload = {
+    correlationID,
+    value,
+    comment: `Lumiris - plano ${input.plan}`,
+    customer: { name: input.customer.name, email: input.customer.email },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: Env.WOOVI_APP_ID as string,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '<no body>');
+    // Pass details as structured properties — logtape eats literal `{}` in the
+    // message template, which mangles JSON embedded in the string.
+    logger.error('Woovi createCharge failed', {
+      status: response.status,
+      statusText: response.statusText,
+      url,
+      appIdPresent: Boolean(Env.WOOVI_APP_ID),
+      payload,
+      response: body || '<empty>',
+    });
+    throw new Error('woovi_charge_failed');
+  }
+
+  const data = (await response.json()) as WooviChargeResponse;
+  const charge = data.charge ?? data;
+  const checkoutUrl = extractCheckoutUrl(data);
+
+  if (!checkoutUrl) {
+    logger.error('Woovi charge created without payment link', { data: JSON.stringify(data) });
+    throw new Error('woovi_no_checkout_url');
+  }
+
+  return {
+    chargeId: charge.globalID ?? charge.id ?? correlationID,
+    checkoutUrl,
+    status: charge.status ?? 'pending',
+  };
+};
+
 type WooviSubscription = {
   globalID?: string;
   id?: string;
@@ -107,15 +130,6 @@ type WooviSubscription = {
   value?: number;
   correlationID?: string;
 };
-
-type WooviSubscriptionResponse = WooviSubscription & {
-  subscription?: WooviSubscription;
-  charge?: WooviCharge;
-  paymentLinkUrl?: string;
-};
-
-const extractCheckoutUrl = (data: WooviSubscriptionResponse): string | null =>
-  data.charge?.paymentLinkUrl ?? data.paymentLinkUrl ?? null;
 
 /** Eventos do Woovi que nos interessam pra liberar/cancelar plano. */
 export type BillingEvent = {

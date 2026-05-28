@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { logger } from '@/libs/Logger';
 import { upsertUserProfile } from '@/libs/UserProfile';
-import { createSubscription } from '@/libs/Woovi';
+import { createCharge } from '@/libs/Woovi';
 import { isPaidPlan } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
@@ -19,23 +19,23 @@ const startCheckout = async (userId: string, plan: PaidPlanId): Promise<string |
     [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() || 'Terapeuta Lumiris';
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
 
-  const subscription = await createSubscription({ userId, plan, customer: { name, email } }).catch(
+  const charge = await createCharge({ userId, plan, customer: { name, email } }).catch(
     (error: unknown) => {
       logger.error(`Checkout failed for ${userId}: ${(error as Error).message}`);
       return null;
     },
   );
 
-  if (!subscription) {
+  if (!charge) {
     return null;
   }
 
   await upsertUserProfile(userId, {
-    wooviSubscriptionId: subscription.subscriptionId,
+    wooviSubscriptionId: charge.chargeId,
     subscriptionStatus: 'pending',
   });
 
-  return subscription.checkoutUrl;
+  return charge.checkoutUrl;
 };
 
 export const POST = async (request: Request) => {
