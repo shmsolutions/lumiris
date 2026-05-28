@@ -27,18 +27,18 @@ export default async function DashboardLayout(props: DashboardLayoutProps) {
   // Gate: send users who haven't finished onboarding to the wizard.
   // Reads from our DB (via auth() userId) — resilient to Clerk API outages.
   const { userId } = await auth();
-  if (userId) {
-    const profile = await getUserProfile(userId);
-    if (!profile.onboarded) {
-      redirect('/onboarding');
-    }
+  const profile = userId ? await getUserProfile(userId) : null;
+  if (profile && !profile.onboarded) {
+    redirect('/onboarding');
   }
+
+  const plan = profile?.plan ?? 'free';
 
   return (
     <div className="min-h-dvh bg-ink-50/40">
-      <Sidebar />
+      <Sidebar plan={plan} />
       <div className="pb-20 lg:pb-0 lg:pl-60">{props.children}</div>
-      <MobileBottomNav />
+      <MobileBottomNav plan={plan} />
     </div>
   );
 }

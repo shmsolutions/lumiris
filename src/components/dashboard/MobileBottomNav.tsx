@@ -13,8 +13,10 @@ import {
   ReportsIcon,
   ScheduleIcon,
   SettingsIcon,
+  SparkIcon,
 } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
+import type { PlanId } from '@/utils/Plans';
 
 type NavItem = {
   href: string;
@@ -42,10 +44,16 @@ const isActive = (pathname: string, href: string, exact?: boolean) => {
  * Bottom navigation visible only on small screens. Reaches the thumb easily,
  * matches native iOS/Android conventions for primary-destination switching.
  */
-export const MobileBottomNav = () => {
+type MobileBottomNavProps = {
+  plan: PlanId;
+};
+
+export const MobileBottomNav = (props: MobileBottomNavProps) => {
   const t = useTranslations('DashboardNav');
+  const tBilling = useTranslations('BillingPage');
   const pathname = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const isPaid = props.plan !== 'free';
 
   // Close sheet on route change.
   useEffect(() => {
@@ -194,6 +202,32 @@ export const MobileBottomNav = () => {
               </ul>
 
               <div className="mt-5 px-3">
+                {isPaid ? (
+                  <Link
+                    href="/dashboard/settings/billing/"
+                    className="flex items-center gap-3 rounded-md bg-brand-50 px-3 py-3 text-sm transition hover:bg-brand-100"
+                  >
+                    <span className="inline-flex size-8 items-center justify-center rounded-md bg-brand-500 text-white">
+                      <SparkIcon size={14} />
+                    </span>
+                    <span className="flex-1">
+                      <span className="block font-semibold text-brand-800">
+                        {tBilling(`plan_${props.plan}_name` as 'plan_student_name')}
+                      </span>
+                      <span className="block text-xs text-brand-700/70">{t('plan_manage')}</span>
+                    </span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/dashboard/settings/billing/"
+                    className="inline-flex w-full items-center justify-center rounded-md bg-brand-500 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600"
+                  >
+                    {t('upgrade_cta')}
+                  </Link>
+                )}
+              </div>
+
+              <div className="mt-3 px-3">
                 <SignOutButton>
                   <button
                     type="button"

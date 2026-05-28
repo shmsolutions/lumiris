@@ -1,5 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
+import { notifyPlanCanceled } from '@/libs/Email';
 import { upsertUserProfile } from '@/libs/UserProfile';
 
 /**
@@ -19,6 +20,8 @@ export const POST = async () => {
     subscriptionStatus: 'canceled',
     currentPeriodEnd: null,
   });
+
+  await notifyPlanCanceled(userId);
 
   return NextResponse.json({ ok: true });
 };

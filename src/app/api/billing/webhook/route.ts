@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { notifyPlanActivated, notifyPlanCanceled } from '@/libs/Email';
 import { logger } from '@/libs/Logger';
 import { markPaymentCanceled, markPaymentPaid } from '@/libs/Payments';
 import { upsertUserProfile } from '@/libs/UserProfile';
@@ -46,6 +47,7 @@ export const POST = async (request: Request) => {
         await markPaymentPaid(event.correlationId);
       }
       logger.info(`Plano ${event.plan} liberado para ${event.userId} via Woovi`);
+      await notifyPlanActivated(event.userId, event.plan);
     } else if (event.kind === 'canceled') {
       await upsertUserProfile(event.userId, {
         plan: 'free',
@@ -55,6 +57,7 @@ export const POST = async (request: Request) => {
         await markPaymentCanceled(event.correlationId);
       }
       logger.info(`Assinatura cancelada/expirada para ${event.userId} — voltou pro free`);
+      await notifyPlanCanceled(event.userId);
     }
   } catch (error) {
     // Não estoura 500: loga e devolve 200 pra evitar retentativas em loop do Woovi.

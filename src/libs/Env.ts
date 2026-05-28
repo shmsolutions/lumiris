@@ -22,6 +22,9 @@ export const Env = createEnv({
       .optional()
       .default('false')
       .transform((v) => v === 'true'),
+    // Resend (emails transacionais). Sem chave, o envio vira no-op com log.
+    RESEND_API_KEY: z.string().startsWith('re_').optional(),
+    RESEND_FROM_EMAIL: z.email().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().optional(),
@@ -47,6 +50,8 @@ export const Env = createEnv({
     WOOVI_BASE_URL: process.env.WOOVI_BASE_URL,
     WOOVI_WEBHOOK_PUBLIC_KEY: process.env.WOOVI_WEBHOOK_PUBLIC_KEY,
     LUME_BILLING_MOCK: process.env.LUME_BILLING_MOCK,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_LOGGING_LEVEL: process.env.NEXT_PUBLIC_LOGGING_LEVEL,
