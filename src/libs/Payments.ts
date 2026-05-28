@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/libs/DB';
 import { paymentSchema } from '@/models/Schema';
 import type { PaidPlanId } from '@/utils/Plans';
@@ -41,6 +41,14 @@ export const recordPayment = async (input: {
         paidAt: status === 'paid' ? new Date() : null,
       },
     });
+};
+
+/** Marca as cobranças pendentes do usuário como pagas — usado no fluxo mock. */
+export const markUserPendingPaid = async (ownerId: string) => {
+  await db
+    .update(paymentSchema)
+    .set({ status: 'paid', paidAt: new Date() })
+    .where(and(eq(paymentSchema.ownerId, ownerId), eq(paymentSchema.status, 'pending')));
 };
 
 export const markPaymentCanceled = async (correlationId: string) => {

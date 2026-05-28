@@ -69,6 +69,13 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ error: 'checkout_failed' }, { status: 502 });
   }
 
+  logger.info('[billing] checkout result', {
+    userId,
+    status: result.status,
+    invoiceUrl: result.invoiceUrl,
+    isMockUrl: result.invoiceUrl.startsWith('/api/billing/mock-confirm'),
+  });
+
   return NextResponse.json({ checkoutUrl: result.invoiceUrl, status: result.status });
 };
 

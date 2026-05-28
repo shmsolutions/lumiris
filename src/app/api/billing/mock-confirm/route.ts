@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { isBillingMockMode } from '@/libs/Asaas';
+import { markUserPendingPaid } from '@/libs/Payments';
 import { upsertUserProfile } from '@/libs/UserProfile';
 import { isPaidPlan } from '@/utils/Plans';
 import type { PlanId } from '@/utils/Plans';
@@ -36,6 +37,9 @@ export const GET = async (request: Request) => {
     subscriptionStatus: 'active',
     currentPeriodEnd: oneMonthFromNow(),
   });
+  // Sem webhook em modo mock, marcamos as cobranças pendentes como pagas aqui
+  // pra o histórico ficar coerente com o plano ativo.
+  await markUserPendingPaid(userId);
 
   // Relative redirect so the browser resolves it against the public domain,
   // not the internal proxy host (0.0.0.0:3000) seen via request.url.

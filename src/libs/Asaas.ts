@@ -27,7 +27,9 @@ type AsaasFetchInit = {
 
 /** Faz uma chamada à API do Asaas com o header de autenticação. Lança em erro. */
 const asaasFetch = async <T>(path: string, init: AsaasFetchInit): Promise<T> => {
-  const response = await fetch(`${baseUrl()}${path}`, {
+  const url = `${baseUrl()}${path}`;
+  logger.info('[billing] Asaas request →', { url, method: init.method });
+  const response = await fetch(url, {
     method: init.method,
     headers: {
       'Content-Type': 'application/json',
@@ -38,8 +40,8 @@ const asaasFetch = async <T>(path: string, init: AsaasFetchInit): Promise<T> => 
 
   if (!response.ok) {
     const detail = await response.text().catch(() => '<no body>');
-    logger.error('Asaas request failed', {
-      path,
+    logger.error('[billing] Asaas request failed', {
+      url,
       method: init.method,
       status: response.status,
       response: detail || '<empty>',
@@ -47,6 +49,7 @@ const asaasFetch = async <T>(path: string, init: AsaasFetchInit): Promise<T> => 
     throw new Error('asaas_request_failed');
   }
 
+  logger.info('[billing] Asaas response ←', { url, status: response.status });
   return (await response.json()) as T;
 };
 
@@ -97,7 +100,18 @@ const ensureCustomer = async (input: SubscribeInput): Promise<string> => {
  * devolve uma URL local que confirma o pagamento na hora.
  */
 export const subscribe = async (input: SubscribeInput): Promise<CheckoutResult> => {
+  logger.info('[billing] subscribe()', {
+    mock: isBillingMockMode,
+    mockFlag: Env.LUME_BILLING_MOCK,
+    hasApiKey: Boolean(Env.ASAAS_API_KEY),
+    apiKeyPrefix: Env.ASAAS_API_KEY ? `${Env.ASAAS_API_KEY.slice(0, 12)}…` : null,
+    baseUrl: baseUrl(),
+    plan: input.plan,
+    reusingCustomer: Boolean(input.existingCustomerId),
+  });
+
   if (isBillingMockMode) {
+    logger.warn('[billing] rodando em MODO MOCK — nenhuma chamada real ao Asaas será feita');
     return {
       customerId: `mock_cus_${input.userId}`,
       subscriptionId: `mock_sub_${input.plan}`,
@@ -129,8 +143,14 @@ export const subscribe = async (input: SubscribeInput): Promise<CheckoutResult> 
     { method: 'GET' },
   );
   const firstPayment = payments.data?.[0];
+  logger.info('[billing] assinatura criada', {
+    subscriptionId: subscription.id,
+    paymentsFound: payments.data?.length ?? 0,
+    firstPaymentId: firstPayment?.id ?? null,
+    hasInvoiceUrl: Boolean(firstPayment?.invoiceUrl),
+  });
   if (!firstPayment?.invoiceUrl) {
-    logger.error('Asaas subscription created without invoice URL', {
+    logger.error('[billing] assinatura criada sem invoiceUrl', {
       subscriptionId: subscription.id,
     });
     throw new Error('asaas_no_invoice_url');
