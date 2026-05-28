@@ -26,7 +26,7 @@ export const Logo = (props: LogoProps) => {
     <span className={`inline-flex items-center gap-2 ${props.className ?? ''}`}>
       <Image
         src="/assets/images/lume-mark.png"
-        alt={props.variant === 'mark' ? 'Lume' : ''}
+        alt={props.variant === 'mark' ? 'Lumiris' : ''}
         width={size.mark}
         height={size.mark}
         className="object-contain"
@@ -37,7 +37,7 @@ export const Logo = (props: LogoProps) => {
           className={`font-semibold tracking-tight ${size.text} ${wordmark}`}
           style={{ letterSpacing: '-0.02em' }}
         >
-          lume
+          lumiris
         </span>
       )}
     </span>

@@ -58,7 +58,7 @@ export const MarketingFooter = () => {
             </Link>
           </li>
           <li>
-            <a href="mailto:oi@lume.com.br" className="transition hover:text-ink-900">
+            <a href="mailto:oi@lumiris.com.br" className="transition hover:text-ink-900">
               {t('link_contact')}
             </a>
           </li>

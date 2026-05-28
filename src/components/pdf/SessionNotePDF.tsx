@@ -222,15 +222,15 @@ const FieldValue = (props: { value: string; emptyLabel: string }) => (
 export const SessionNotePDF = (props: SessionNotePDFProps) => (
   <Document
     title={`${props.labels.title} - ${props.patientName} - ${props.sessionDateLabel}`}
-    author="Lume"
-    creator="Lume"
-    producer="Lume"
+    author="Lumiris"
+    creator="Lumiris"
+    producer="Lumiris"
   >
     <Page size="A4" style={styles.page}>
       <View style={styles.brandRow} fixed>
         <View style={styles.brandLeft}>
           <View style={styles.brandDot} />
-          <Text style={styles.brandName}>lume</Text>
+          <Text style={styles.brandName}>lumiris</Text>
         </View>
         <Text style={styles.brandMeta}>{props.generatedAtLabel}</Text>
       </View>
@@ -319,7 +319,7 @@ export const SessionNotePDF = (props: SessionNotePDFProps) => (
       ) : null}
 
       <View style={styles.footer} fixed>
-        <Text>lume · prontuário inteligente</Text>
+        <Text>lumiris · prontuário inteligente</Text>
         <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </View>
     </Page>

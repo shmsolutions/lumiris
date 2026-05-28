@@ -29,7 +29,7 @@ export const ProductPreview = () => {
               <span className="size-2.5 rounded-full bg-ink-300" />
               <span className="size-2.5 rounded-full bg-ink-300" />
               <span className="ml-4 rounded-md bg-surface-elevated px-3 py-1 text-xs text-ink-500">
-                app.lume.com.br/dashboard/patients
+                app.lumiris.com.br/dashboard/patients
               </span>
             </div>
 
@@ -37,7 +37,7 @@ export const ProductPreview = () => {
               <aside className="hidden border-r border-ink-200 bg-ink-50/50 p-5 md:block">
                 <div className="flex items-center gap-2 text-sm font-semibold text-ink-800">
                   <span className="inline-block size-2 rounded-full bg-brand-500" />
-                  lume
+                  lumiris
                 </div>
                 <nav className="mt-6 space-y-1 text-sm">
                   <span className="block rounded-md px-3 py-2 text-ink-600">

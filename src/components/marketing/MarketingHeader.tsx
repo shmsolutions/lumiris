@@ -15,7 +15,7 @@ export const MarketingHeader = () => {
 
   return (
     <>
-      <Link href="/" className="-m-1 p-1" aria-label="Lume" onClick={close}>
+      <Link href="/" className="-m-1 p-1" aria-label="Lumiris" onClick={close}>
         <Logo />
       </Link>
 

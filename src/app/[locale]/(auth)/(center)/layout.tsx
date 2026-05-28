@@ -39,7 +39,7 @@ export default async function CenteredLayout(props: {
           className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-brand-500/30 blur-3xl"
         />
 
-        <Link href="/" className="relative inline-flex w-fit" aria-label="Lume">
+        <Link href="/" className="relative inline-flex w-fit" aria-label="Lumiris">
           <Logo size="lg" tone="light" />
         </Link>
 
@@ -58,7 +58,7 @@ export default async function CenteredLayout(props: {
 
       <main className="flex flex-col bg-surface">
         <header className="flex items-center justify-between px-6 py-6 lg:px-10">
-          <Link href="/" className="-m-1 inline-flex p-1 lg:hidden" aria-label="Lume">
+          <Link href="/" className="-m-1 inline-flex p-1 lg:hidden" aria-label="Lumiris">
             <Logo size="sm" />
           </Link>
           <Link href="/" className="ml-auto text-sm text-ink-500 transition hover:text-ink-700">

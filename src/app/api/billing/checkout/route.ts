@@ -20,7 +20,7 @@ export const POST = async (request: Request) => {
 
   const user = await currentUser().catch(() => null);
   const name =
-    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() || 'Terapeuta Lume';
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() || 'Terapeuta Lumiris';
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
 
   const subscription = await createSubscription({

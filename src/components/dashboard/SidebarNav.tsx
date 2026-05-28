@@ -53,7 +53,7 @@ export const SidebarNav = () => {
   return (
     <div className="flex h-full flex-col">
       <div className="px-5 py-5">
-        <Link href="/dashboard/" className="-m-1 inline-flex p-1" aria-label="Lume">
+        <Link href="/dashboard/" className="-m-1 inline-flex p-1" aria-label="Lumiris">
           <Logo size="md" />
         </Link>
       </div>

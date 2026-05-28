@@ -6,7 +6,7 @@ const localePrefix: LocalePrefixMode = 'as-needed';
 
 /** Centralized application configuration. */
 export const AppConfig = {
-  name: 'Lume',
+  name: 'Lumiris',
   tagline: 'O prontuário que evolui com você',
   i18n: {
     locales: ['pt-BR', 'en'],
