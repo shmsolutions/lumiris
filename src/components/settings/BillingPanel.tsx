@@ -40,7 +40,9 @@ export const BillingPanel = (props: BillingPanelProps) => {
       setErrorMessage(t('error_checkout'));
       return;
     }
-    window.location.href = checkoutUrl;
+    // Abre em nova aba pra o usuário não perder o contexto do app.
+    window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+    setLoadingPlan(null);
   };
 
   return (

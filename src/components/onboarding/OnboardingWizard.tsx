@@ -51,7 +51,9 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
       });
       if (checkout.ok) {
         const { checkoutUrl } = (await checkout.json()) as { checkoutUrl: string };
-        window.location.href = checkoutUrl;
+        // Pagamento em nova aba; manda o usuário pro dashboard enquanto isso.
+        window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+        router.push('/dashboard/');
         return;
       }
       // Falha no checkout: entra no app mesmo assim (free) e avisa nas configurações.

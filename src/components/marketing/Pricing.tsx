@@ -113,6 +113,8 @@ export const Pricing = () => {
                   ) : (
                     <a
                       href={`/api/billing/checkout?plan=${plan.key}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className={`inline-flex w-full items-center justify-center rounded-md px-4 py-2.5 text-sm font-semibold shadow-sm transition ${
                         isFeatured
                           ? 'bg-brand-500 text-white hover:bg-brand-600'
