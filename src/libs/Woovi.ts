@@ -6,6 +6,8 @@ import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
 const DEFAULT_BASE_URL = 'https://api.woovi.com';
 const CORRELATION_PREFIX = 'lume_';
+// `:` is safe — Clerk userIds não contêm dois-pontos.
+const CORRELATION_SEPARATOR = ':';
 
 /**
  * Sem App ID configurado (ou mock explícito) rodamos em modo simulado: o
@@ -14,14 +16,26 @@ const CORRELATION_PREFIX = 'lume_';
  */
 export const isBillingMockMode = Env.LUME_BILLING_MOCK || !Env.WOOVI_APP_ID;
 
-/** correlationID determinístico por usuário — usado pra mapear o webhook de volta. */
-export const correlationIdFor = (userId: string) => `${CORRELATION_PREFIX}${userId}`;
+/**
+ * Gera um correlationID único por tentativa, no formato `lume_<userId>:<suffix>`.
+ * O prefixo carrega o userId pra o webhook conseguir mapear de volta; o sufixo
+ * evita colisão com cobranças anteriores (Woovi não aceita correlationID repetido).
+ */
+export const correlationIdFor = (userId: string) =>
+  `${CORRELATION_PREFIX}${userId}${CORRELATION_SEPARATOR}${Date.now().toString(36)}`;
 
 /** Extrai o userId de um correlationID nosso; null se não for um. */
-export const userIdFromCorrelationId = (correlationId: string | null | undefined): string | null =>
-  correlationId?.startsWith(CORRELATION_PREFIX)
-    ? correlationId.slice(CORRELATION_PREFIX.length)
-    : null;
+export const userIdFromCorrelationId = (
+  correlationId: string | null | undefined,
+): string | null => {
+  if (!correlationId?.startsWith(CORRELATION_PREFIX)) {
+    return null;
+  }
+  const rest = correlationId.slice(CORRELATION_PREFIX.length);
+  const separatorIndex = rest.indexOf(CORRELATION_SEPARATOR);
+  // Backward-compat: aceita também correlationIDs antigos sem sufixo.
+  return separatorIndex === -1 ? rest : rest.slice(0, separatorIndex);
+};
 
 type CheckoutCustomer = {
   name: string;
@@ -85,9 +99,9 @@ const fetchExistingCharge = async (correlationID: string): Promise<CheckoutResul
 
 /**
  * Cria uma cobrança (Pix) no Woovi e devolve a URL de checkout com o link de
- * pagamento. O charge é idempotente no correlationID: reenviar com o mesmo id
- * devolve a cobrança existente, então não há erro de duplicado. Em modo mock
- * devolve uma URL local que confirma o pagamento na hora.
+ * pagamento. Como o correlationID inclui um sufixo único por chamada, cada
+ * tentativa gera uma cobrança nova — sem colisão com pagamentos anteriores.
+ * Em modo mock devolve uma URL local que confirma o pagamento na hora.
  */
 export const createCharge = async (input: {
   userId: string;
