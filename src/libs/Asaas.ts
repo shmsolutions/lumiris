@@ -5,13 +5,6 @@ import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
 const DEFAULT_BASE_URL = 'https://api-sandbox.asaas.com/v3';
 
-/**
- * Sem chave da API (ou mock explícito) rodamos em modo simulado: o checkout
- * devolve uma URL local que confirma o pagamento, permitindo testar o fluxo
- * de ponta a ponta antes de plugar a chave real do Asaas.
- */
-export const isBillingMockMode = Env.LUME_BILLING_MOCK || !Env.ASAAS_API_KEY;
-
 const baseUrl = () => (Env.ASAAS_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, '');
 
 /** Valor do plano em reais (Asaas trabalha com decimal, não centavos). */
@@ -78,7 +71,8 @@ type SubscribeInput = {
 
 /** Cria (ou reaproveita) o cliente no Asaas e devolve o id. */
 const ensureCustomer = async (input: SubscribeInput): Promise<string> => {
-  if (input.existingCustomerId) {
+  // Só reaproveita ids reais do Asaas (cus_…). Ignora lixo de testes antigos.
+  if (input.existingCustomerId?.startsWith('cus_')) {
     return input.existingCustomerId;
   }
   const customer = await asaasFetch<AsaasCustomer>('/customers', {
@@ -96,31 +90,9 @@ const ensureCustomer = async (input: SubscribeInput): Promise<string> => {
 
 /**
  * Cria uma assinatura recorrente mensal no Asaas com billingType UNDEFINED — o
- * cliente escolhe Pix, cartão ou boleto na página hospedada. Em modo mock,
- * devolve uma URL local que confirma o pagamento na hora.
+ * cliente escolhe Pix, cartão ou boleto na página hospedada.
  */
 export const subscribe = async (input: SubscribeInput): Promise<CheckoutResult> => {
-  logger.info('[billing] subscribe()', {
-    mock: isBillingMockMode,
-    mockFlag: Env.LUME_BILLING_MOCK,
-    hasApiKey: Boolean(Env.ASAAS_API_KEY),
-    apiKeyPrefix: Env.ASAAS_API_KEY ? `${Env.ASAAS_API_KEY.slice(0, 12)}…` : null,
-    baseUrl: baseUrl(),
-    plan: input.plan,
-    reusingCustomer: Boolean(input.existingCustomerId),
-  });
-
-  if (isBillingMockMode) {
-    logger.warn('[billing] rodando em MODO MOCK — nenhuma chamada real ao Asaas será feita');
-    return {
-      customerId: `mock_cus_${input.userId}`,
-      subscriptionId: `mock_sub_${input.plan}`,
-      paymentId: `mock_pay_${input.plan}_${Date.now().toString(36)}`,
-      invoiceUrl: `/api/billing/mock-confirm?plan=${input.plan}`,
-      status: 'mock',
-    };
-  }
-
   const customerId = await ensureCustomer(input);
 
   const subscription = await asaasFetch<AsaasSubscription>('/subscriptions', {
@@ -165,9 +137,9 @@ export const subscribe = async (input: SubscribeInput): Promise<CheckoutResult> 
   };
 };
 
-/** Cancela a assinatura recorrente no Asaas. Silencioso em modo mock. */
+/** Cancela a assinatura recorrente no Asaas. Ignora ids inválidos. */
 export const cancelSubscription = async (subscriptionId: string | null): Promise<void> => {
-  if (isBillingMockMode || !subscriptionId || subscriptionId.startsWith('mock_')) {
+  if (!subscriptionId?.startsWith('sub_')) {
     return;
   }
   await asaasFetch(`/subscriptions/${subscriptionId}`, { method: 'DELETE' }).catch(
@@ -240,16 +212,16 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
 
 /**
  * Valida o webhook pelo token compartilhado (header asaas-access-token).
- * Sem token configurado: em produção real rejeita; em dev/mock aceita e avisa.
+ * Sem token configurado: em produção rejeita; em dev aceita e avisa.
  */
 export const verifyWebhookToken = (token: string | null): boolean => {
   const expected = Env.ASAAS_WEBHOOK_TOKEN;
   if (!expected) {
-    if (Env.NODE_ENV === 'production' && !isBillingMockMode) {
+    if (Env.NODE_ENV === 'production') {
       logger.error('ASAAS_WEBHOOK_TOKEN ausente em produção — webhook rejeitado');
       return false;
     }
-    logger.warn('ASAAS_WEBHOOK_TOKEN ausente — webhook aceito sem validação (dev/mock)');
+    logger.warn('ASAAS_WEBHOOK_TOKEN ausente — webhook aceito sem validação (dev)');
     return true;
   }
   return token === expected;

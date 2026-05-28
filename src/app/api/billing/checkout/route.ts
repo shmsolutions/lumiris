@@ -73,7 +73,6 @@ export const POST = async (request: Request) => {
     userId,
     status: result.status,
     invoiceUrl: result.invoiceUrl,
-    isMockUrl: result.invoiceUrl.startsWith('/api/billing/mock-confirm'),
   });
 
   return NextResponse.json({ checkoutUrl: result.invoiceUrl, status: result.status });

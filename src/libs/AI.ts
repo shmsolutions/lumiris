@@ -53,27 +53,11 @@ export type ReportSource = {
 export type DraftResult = {
   transcript: string;
   evolution: EvolutionDraft;
-  /** Source of the transcript ('audio' = Whisper, 'text' = passthrough, 'mock' = local mock). */
-  transcriptSource: 'audio' | 'text' | 'mock';
+  /** Source of the transcript ('audio' = Whisper, 'text' = passthrough). */
+  transcriptSource: 'audio' | 'text';
   /** Did the model actually structure the fields, or did we fall back to empty ones? */
   structured: boolean;
 };
-
-const MOCK_DRAFT: DraftResult = {
-  transcript:
-    'Hoje a Helena chegou disposta. Trabalhamos integração sensorial com circuito de obstáculos. Boa coordenação motora grossa, ainda com dificuldade em motricidade fina, principalmente no uso da pinça superior. Mãe relatou melhora na rotina escolar nas últimas duas semanas. Para a próxima, vou focar em atividades de recorte e colagem para reforçar pinça e atenção sustentada.',
-  evolution: {
-    procedimento:
-      'Realizado circuito de obstáculos para integração sensorial, com atividades de coordenação motora grossa e estímulo de motricidade fina (uso da pinça superior).',
-    intercorrencia: 'Sem intercorrências.',
-    evolucao:
-      'Paciente chegou disposta e participativa. Coordenação motora grossa preservada; mantém dificuldade em motricidade fina, especialmente no uso da pinça superior. Mãe relatou melhora na rotina escolar nas últimas duas semanas. Evolução positiva em integração sensorial e atenção sustentada. Próximo foco: recorte e colagem para reforço de pinça e atenção sustentada.',
-  },
-  transcriptSource: 'mock',
-  structured: true,
-};
-
-const isMockMode = () => Env.LUME_AI_MOCK || !Env.OPENAI_API_KEY;
 
 let openaiClient: OpenAI | null = null;
 
@@ -178,10 +162,6 @@ const emptyEvolution = (): EvolutionDraft => ({
  * (gpt-4.1-mini). Falls back gracefully — never loses the input.
  */
 export const buildDraftFromAudio = async (audio: File): Promise<DraftResult> => {
-  if (isMockMode()) {
-    return MOCK_DRAFT;
-  }
-
   let transcript = '';
   const transcriptSource: 'audio' | 'text' = 'audio';
 
@@ -230,51 +210,10 @@ Diretrizes:
 - "Conclusão": síntese objetiva do estado atual e da continuidade do tratamento.
 - A responsabilidade clínica é sempre do terapeuta — você produz um rascunho para revisão.`;
 
-const MOCK_REPORT: ReportContent = {
-  initialComplaint:
-    'Encaminhada com queixa de dificuldades em motricidade fina e processamento sensorial, com impacto nas atividades escolares e de vida diária.',
-  generalEvolution:
-    'Ao longo do período, a paciente apresentou evolução consistente na integração sensorial e na atenção sustentada. Houve maior tolerância a estímulos táteis e melhora progressiva na coordenação motora grossa. A motricidade fina segue em desenvolvimento, com ganhos perceptíveis no uso da pinça.',
-  objectiveProgress: [
-    {
-      title: 'Melhorar pinça superior em atividades de recorte',
-      progress:
-        'Progresso moderado. No início do período não sustentava a pinça superior; ao final, realiza recortes simples com supervisão e menor fadiga.',
-    },
-    {
-      title: 'Ampliar tolerância a estímulos sensoriais',
-      progress:
-        'Progresso significativo. Reduziu episódios de recusa a texturas e passou a participar de atividades com diferentes materiais.',
-    },
-  ],
-  difficulties:
-    'Oscilações de humor em dias de maior demanda escolar e fadiga ao final das sessões longas. Houve uma intercorrência de recusa pontual relacionada a estímulo auditivo intenso.',
-  suggestions:
-    'Manter o foco em motricidade fina com gradação de dificuldade. Introduzir atividades bilaterais. Orientar a escola quanto a pausas sensoriais. Reavaliar objetivos em 3 meses.',
-  conclusion:
-    'A paciente evolui de forma favorável e demonstra benefício claro da intervenção em Terapia Ocupacional. Recomenda-se a continuidade do tratamento com a frequência atual.',
-};
-
 /**
  * Generate a structured progress report from the gathered source material.
- * Mock mode returns a realistic fixed report.
  */
 export const generateReport = async (source: ReportSource): Promise<ReportContent> => {
-  if (isMockMode()) {
-    return {
-      ...MOCK_REPORT,
-      objectiveProgress:
-        source.objectives.length > 0
-          ? source.objectives.map((o) => ({
-              title: o.title,
-              progress:
-                MOCK_REPORT.objectiveProgress[0]?.progress ??
-                'Progresso observado ao longo do período.',
-            }))
-          : MOCK_REPORT.objectiveProgress,
-    };
-  }
-
   const client = getOpenAI();
   if (!client) {
     throw new Error('OPENAI_API_KEY not configured');
@@ -372,10 +311,6 @@ ${notesText || 'nenhuma evolução registrada no período'}`;
  * Build a draft from plain text input (no audio). Skip Whisper, run GPT only.
  */
 export const buildDraftFromText = async (text: string): Promise<DraftResult> => {
-  if (isMockMode()) {
-    return { ...MOCK_DRAFT, transcript: text || MOCK_DRAFT.transcript };
-  }
-
   if (!text.trim()) {
     return {
       transcript: '',
