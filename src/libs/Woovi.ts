@@ -54,6 +54,36 @@ const extractCheckoutUrl = (data: WooviChargeResponse): string | null =>
   data.charge?.paymentLinkUrl ?? data.paymentLinkUrl ?? null;
 
 /**
+ * Busca uma cobrança existente pelo correlationID e devolve seu checkout.
+ * Usado quando o create falha com 400 por já existir uma charge com o mesmo id.
+ */
+const fetchExistingCharge = async (correlationID: string): Promise<CheckoutResult | null> => {
+  const response = await fetch(`${baseUrl()}/api/v1/charge/${correlationID}`, {
+    headers: { Authorization: Env.WOOVI_APP_ID as string },
+  });
+
+  if (!response.ok) {
+    const body = await response.text().catch(() => '<no body>');
+    logger.error('Woovi getCharge failed', { status: response.status, response: body });
+    return null;
+  }
+
+  const data = (await response.json()) as WooviChargeResponse;
+  const charge = data.charge ?? data;
+  const checkoutUrl = extractCheckoutUrl(data);
+  if (!checkoutUrl) {
+    logger.error('Woovi existing charge has no payment link', { data: JSON.stringify(data) });
+    return null;
+  }
+
+  return {
+    chargeId: charge.globalID ?? charge.id ?? correlationID,
+    checkoutUrl,
+    status: charge.status ?? 'pending',
+  };
+};
+
+/**
  * Cria uma cobrança (Pix) no Woovi e devolve a URL de checkout com o link de
  * pagamento. O charge é idempotente no correlationID: reenviar com o mesmo id
  * devolve a cobrança existente, então não há erro de duplicado. Em modo mock
@@ -94,6 +124,17 @@ export const createCharge = async (input: {
 
   if (!response.ok) {
     const body = await response.text().catch(() => '<no body>');
+
+    // The charge already exists for this correlationID — fetch it and reuse
+    // its payment link instead of failing (matches both pt "Correlação" and
+    // any future English variant).
+    if (response.status === 400 && body.toLowerCase().includes('correla')) {
+      const existing = await fetchExistingCharge(correlationID);
+      if (existing) {
+        return existing;
+      }
+    }
+
     // Pass details as structured properties — logtape eats literal `{}` in the
     // message template, which mangles JSON embedded in the string.
     logger.error('Woovi createCharge failed', {
