@@ -6,6 +6,8 @@ import createNextIntlPlugin from 'next-intl/plugin';
 
 // Define the base Next.js configuration
 const baseConfig: NextConfig = {
+  // Emit a self-contained server bundle for Docker (only traced deps shipped).
+  output: 'standalone',
   devIndicators: {
     position: 'bottom-right',
   },

@@ -1,0 +1,5 @@
+# Force LF on files executed in Linux containers/VPS, regardless of OS.
+*.sh text eol=lf
+*.mjs text eol=lf
+Dockerfile text eol=lf
+Caddyfile text eol=lf

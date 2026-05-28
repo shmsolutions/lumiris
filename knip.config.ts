@@ -2,7 +2,8 @@ import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
   // Files to exclude from Knip analysis
-  ignore: ['src/libs/I18n.ts', 'src/types/I18n.ts'],
+  // migrate.mjs is invoked by the Docker migrator container, not imported.
+  ignore: ['src/libs/I18n.ts', 'src/types/I18n.ts', 'scripts/migrate.mjs'],
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     '@clerk/shared',

@@ -56,4 +56,7 @@ export const Env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     NODE_ENV: process.env.NODE_ENV,
   },
+  // Skip during `next build` in Docker, where server secrets aren't present.
+  // Runtime (`node server.js`) still validates because this flag is unset there.
+  skipValidation: process.env.SKIP_ENV_VALIDATION === 'true',
 });

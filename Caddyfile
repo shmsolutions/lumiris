@@ -1,0 +1,6 @@
+# Terminates TLS (auto Let's Encrypt) and proxies to the Next.js app.
+{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000
+	tls {$ACME_EMAIL}
+}
