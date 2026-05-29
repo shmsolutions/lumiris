@@ -4,7 +4,6 @@ import { CallToAction } from '@/components/marketing/CallToAction';
 import { Comparison } from '@/components/marketing/Comparison';
 import { Faq } from '@/components/marketing/Faq';
 import { Features } from '@/components/marketing/Features';
-import { FounderNote } from '@/components/marketing/FounderNote';
 import { Hero } from '@/components/marketing/Hero';
 import { HowItWorks } from '@/components/marketing/HowItWorks';
 import { Pricing } from '@/components/marketing/Pricing';
@@ -41,7 +40,6 @@ export default async function IndexPage(props: IndexPageProps) {
       <Comparison />
       <Pricing />
       <Trust />
-      <FounderNote />
       <Faq />
       <CallToAction />
     </>

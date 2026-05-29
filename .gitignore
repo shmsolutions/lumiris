@@ -61,3 +61,6 @@ build-archive.log
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Stitch reference screenshots (não faz parte do app)
+stitch-ref/

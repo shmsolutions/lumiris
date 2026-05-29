@@ -1,0 +1,1 @@
+ALTER TABLE "patient" ADD COLUMN "report_reminder_sent_at" timestamp;

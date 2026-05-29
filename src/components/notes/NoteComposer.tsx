@@ -2,13 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
+import { CloseIcon, FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { ProcessingOverlay } from '@/components/feedback/ProcessingOverlay';
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
 import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
-import { useRouter } from '@/libs/I18nNavigation';
+import { Link, useRouter } from '@/libs/I18nNavigation';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { TemplateDefinition } from '@/validations/TemplateValidation';
 
@@ -25,6 +25,12 @@ type NoteTemplateOption = {
 
 type NoteComposerProps = {
   patientId: string;
+  /** Shown in the capture header chip ("Sessão com {name}"). */
+  patientName?: string;
+  /** Whether the user can run AI right now (paid plan or free-trial credits). */
+  aiAvailable?: boolean;
+  /** Free-trial generations left; null when the plan has unlimited AI. */
+  trialRemaining?: number | null;
   /** Optional appointment to link this note to (passed via URL param). */
   appointmentId?: string;
   /** Active objectives from the treatment plan, shown as checklist on review. */
@@ -53,16 +59,22 @@ export const NoteComposer = (props: NoteComposerProps) => {
   const t = useTranslations('NoteComposer');
   const router = useRouter();
 
+  // No AI plan → there's nothing to capture (no transcription, no structuring).
+  // Drop the recording screen entirely and open straight in the manual editor.
+  const noAi = props.aiAvailable === false;
+
   const [mode, setMode] = useState<Mode>('audio');
-  const [phase, setPhase] = useState<Phase>('capture');
+  const [phase, setPhase] = useState<Phase>(noAi ? 'review' : 'capture');
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioMime, setAudioMime] = useState<string>('');
   const [textInput, setTextInput] = useState('');
-  const [draft, setDraft] = useState<Draft | null>(null);
+  const [draft, setDraft] = useState<Draft | null>(
+    noAi ? { transcript: '', evolution: emptyEvolution, structured: false } : null,
+  );
   const [sessionDate, setSessionDate] = useState(todayIso());
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [linkedObjectiveIds, setLinkedObjectiveIds] = useState<string[]>([]);
-  const [aiLocked, setAiLocked] = useState(false);
+  const [aiLocked, setAiLocked] = useState(noAi);
   const [templateId, setTemplateId] = useState('');
   const [values, setValues] = useState<TemplateValues>({});
 
@@ -190,47 +202,72 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
   const canProceed = mode === 'audio' ? audioBlob !== null : textInput.trim().length > 0;
 
-  if (phase === 'review' && draft) {
-    const isSaving = (phase as Phase) === 'saving';
+  if ((phase === 'review' || phase === 'saving') && draft) {
+    const isSaving = phase === 'saving';
     return (
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50/50 px-5 py-4">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
-              <SparkIcon size={18} />
-            </span>
-            <div>
-              <div className="text-sm font-semibold text-ink-900">
-                {aiLocked
-                  ? t('review_ai_locked_title')
-                  : (draft.structured
-                    ? t('review_structured_title')
-                    : t('review_unstructured_title'))}
+        {aiLocked ? (
+          <div className="relative overflow-hidden rounded-2xl border border-brand-200 bg-brand-50/60 p-5">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  'radial-gradient(90% 90% at 100% 0%, rgba(247,188,116,0.28), transparent 60%)',
+              }}
+            />
+            <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-sm shadow-brand-500/25">
+                  <SparkIcon size={20} />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-base font-semibold text-ink-900">
+                    {t('review_ai_locked_title')}
+                  </div>
+                  <p className="mt-0.5 text-sm text-ink-600">{t('review_ai_locked_hint')}</p>
+                </div>
               </div>
-              <div className="text-xs text-ink-600">
-                {aiLocked
-                  ? t('review_ai_locked_hint')
-                  : (draft.structured
-                    ? t('review_structured_hint')
-                    : t('review_unstructured_hint'))}
-              </div>
+              <Link
+                href="/dashboard/settings/?tab=plano"
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition hover:shadow-md hover:shadow-brand-500/30 active:scale-[0.99] sm:py-2.5"
+              >
+                <SparkIcon size={15} />
+                {t('upgrade_cta')}
+              </Link>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-ink-600" htmlFor="session-date">
-              {t('field_session_date')}
-            </label>
-            <input
-              id="session-date"
-              type="date"
-              value={sessionDate}
-              onChange={(event) => {
-                setSessionDate(event.target.value);
-              }}
-              className="rounded-md border border-ink-200 bg-surface-elevated px-2 py-1 text-xs text-ink-900 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
-            />
+        ) : (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-200 bg-brand-50/50 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
+                <SparkIcon size={18} />
+              </span>
+              <div>
+                <div className="text-sm font-semibold text-ink-900">
+                  {draft.structured ? t('review_structured_title') : t('review_unstructured_title')}
+                </div>
+                <div className="text-xs text-ink-600">
+                  {draft.structured ? t('review_structured_hint') : t('review_unstructured_hint')}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-ink-600" htmlFor="session-date">
+                {t('field_session_date')}
+              </label>
+              <input
+                id="session-date"
+                type="date"
+                value={sessionDate}
+                onChange={(event) => {
+                  setSessionDate(event.target.value);
+                }}
+                className="rounded-md border border-ink-200 bg-surface-elevated px-2 py-1 text-xs text-ink-900 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {draft.transcript ? (
           <details className="rounded-xl border border-ink-200 bg-surface-elevated">
@@ -241,6 +278,28 @@ export const NoteComposer = (props: NoteComposerProps) => {
               {draft.transcript}
             </p>
           </details>
+        ) : null}
+
+        {aiLocked ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200 pt-5">
+            <span className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
+              {t('upgrade_manual')}
+            </span>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-ink-600" htmlFor="session-date">
+                {t('field_session_date')}
+              </label>
+              <input
+                id="session-date"
+                type="date"
+                value={sessionDate}
+                onChange={(event) => {
+                  setSessionDate(event.target.value);
+                }}
+                className="rounded-md border border-ink-200 bg-surface-elevated px-2 py-1 text-xs text-ink-900 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              />
+            </div>
+          </div>
         ) : null}
 
         {selectedTemplate ? (
@@ -310,12 +369,16 @@ export const NoteComposer = (props: NoteComposerProps) => {
           <button
             type="button"
             onClick={() => {
+              if (noAi) {
+                router.push(`/dashboard/patients/${props.patientId}/notes/`);
+                return;
+              }
               setDraft(null);
               setPhase('capture');
             }}
             className="text-sm text-ink-500 transition hover:text-ink-700"
           >
-            {t('discard')}
+            {noAi ? t('cancel') : t('discard')}
           </button>
         </div>
       </div>
@@ -327,7 +390,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
     : [];
 
   return (
-    <div className="space-y-6">
+    <div className="fixed inset-0 z-50 flex flex-col bg-surface">
       {phase === 'processing' ? (
         <ProcessingOverlay
           title={t('processing_title')}
@@ -335,117 +398,140 @@ export const NoteComposer = (props: NoteComposerProps) => {
         />
       ) : null}
 
-      {templates.length > 0 ? (
-        <div>
-          <label
-            className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
-            htmlFor="noteTemplate"
-          >
-            {t('template_label')}
-          </label>
-          <select
-            id="noteTemplate"
-            value={templateId}
-            onChange={(e) => {
-              setTemplateId(e.target.value);
-            }}
-            className="mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
-          >
-            <option value="">{t('template_default')}</option>
-            {templates.map((tpl) => (
-              <option key={tpl.id} value={tpl.id}>
-                {tpl.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : null}
+      {/* Warm ambient wash so the focused screen still feels like Lume. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(110% 60% at 50% -5%, rgba(247,188,116,0.16), transparent 60%)',
+        }}
+      />
 
-      {guideSections.length > 0 ? (
-        <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4">
-          <h3 className="text-xs font-semibold tracking-wider text-brand-800 uppercase">
-            {t('guide_title')}
-          </h3>
-          <ul className="mt-2 space-y-1.5">
-            {guideSections.map((section) => (
-              <li key={section.key} className="text-xs text-ink-700">
-                <span className="font-semibold text-ink-900">{section.title}:</span> {section.guide}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-
-      <div className="inline-flex rounded-md bg-ink-100 p-1">
+      {/* Top bar: cancel + session context. */}
+      <div
+        className="relative flex items-center justify-between px-4 py-3"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+      >
         <button
           type="button"
           onClick={() => {
-            setMode('audio');
+            router.push(`/dashboard/patients/${props.patientId}/notes/`);
           }}
-          className={`inline-flex items-center gap-2 rounded px-4 py-1.5 text-xs font-semibold transition ${
-            mode === 'audio'
-              ? 'bg-surface-elevated text-ink-900 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700'
-          }`}
+          className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-ink-500 transition hover:text-ink-900"
         >
-          <MicIcon size={14} />
-          {t('mode_audio')}
+          <CloseIcon size={18} />
+          {t('cancel')}
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMode('text');
-          }}
-          className={`inline-flex items-center gap-2 rounded px-4 py-1.5 text-xs font-semibold transition ${
-            mode === 'text'
-              ? 'bg-surface-elevated text-ink-900 shadow-sm'
-              : 'text-ink-500 hover:text-ink-700'
-          }`}
-        >
-          <FileIcon size={14} />
-          {t('mode_text')}
-        </button>
+        {props.patientName ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-200 bg-surface-elevated/70 px-3 py-1 text-xs text-ink-600 backdrop-blur">
+            <span className="size-1.5 rounded-full bg-accent-500" />
+            {t('session_with', { name: props.patientName })}
+          </span>
+        ) : null}
       </div>
 
-      {mode === 'audio' ? (
-        <AudioRecorder
-          onAudioReady={(blob, mime) => {
-            setAudioBlob(blob);
-            setAudioMime(mime);
+      {/* Center stage. */}
+      <div className="relative flex flex-1 flex-col items-center justify-center overflow-y-auto px-6 py-4 text-center">
+        <div className="w-full max-w-md">
+          <h1 className="text-2xl font-semibold tracking-tight text-ink-900">
+            {t('capture_headline')}
+          </h1>
+
+          {typeof props.trialRemaining === 'number' ? (
+            <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700">
+              <SparkIcon size={13} />
+              {t('trial_remaining', { count: props.trialRemaining })}
+            </div>
+          ) : null}
+
+          {templates.length > 0 ? (
+            <select
+              aria-label={t('template_label')}
+              value={templateId}
+              onChange={(e) => {
+                setTemplateId(e.target.value);
+              }}
+              className="mx-auto mt-4 block w-auto max-w-full rounded-full border border-ink-200 bg-surface-elevated px-4 py-1.5 text-xs font-medium text-ink-700 transition focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+            >
+              <option value="">{t('template_default')}</option>
+              {templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.name}
+                </option>
+              ))}
+            </select>
+          ) : null}
+
+          {guideSections.length > 0 ? (
+            <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50/40 p-4 text-left">
+              <h3 className="text-xs font-semibold tracking-wider text-brand-800 uppercase">
+                {t('guide_title')}
+              </h3>
+              <ul className="mt-2 space-y-1.5">
+                {guideSections.map((section) => (
+                  <li key={section.key} className="text-xs text-ink-700">
+                    <span className="font-semibold text-ink-900">{section.title}:</span>{' '}
+                    {section.guide}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          <div className="mt-8">
+            {mode === 'audio' ? (
+              <AudioRecorder
+                bare
+                onAudioReady={(blob, mime) => {
+                  setAudioBlob(blob);
+                  setAudioMime(mime);
+                }}
+                disabled={phase === 'processing'}
+              />
+            ) : (
+              <textarea
+                value={textInput}
+                onChange={(event) => {
+                  setTextInput(event.target.value);
+                }}
+                rows={8}
+                disabled={phase === 'processing'}
+                placeholder={t('text_placeholder')}
+                className="w-full rounded-xl border border-ink-200 bg-surface-elevated px-4 py-3 text-left text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+              />
+            )}
+          </div>
+
+          {errorMessage ? <p className="mt-4 text-sm text-danger">{errorMessage}</p> : null}
+        </div>
+      </div>
+
+      {/* Bottom actions. */}
+      <div
+        className="relative space-y-3 px-6 pt-3"
+        style={{ paddingBottom: 'max(1.75rem, env(safe-area-inset-bottom))' }}
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === 'audio' ? 'text' : 'audio');
           }}
           disabled={phase === 'processing'}
-        />
-      ) : (
-        <div>
-          <label className="block text-xs font-semibold tracking-wide text-ink-600 uppercase">
-            {t('text_label')}
-          </label>
-          <textarea
-            value={textInput}
-            onChange={(event) => {
-              setTextInput(event.target.value);
-            }}
-            rows={10}
-            disabled={phase === 'processing'}
-            placeholder={t('text_placeholder')}
-            className="mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
-          />
-        </div>
-      )}
-
-      {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}
-
-      <div className="flex flex-wrap items-center gap-3">
+          className="mx-auto flex items-center gap-1.5 text-sm font-medium text-brand-700 transition hover:text-brand-800 disabled:opacity-50"
+        >
+          {mode === 'audio' ? <FileIcon size={15} /> : <MicIcon size={15} />}
+          {mode === 'audio' ? t('switch_text') : t('switch_audio')}
+        </button>
         <button
           type="button"
           onClick={startReview}
           disabled={!canProceed || phase === 'processing'}
-          className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 px-6 py-3.5 text-sm font-semibold text-white shadow-sm shadow-brand-500/25 transition hover:shadow-md hover:shadow-brand-500/30 active:scale-[0.99] disabled:opacity-50 disabled:shadow-none"
         >
-          {phase === 'processing' ? <Spinner size={14} /> : <SparkIcon size={14} />}
+          {phase === 'processing' ? <Spinner size={15} /> : <SparkIcon size={15} />}
           {phase === 'processing' ? t('processing') : t('structure')}
         </button>
-        <p className="text-xs text-ink-500">{t('processing_hint')}</p>
       </div>
     </div>
   );

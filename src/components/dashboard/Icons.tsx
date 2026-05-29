@@ -141,6 +141,12 @@ export const FileIcon = (props: IconProps) => (
   </svg>
 );
 
+export const ChevronDownIcon = (props: IconProps) => (
+  <svg {...base(props.size)} className={props.className}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
 export const MicIcon = (props: IconProps) => (
   <svg {...base(props.size)} className={props.className}>
     <rect x="9" y="3" width="6" height="12" rx="3" />

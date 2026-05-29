@@ -2,6 +2,9 @@ export type PlanId = 'free' | 'student' | 'pro';
 
 export const PLAN_IDS = ['free', 'student', 'pro'] as const;
 
+/** Gerações de IA gratuitas (vitalícias) que o plano free ganha pra experimentar. */
+export const FREE_AI_TRIAL = 3;
+
 export type PlanLimits = {
   /** Max active patients. Number.POSITIVE_INFINITY = unlimited. */
   maxPatients: number;

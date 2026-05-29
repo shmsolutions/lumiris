@@ -7,6 +7,8 @@ const DEFAULT_BASE_URL = 'https://api-sandbox.asaas.com/v3';
 
 const baseUrl = () => (Env.ASAAS_BASE_URL || DEFAULT_BASE_URL).replace(/\/$/, '');
 
+const appUrl = () => (Env.NEXT_PUBLIC_APP_URL || 'https://lumiris.com.br').replace(/\/$/, '');
+
 /** Valor do plano em reais (Asaas trabalha com decimal, não centavos). */
 const planValueReais = (plan: PaidPlanId) => PLAN_PRICE_CENTS[plan] / 100;
 
@@ -46,95 +48,65 @@ const asaasFetch = async <T>(path: string, init: AsaasFetchInit): Promise<T> => 
   return (await response.json()) as T;
 };
 
-type AsaasCustomer = { id: string };
-type AsaasSubscription = { id: string; status?: string };
-type AsaasPayment = { id: string; invoiceUrl?: string; value?: number; status?: string };
-type AsaasPaymentList = { data?: AsaasPayment[] };
+type AsaasCheckout = { id?: string; link?: string; url?: string; invoiceUrl?: string };
 
-export type CheckoutResult = {
-  customerId: string;
-  subscriptionId: string;
-  /** id da cobrança gerada (pay_xxx) — chave pra persistir e mapear o webhook. */
-  paymentId: string;
-  /** Página hospedada do Asaas onde o cliente escolhe Pix/cartão/boleto. */
-  invoiceUrl: string;
-  status: string;
-};
+export type CheckoutSession = { checkoutUrl: string };
 
-type SubscribeInput = {
+type CreateCheckoutInput = {
   userId: string;
   plan: PaidPlanId;
   customer: { name: string; email: string; taxId: string };
-  /** Reaproveita um cliente já criado no Asaas, se houver. */
-  existingCustomerId: string | null;
-};
-
-/** Cria (ou reaproveita) o cliente no Asaas e devolve o id. */
-const ensureCustomer = async (input: SubscribeInput): Promise<string> => {
-  // Só reaproveita ids reais do Asaas (cus_…). Ignora lixo de testes antigos.
-  if (input.existingCustomerId?.startsWith('cus_')) {
-    return input.existingCustomerId;
-  }
-  const customer = await asaasFetch<AsaasCustomer>('/customers', {
-    method: 'POST',
-    body: {
-      name: input.customer.name,
-      cpfCnpj: input.customer.taxId,
-      email: input.customer.email,
-      externalReference: input.userId,
-      notificationDisabled: false,
-    },
-  });
-  return customer.id;
 };
 
 /**
- * Cria uma assinatura recorrente mensal no Asaas com billingType UNDEFINED — o
- * cliente escolhe Pix, cartão ou boleto na página hospedada.
+ * Cria uma sessão de Checkout (página moderna do Asaas) pra uma assinatura
+ * mensal. A assinatura só é criada quando o cliente conclui o pagamento — por
+ * isso mapeamos o usuário de volta via `externalReference` (userId) no webhook.
  */
-export const subscribe = async (input: SubscribeInput): Promise<CheckoutResult> => {
-  const customerId = await ensureCustomer(input);
-
-  const subscription = await asaasFetch<AsaasSubscription>('/subscriptions', {
+export const createCheckout = async (input: CreateCheckoutInput): Promise<CheckoutSession> => {
+  const checkout = await asaasFetch<AsaasCheckout>('/checkouts', {
     method: 'POST',
     body: {
-      customer: customerId,
-      billingType: 'UNDEFINED',
-      value: planValueReais(input.plan),
-      nextDueDate: today(),
-      cycle: 'MONTHLY',
-      description: `Lumiris — plano ${input.plan}`,
+      billingTypes: ['CREDIT_CARD', 'PIX'],
+      chargeTypes: ['RECURRENT'],
+      minutesToExpire: 60,
       externalReference: input.userId,
+      callback: {
+        successUrl: `${appUrl()}/dashboard/settings/?tab=plano&paid=1`,
+        cancelUrl: `${appUrl()}/dashboard/settings/?tab=plano`,
+      },
+      items: [
+        {
+          name: `Lumiris — plano ${input.plan}`,
+          description: `Assinatura mensal do plano ${input.plan}`,
+          quantity: 1,
+          value: planValueReais(input.plan),
+        },
+      ],
+      subscription: {
+        cycle: 'MONTHLY',
+        nextDueDate: today(),
+        externalReference: input.userId,
+      },
+      customerData: {
+        name: input.customer.name,
+        email: input.customer.email,
+        cpfCnpj: input.customer.taxId,
+      },
     },
   });
 
-  // A primeira cobrança é criada logo após a assinatura, então buscamos a lista
-  // de pagamentos pra pegar a URL de checkout.
-  const payments = await asaasFetch<AsaasPaymentList>(
-    `/subscriptions/${subscription.id}/payments`,
-    { method: 'GET' },
-  );
-  const firstPayment = payments.data?.[0];
-  logger.info('[billing] assinatura criada', {
-    subscriptionId: subscription.id,
-    paymentsFound: payments.data?.length ?? 0,
-    firstPaymentId: firstPayment?.id ?? null,
-    hasInvoiceUrl: Boolean(firstPayment?.invoiceUrl),
-  });
-  if (!firstPayment?.invoiceUrl) {
-    logger.error('[billing] assinatura criada sem invoiceUrl', {
-      subscriptionId: subscription.id,
-    });
-    throw new Error('asaas_no_invoice_url');
-  }
+  // Log temporário da resposta crua — confirmar qual campo traz a URL e o shape
+  // no sandbox. Remover depois de validado.
+  logger.info('[billing] checkout response (raw)', { checkout });
 
-  return {
-    customerId,
-    subscriptionId: subscription.id,
-    paymentId: firstPayment.id,
-    invoiceUrl: firstPayment.invoiceUrl,
-    status: firstPayment.status ?? 'PENDING',
-  };
+  const checkoutUrl = checkout.link ?? checkout.url ?? checkout.invoiceUrl;
+  if (!checkoutUrl) {
+    logger.error('[billing] checkout criado sem URL', { checkout });
+    throw new Error('asaas_no_checkout_url');
+  }
+  logger.info('[billing] checkout criado', { id: checkout.id ?? null, checkoutUrl });
+  return { checkoutUrl };
 };
 
 /** Cancela a assinatura recorrente no Asaas. Ignora ids inválidos. */
@@ -158,8 +130,12 @@ export type BillingEvent = {
   kind: 'paid' | 'canceled' | 'past_due' | 'unknown';
   /** id da cobrança (pay_xxx). */
   paymentId: string | null;
-  /** id da assinatura (sub_xxx) — usado pra mapear o usuário. */
+  /** id da assinatura (sub_xxx) — usado pra mapear o usuário (fluxo legado). */
   subscriptionId: string | null;
+  /** id do cliente no Asaas (cus_xxx). */
+  customerId: string | null;
+  /** Nosso userId, propagado via externalReference no checkout. */
+  externalReference: string | null;
   plan: PlanId | null;
 };
 
@@ -167,6 +143,8 @@ type AsaasWebhookPayment = {
   id?: string;
   value?: number;
   subscription?: string;
+  customer?: string;
+  externalReference?: string;
 };
 
 type AsaasWebhookPayload = {
@@ -195,6 +173,8 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
   const base = {
     paymentId: payment.id ?? null,
     subscriptionId: payment.subscription ?? null,
+    customerId: payment.customer ?? null,
+    externalReference: payment.externalReference ?? null,
     plan: getPlanByValueCents(valueCents),
   };
 

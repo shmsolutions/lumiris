@@ -16,6 +16,8 @@ export const Env = createEnv({
     // Resend (emails transacionais). Sem chave, o envio vira no-op com log.
     RESEND_API_KEY: z.string().startsWith('re_').optional(),
     RESEND_FROM_EMAIL: z.email().optional(),
+    // Segredo compartilhado com o cron do Coolify (header Authorization: Bearer).
+    CRON_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().optional(),
@@ -41,6 +43,7 @@ export const Env = createEnv({
     ASAAS_WEBHOOK_TOKEN: process.env.ASAAS_WEBHOOK_TOKEN,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_LOGGING_LEVEL: process.env.NEXT_PUBLIC_LOGGING_LEVEL,

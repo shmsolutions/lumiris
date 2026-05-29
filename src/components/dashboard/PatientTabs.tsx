@@ -25,29 +25,31 @@ export const PatientTabs = (props: PatientTabsProps) => {
   const pathname = usePathname();
 
   return (
-    <nav className="-mb-px flex gap-1 overflow-x-auto border-b border-ink-200">
-      {tabs.map((tab) => {
-        const base = `/dashboard/patients/${props.patientId}`;
-        const href = tab.segment ? `${base}/${tab.segment}/` : `${base}/`;
-        const normalized = pathname.replace(/\/$/, '');
-        const target = href.replace(/\/$/, '');
-        const active = normalized === target;
+    <div className="-mx-2">
+      <nav className="flex snap-x [scrollbar-width:none] gap-2 overflow-x-auto [mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] px-4 pt-1 pb-1 [-webkit-mask-image:linear-gradient(to_right,black_calc(100%-28px),transparent)] sm:[mask-image:none] sm:px-0 sm:[-webkit-mask-image:none] [&::-webkit-scrollbar]:hidden">
+        {tabs.map((tab) => {
+          const base = `/dashboard/patients/${props.patientId}`;
+          const href = tab.segment ? `${base}/${tab.segment}/` : `${base}/`;
+          const normalized = pathname.replace(/\/$/, '');
+          const target = href.replace(/\/$/, '');
+          const active = normalized === target;
 
-        return (
-          <Link
-            key={tab.key}
-            href={href}
-            aria-current={active ? 'page' : undefined}
-            className={`inline-flex items-center border-b-2 px-3 py-3 text-sm font-medium whitespace-nowrap transition ${
-              active
-                ? 'border-brand-500 text-brand-700'
-                : 'border-transparent text-ink-500 hover:border-ink-300 hover:text-ink-800'
-            }`}
-          >
-            {t(`tab_${tab.key}` as 'tab_overview')}
-          </Link>
-        );
-      })}
-    </nav>
+          return (
+            <Link
+              key={tab.key}
+              href={href}
+              aria-current={active ? 'page' : undefined}
+              className={`shrink-0 snap-start rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+                active
+                  ? 'bg-brand-500 text-white shadow-sm shadow-brand-500/25'
+                  : 'bg-surface-elevated text-ink-600 ring-1 ring-ink-200 hover:text-ink-900 hover:ring-ink-300'
+              }`}
+            >
+              {t(`tab_${tab.key}` as 'tab_overview')}
+            </Link>
+          );
+        })}
+      </nav>
+    </div>
   );
 };

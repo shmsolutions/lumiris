@@ -32,12 +32,21 @@ export const POST = async (request: Request) => {
 
   const event = parseWebhookEvent(parseBody(rawBody));
 
-  // Sem assinatura no payload (ex: cobrança avulsa/teste) não há o que liberar.
-  if (!event.subscriptionId) {
-    return NextResponse.json({ ok: true });
-  }
+  // Log temporário — acompanhar o mapeamento no sandbox. Remover depois.
+  logger.info('[billing] webhook event', {
+    kind: event.kind,
+    plan: event.plan,
+    externalReference: event.externalReference,
+    subscriptionId: event.subscriptionId,
+    customerId: event.customerId,
+    paymentId: event.paymentId,
+  });
 
-  const userId = await getUserIdByAsaasSubscription(event.subscriptionId);
+  // Mapeia o usuário: preferimos o externalReference (userId) propagado pelo
+  // Checkout; caímos pra subscriptionId no fluxo legado de assinatura direta.
+  const userId =
+    event.externalReference ??
+    (event.subscriptionId ? await getUserIdByAsaasSubscription(event.subscriptionId) : null);
   if (!userId) {
     return NextResponse.json({ ok: true });
   }
@@ -48,8 +57,11 @@ export const POST = async (request: Request) => {
         plan: event.plan,
         subscriptionStatus: 'active',
         currentPeriodEnd: oneMonthFromNow(),
+        // Guarda ids do Asaas vindos do checkout pra cancelamento/futuros webhooks.
+        ...(event.subscriptionId ? { asaasSubscriptionId: event.subscriptionId } : {}),
+        ...(event.customerId ? { asaasCustomerId: event.customerId } : {}),
       });
-      if (event.paymentId) {
+      if (event.paymentId && event.subscriptionId) {
         await recordPayment({
           ownerId: userId,
           correlationId: event.paymentId,

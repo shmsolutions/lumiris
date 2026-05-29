@@ -15,41 +15,53 @@ const initials = (name: string) =>
     .map((part) => part[0]?.toUpperCase())
     .join('');
 
+const Chip = (props: { label: string; value: string }) => (
+  <span className="inline-flex items-center gap-1.5 rounded-full border border-ink-200/80 bg-surface-elevated/70 px-2.5 py-1 text-xs backdrop-blur">
+    <span className="text-ink-400">{props.label}</span>
+    <span className="font-semibold text-ink-700">{props.value}</span>
+  </span>
+);
+
 export const PatientHeader = (props: PatientHeaderProps) => {
   const t = useTranslations('PatientHeader');
 
   return (
-    <div className="flex flex-wrap items-start justify-between gap-6 border-b border-ink-200/70 pb-6">
-      <div className="flex min-w-0 items-start gap-4">
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-100 text-base font-semibold text-brand-700 ring-1 ring-brand-200/70">
+    <div className="relative overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
+      {/* Warm "lume" wash so the patient cover feels alive, not a flat slab. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(120% 100% at 0% 0%, rgba(247,188,116,0.22), transparent 55%), radial-gradient(90% 80% at 100% 0%, rgba(13,148,136,0.06), transparent 60%)',
+        }}
+      />
+
+      <div className="relative flex items-center gap-4 p-5">
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400 to-brand-600 text-lg font-semibold text-white shadow-sm ring-1 shadow-brand-500/25 ring-brand-300/40">
           {initials(props.fullName) || '·'}
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-2xl font-semibold tracking-tight text-ink-900 sm:text-3xl">
+          <h1 className="truncate text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
             {props.fullName}
           </h1>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-500">
-            {props.birthDate ? (
-              <span className="inline-flex items-center gap-1">
-                <span className="text-ink-400">{t('field_birth')}</span>
-                <span className="font-medium text-ink-700">{props.birthDate}</span>
-              </span>
-            ) : null}
-            {props.cid ? (
-              <span className="inline-flex items-center gap-1">
-                <span className="text-ink-400">{t('field_cid')}</span>
-                <span className="font-medium text-ink-700">{props.cid}</span>
-              </span>
-            ) : null}
-            {props.diagnosis ? (
-              <span className="inline-flex items-center gap-1">
-                <span className="text-ink-400">{t('field_diagnosis')}</span>
-                <span className="font-medium text-ink-700">{props.diagnosis}</span>
-              </span>
-            ) : null}
-          </div>
+          {props.birthDate || props.cid ? (
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              {props.birthDate ? <Chip label={t('field_birth')} value={props.birthDate} /> : null}
+              {props.cid ? <Chip label={t('field_cid')} value={props.cid} /> : null}
+            </div>
+          ) : null}
         </div>
       </div>
+
+      {props.diagnosis ? (
+        <div className="relative flex items-baseline gap-2 border-t border-ink-200/70 bg-ink-50/50 px-5 py-3">
+          <span className="shrink-0 text-[10px] font-semibold tracking-wider text-ink-400 uppercase">
+            {t('field_diagnosis')}
+          </span>
+          <span className="min-w-0 text-sm text-ink-700">{props.diagnosis}</span>
+        </div>
+      ) : null}
     </div>
   );
 };

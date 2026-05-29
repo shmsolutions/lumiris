@@ -1,6 +1,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
+import { notifyWelcome } from '@/libs/Email';
 import { upsertUserProfile } from '@/libs/UserProfile';
 import { OnboardingValidation } from '@/validations/OnboardingValidation';
 
@@ -23,6 +24,9 @@ export const POST = async (request: Request) => {
     plan: 'free',
     onboarded: true,
   });
+
+  // Boas-vindas — não-bloqueante, falha de e-mail não trava o onboarding.
+  void notifyWelcome(userId);
 
   return NextResponse.json({ ok: true, selectedPlan: parse.data.plan });
 };

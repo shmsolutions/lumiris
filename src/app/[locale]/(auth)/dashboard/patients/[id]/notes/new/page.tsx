@@ -2,10 +2,13 @@ import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { FlameIcon } from '@/components/dashboard/Icons';
 import { NoteComposer } from '@/components/notes/NoteComposer';
 import { db } from '@/libs/DB';
+import { getAiAccess } from '@/libs/Entitlements';
 import { Link } from '@/libs/I18nNavigation';
 import { listTemplates } from '@/libs/Templates';
+import { getUserProfile } from '@/libs/UserProfile';
 import { appointmentSchema, patientSchema, treatmentPlanSchema } from '@/models/Schema';
 import { TemplateDefinitionValidation } from '@/validations/TemplateValidation';
 import { TreatmentPlanUpsertValidation } from '@/validations/TreatmentPlanValidation';
@@ -28,7 +31,7 @@ export default async function NewNotePage(props: NewNotePageProps) {
   }
 
   const [patient] = await db
-    .select({ id: patientSchema.id })
+    .select({ id: patientSchema.id, fullName: patientSchema.fullName })
     .from(patientSchema)
     .where(and(eq(patientSchema.id, id), eq(patientSchema.ownerId, userId)))
     .limit(1);
@@ -49,6 +52,9 @@ export default async function NewNotePage(props: NewNotePageProps) {
   const activeObjectives = allObjectives
     .filter((o) => o.status === 'active')
     .map(({ id: oid, title }) => ({ id: oid, title }));
+
+  const profile = await getUserProfile(userId);
+  const aiAccess = getAiAccess(profile);
 
   const templateRows = await listTemplates(userId, 'evolucao');
   const templates = templateRows.map((tpl) => ({
@@ -90,16 +96,23 @@ export default async function NewNotePage(props: NewNotePageProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <Link
-            href={`/dashboard/patients/${id}/notes/`}
-            className="text-xs text-brand-700 transition hover:text-brand-800"
-          >
-            ← {t('back')}
-          </Link>
-          <h2 className="mt-1 text-lg font-semibold text-ink-900">{t('title')}</h2>
-          <p className="text-sm text-ink-500">{t('description')}</p>
+      <div>
+        <Link
+          href={`/dashboard/patients/${id}/notes/`}
+          className="inline-flex items-center gap-1 text-xs font-medium text-brand-700 transition hover:text-brand-800"
+        >
+          ← {t('back')}
+        </Link>
+        <div className="mt-3 flex items-start gap-3">
+          <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-200/70">
+            <FlameIcon size={20} />
+          </span>
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-ink-900 sm:text-2xl">
+              {t('title')}
+            </h2>
+            <p className="mt-0.5 text-sm text-ink-500">{t('description')}</p>
+          </div>
         </div>
       </div>
 
@@ -111,6 +124,9 @@ export default async function NewNotePage(props: NewNotePageProps) {
 
       <NoteComposer
         patientId={id}
+        patientName={patient.fullName}
+        aiAvailable={aiAccess.allowed}
+        trialRemaining={aiAccess.unlimited ? null : aiAccess.trialRemaining}
         appointmentId={appointmentId}
         objectives={activeObjectives}
         templates={templates}

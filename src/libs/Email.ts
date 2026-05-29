@@ -92,6 +92,75 @@ Lumiris`;
   return { subject, html, text };
 };
 
+/** Primeiro contato logo após o cadastro/onboarding. */
+export const welcomeEmail = (input: { name: string }): Omit<EmailInput, 'to'> => {
+  const subject = 'Boas-vindas ao Lumiris';
+  const intro = greeting(input.name);
+
+  const html = `<!doctype html><html><body style="${baseStyle}">
+<h1 style="font-size:20px;margin:0 0 16px">Que bom ter você aqui ✨</h1>
+<p>${intro}</p>
+<p>O Lumiris transforma horas de prontuário em minutos. Comece cadastrando um paciente e gravando a primeira evolução — a IA organiza pra você revisar.</p>
+<p style="margin:24px 0"><a href="${appUrl}/dashboard/" style="${buttonStyle}">Abrir o painel</a></p>
+<p>Qualquer dúvida, é só responder este e-mail.</p>
+<p style="${footerStyle}">Lumiris — prontuário inteligente para Terapeutas Ocupacionais.</p>
+</body></html>`;
+
+  const text = `${intro}
+
+O Lumiris transforma horas de prontuário em minutos. Comece cadastrando um paciente e gravando a primeira evolução — a IA organiza pra você revisar.
+
+Abra o painel: ${appUrl}/dashboard/
+
+Qualquer dúvida, é só responder este e-mail.
+
+Lumiris`;
+
+  return { subject, html, text };
+};
+
+/** Digest de relatórios trimestrais vencendo, enviado pela cron. */
+export const reportReminderEmail = (input: {
+  name: string;
+  patients: { fullName: string; dueLabel: string }[];
+}): Omit<EmailInput, 'to'> => {
+  const count = input.patients.length;
+  const subject =
+    count === 1
+      ? '1 relatório trimestral chegando o prazo — Lumiris'
+      : `${count} relatórios trimestrais chegando o prazo — Lumiris`;
+  const intro = greeting(input.name);
+
+  const items = input.patients
+    .map(
+      (p) =>
+        `<li style="margin-bottom:6px"><strong>${p.fullName}</strong> — <span style="color:#9A988C">${p.dueLabel}</span></li>`,
+    )
+    .join('');
+  const textItems = input.patients.map((p) => `- ${p.fullName} (${p.dueLabel})`).join('\n');
+
+  const html = `<!doctype html><html><body style="${baseStyle}">
+<h1 style="font-size:20px;margin:0 0 16px">Relatórios trimestrais a caminho</h1>
+<p>${intro}</p>
+<p>Estes pacientes estão com o relatório trimestral chegando no prazo:</p>
+<ul style="padding-left:18px;margin:16px 0">${items}</ul>
+<p style="margin:24px 0"><a href="${appUrl}/dashboard/reports/" style="${buttonStyle}">Gerar relatórios</a></p>
+<p style="${footerStyle}">Lumiris — a gente avisa pra você não correr na última hora.</p>
+</body></html>`;
+
+  const text = `${intro}
+
+Estes pacientes estão com o relatório trimestral chegando no prazo:
+
+${textItems}
+
+Gerar relatórios: ${appUrl}/dashboard/reports/
+
+Lumiris`;
+
+  return { subject, html, text };
+};
+
 const planLabels: Record<PaidPlanId, string> = {
   student: 'Estudante',
   pro: 'Profissional',
@@ -123,6 +192,45 @@ export const notifyPlanActivated = async (userId: string, plan: PaidPlanId): Pro
     await sendEmail({ to: email, ...template });
   } catch (error) {
     logger.error('notifyPlanActivated failed', { userId, error: (error as Error).message });
+  }
+};
+
+/** Envia o e-mail de boas-vindas. Best-effort — não joga. */
+export const notifyWelcome = async (userId: string): Promise<void> => {
+  try {
+    const { email, name } = await fetchUserContact(userId);
+    if (!email) {
+      logger.warn('No email for user, skipping welcome', { userId });
+      return;
+    }
+    await sendEmail({ to: email, ...welcomeEmail({ name }) });
+  } catch (error) {
+    logger.error('notifyWelcome failed', { userId, error: (error as Error).message });
+  }
+};
+
+/**
+ * Envia o digest de relatórios vencendo. Devolve true se o e-mail saiu (pra
+ * cron só marcar os pacientes como avisados quando o envio acontece).
+ */
+export const notifyReportReminder = async (
+  userId: string,
+  patients: { fullName: string; dueLabel: string }[],
+): Promise<boolean> => {
+  if (patients.length === 0) {
+    return false;
+  }
+  try {
+    const { email, name } = await fetchUserContact(userId);
+    if (!email) {
+      logger.warn('No email for user, skipping report reminder', { userId });
+      return false;
+    }
+    await sendEmail({ to: email, ...reportReminderEmail({ name, patients }) });
+    return true;
+  } catch (error) {
+    logger.error('notifyReportReminder failed', { userId, error: (error as Error).message });
+    return false;
   }
 };
 

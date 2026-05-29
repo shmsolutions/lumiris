@@ -1,15 +1,14 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import { subscribe } from '@/libs/Asaas';
+import { createCheckout } from '@/libs/Asaas';
 import { logger } from '@/libs/Logger';
-import { recordPayment } from '@/libs/Payments';
 import { getUserProfile, upsertUserProfile } from '@/libs/UserProfile';
-import { isPaidPlan, PLAN_PRICE_CENTS } from '@/utils/Plans';
+import { isPaidPlan } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
 
-const startSubscription = async (userId: string, plan: PaidPlanId, taxId: string) => {
+const startCheckout = async (userId: string, plan: PaidPlanId, taxId: string) => {
   const profile = await getUserProfile(userId);
   const user = await currentUser().catch(() => null);
   const name =
@@ -18,11 +17,10 @@ const startSubscription = async (userId: string, plan: PaidPlanId, taxId: string
     'Terapeuta Lumiris';
   const email = user?.primaryEmailAddress?.emailAddress ?? '';
 
-  const result = await subscribe({
+  const result = await createCheckout({
     userId,
     plan,
     customer: { name, email, taxId },
-    existingCustomerId: profile.asaasCustomerId,
   }).catch((error: unknown) => {
     logger.error(`Checkout failed for ${userId}: ${(error as Error).message}`);
     return null;
@@ -32,23 +30,9 @@ const startSubscription = async (userId: string, plan: PaidPlanId, taxId: string
     return null;
   }
 
-  await Promise.all([
-    upsertUserProfile(userId, {
-      taxId,
-      asaasCustomerId: result.customerId,
-      asaasSubscriptionId: result.subscriptionId,
-      subscriptionStatus: 'pending',
-    }),
-    recordPayment({
-      ownerId: userId,
-      correlationId: result.paymentId,
-      asaasSubscriptionId: result.subscriptionId,
-      plan,
-      valueCents: PLAN_PRICE_CENTS[plan],
-      paymentLinkUrl: result.invoiceUrl,
-    }),
-  ]);
-
+  // Guardamos o CPF/CNPJ e marcamos pendente; assinatura/cliente são
+  // capturados no webhook quando o pagamento conclui.
+  await upsertUserProfile(userId, { taxId, subscriptionStatus: 'pending' });
   return result;
 };
 
@@ -64,18 +48,12 @@ export const POST = async (request: Request) => {
     return NextResponse.json(z.treeifyError(parse.error), { status: 422 });
   }
 
-  const result = await startSubscription(userId, parse.data.plan, parse.data.taxId);
+  const result = await startCheckout(userId, parse.data.plan, parse.data.taxId);
   if (!result) {
     return NextResponse.json({ error: 'checkout_failed' }, { status: 502 });
   }
 
-  logger.info('[billing] checkout result', {
-    userId,
-    status: result.status,
-    invoiceUrl: result.invoiceUrl,
-  });
-
-  return NextResponse.json({ checkoutUrl: result.invoiceUrl, status: result.status });
+  return NextResponse.json({ checkoutUrl: result.checkoutUrl });
 };
 
 /**

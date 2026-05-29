@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '@/libs/DB';
 import { userProfileSchema } from '@/models/Schema';
 import { PLAN_IDS } from '@/utils/Plans';
@@ -15,6 +15,7 @@ export type UserProfile = {
   studentName: string;
   plan: PlanId;
   onboarded: boolean;
+  aiTrialUsed: number;
   taxId: string | null;
   asaasCustomerId: string | null;
   asaasSubscriptionId: string | null;
@@ -43,6 +44,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
     studentName: row?.studentName ?? '',
     plan: normalizePlan(row?.plan),
     onboarded: row?.onboarded ?? false,
+    aiTrialUsed: row?.aiTrialUsed ?? 0,
     taxId: row?.taxId ?? null,
     asaasCustomerId: row?.asaasCustomerId ?? null,
     asaasSubscriptionId: row?.asaasSubscriptionId ?? null,
@@ -106,6 +108,14 @@ export const getUserIdByAsaasSubscription = async (
     .where(eq(userProfileSchema.asaasSubscriptionId, subscriptionId))
     .limit(1);
   return row?.userId ?? null;
+};
+
+/** Conta +1 geração de IA consumida no trial gratuito. */
+export const incrementAiTrial = async (userId: string) => {
+  await db
+    .update(userProfileSchema)
+    .set({ aiTrialUsed: sql`${userProfileSchema.aiTrialUsed} + 1` })
+    .where(eq(userProfileSchema.userId, userId));
 };
 
 export const upsertUserProfile = async (userId: string, data: UpsertInput) => {

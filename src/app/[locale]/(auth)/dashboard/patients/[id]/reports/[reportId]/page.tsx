@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
-import { FileIcon } from '@/components/dashboard/Icons';
+import { ArrowRightIcon, FileIcon, SparkIcon } from '@/components/dashboard/Icons';
 import { ReportDetail } from '@/components/reports/ReportDetail';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
@@ -88,12 +88,13 @@ export default async function ReportDetailPage(props: ReportDetailPageProps) {
           </div>
         ) : (
           <Link
-            href="/dashboard/settings/"
-            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-ink-300 px-3 py-2 text-xs font-medium text-ink-500 transition hover:border-ink-400"
+            href="/dashboard/settings/?tab=plano"
+            className="inline-flex items-center gap-1.5 rounded-md border border-brand-200 bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700 transition hover:bg-brand-100"
             title={t('export_locked_hint')}
           >
-            <FileIcon size={14} />
+            <SparkIcon size={14} />
             {t('export_locked')}
+            <ArrowRightIcon size={13} />
           </Link>
         )}
       </div>

@@ -12,7 +12,7 @@ type Plan = {
 };
 
 const plans: Plan[] = [
-  { key: 'free', price: 'R$ 0', features: 4 },
+  { key: 'free', price: 'R$ 0', features: 5 },
   {
     key: 'student',
     price: 'R$ 19',

@@ -1,7 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, desc, eq } from 'drizzle-orm';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { AlertIcon, ArrowRightIcon, CheckIcon, MicIcon } from '@/components/dashboard/Icons';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import {
@@ -23,6 +24,17 @@ const FieldRow = (props: { label: string; value: React.ReactNode }) => (
     <div className="min-w-0 text-sm break-words text-ink-800">{props.value}</div>
   </div>
 );
+
+const notePreview = (note: {
+  procedimento: string | null;
+  evolucao: string | null;
+  intercorrencia: string | null;
+}) => {
+  const fields = [note.procedimento, note.evolucao, note.intercorrencia].filter((s): s is string =>
+    Boolean(s?.trim()),
+  );
+  return fields[0]?.slice(0, 220) ?? '';
+};
 
 export default async function PatientOverviewPage(props: PatientOverviewPageProps) {
   const { locale, id } = await props.params;
@@ -56,6 +68,19 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
     .where(eq(sessionNoteSchema.patientId, id));
   const notesCount = notesCountRow?.value ?? 0;
 
+  const [latestNote] = await db
+    .select({
+      id: sessionNoteSchema.id,
+      procedimento: sessionNoteSchema.procedimento,
+      intercorrencia: sessionNoteSchema.intercorrencia,
+      evolucao: sessionNoteSchema.evolucao,
+      sessionDate: sessionNoteSchema.sessionDate,
+    })
+    .from(sessionNoteSchema)
+    .where(eq(sessionNoteSchema.patientId, id))
+    .orderBy(desc(sessionNoteSchema.sessionDate), desc(sessionNoteSchema.createdAt))
+    .limit(1);
+
   const [planRow] = await db
     .select({ objectives: treatmentPlanSchema.objectives })
     .from(treatmentPlanSchema)
@@ -64,14 +89,84 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
   const planObjectives: Objective[] = TreatmentPlanUpsertValidation.shape.objectives.parse(
     planRow?.objectives ?? [],
   );
-  const activeObjectivesCount = planObjectives.filter((o) => o.status === 'active').length;
+  const activeObjectives = planObjectives.filter((o) => o.status === 'active');
+  const topObjectives = activeObjectives.slice(0, 3);
 
   const empty = <span className="text-ink-400">—</span>;
+
+  const dateFmt = new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+  const lastSessionLabel = latestNote
+    ? dateFmt.format(new Date(`${latestNote.sessionDate}T12:00:00`))
+    : null;
+
+  const attentionItems: string[] = [];
+  if (!anamnesis) {
+    attentionItems.push(t('hub_attention_anamnesis'));
+  }
+  if (activeObjectives.length === 0) {
+    attentionItems.push(t('hub_attention_plan'));
+  }
+  if (notesCount === 0) {
+    attentionItems.push(t('hub_attention_notes'));
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       <div className="space-y-4 lg:col-span-2">
-        <section className="overflow-hidden rounded-xl border border-ink-200 bg-surface-elevated">
+        {/* Última sessão — o que aconteceu por último, em destaque. */}
+        {latestNote ? (
+          <Link
+            href={`/dashboard/patients/${id}/notes/${latestNote.id}/`}
+            className="group block rounded-2xl border border-ink-200 bg-surface-elevated p-5 transition hover:border-ink-300 hover:shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-2">
+                <span className="size-2 rounded-full bg-accent-500" />
+                <span className="text-xs font-semibold tracking-wider text-accent-700 uppercase">
+                  {t('hub_last_session')}
+                </span>
+              </span>
+              <span className="text-xs text-ink-400">{lastSessionLabel}</span>
+            </div>
+            <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-ink-700">
+              {notePreview(latestNote)}
+            </p>
+            <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-700 transition group-hover:gap-1.5 group-hover:text-brand-800">
+              {t('hub_read_full')}
+              <ArrowRightIcon size={14} />
+            </span>
+          </Link>
+        ) : null}
+
+        {/* Nova evolução — ação principal, sempre à mão. */}
+        <Link
+          href={`/dashboard/patients/${id}/notes/new/`}
+          className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-brand-200/70 bg-brand-50/50 p-5 transition hover:border-brand-300 hover:bg-brand-50"
+        >
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(90% 80% at 100% 0%, rgba(247,188,116,0.25), transparent 60%)',
+            }}
+          />
+          <div className="relative min-w-0 flex-1">
+            <div className="text-base font-semibold text-ink-900">
+              {t('hub_new_evolution_title')}
+            </div>
+            <div className="text-sm text-ink-600">{t('hub_new_evolution_desc')}</div>
+          </div>
+          <span className="relative inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-sm shadow-brand-500/25 transition group-hover:scale-105">
+            <MicIcon size={20} />
+          </span>
+        </Link>
+
+        <section className="overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
           <header className="border-b border-ink-200 px-5 py-3">
             <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
               {t('section_personal')}
@@ -88,7 +183,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
           <FieldRow label={t('field_contact_email')} value={patient.contactEmail ?? empty} />
         </section>
 
-        <section className="overflow-hidden rounded-xl border border-ink-200 bg-surface-elevated">
+        <section className="overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
           <header className="border-b border-ink-200 px-5 py-3">
             <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
               {t('section_clinical')}
@@ -107,7 +202,35 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
       </div>
 
       <aside className="space-y-4">
-        <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
+        {/* Atenção necessária — só aparece quando há pendência real. */}
+        {attentionItems.length > 0 ? (
+          <section className="rounded-2xl border border-brand-200/70 bg-brand-50/40 p-5">
+            <div className="flex items-center gap-2">
+              <AlertIcon className="text-brand-600" size={18} />
+              <h2 className="text-xs font-semibold tracking-wider text-brand-700 uppercase">
+                {t('hub_attention_title')}
+              </h2>
+            </div>
+            <ul className="mt-3 space-y-2">
+              {attentionItems.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2 rounded-lg border border-ink-200/70 bg-surface-elevated px-3 py-2.5 text-sm text-ink-700"
+                >
+                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-brand-500" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : (
+          <section className="flex items-center gap-2 rounded-2xl border border-accent-500/30 bg-accent-50 px-5 py-4 text-sm text-accent-700">
+            <CheckIcon size={18} />
+            {t('hub_attention_none')}
+          </section>
+        )}
+
+        <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
           <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
             {t('status_title')}
           </h2>
@@ -126,9 +249,9 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
             </li>
             <li className="flex items-center justify-between">
               <span className="text-ink-700">{t('status_plan')}</span>
-              {activeObjectivesCount > 0 ? (
+              {activeObjectives.length > 0 ? (
                 <span className="rounded-full bg-accent-50 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-accent-700 uppercase">
-                  {t('status_plan_active', { count: activeObjectivesCount })}
+                  {t('status_plan_active', { count: activeObjectives.length })}
                 </span>
               ) : (
                 <span className="rounded-full bg-ink-100 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-ink-500 uppercase">
@@ -151,7 +274,48 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
           </ul>
         </section>
 
-        <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
+        {/* Objetivos em andamento — puxados do plano terapêutico. */}
+        <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
+              {t('hub_goals_title')}
+            </h2>
+            <Link
+              href={`/dashboard/patients/${id}/plan/`}
+              className="text-xs font-semibold text-brand-700 transition hover:text-brand-800"
+            >
+              {t('hub_goals_view_all')} →
+            </Link>
+          </div>
+          {topObjectives.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+              {topObjectives.map((objective) => (
+                <li
+                  key={objective.id}
+                  className="rounded-lg border border-ink-200/70 bg-ink-50/40 px-3 py-2.5"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <span className="mt-1 h-8 w-1 shrink-0 rounded-full bg-brand-400" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-ink-800">{objective.title}</div>
+                      {objective.targetDate ? (
+                        <div className="mt-0.5 text-xs text-ink-500">
+                          {t('hub_goals_target', {
+                            date: dateFmt.format(new Date(`${objective.targetDate}T12:00:00`)),
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-ink-400">{t('hub_goals_empty')}</p>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
           <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
             {t('actions_title')}
           </h2>

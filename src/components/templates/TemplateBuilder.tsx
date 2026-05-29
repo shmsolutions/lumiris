@@ -4,9 +4,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { UseFormReturn } from 'react-hook-form';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { Select } from '@/components/forms/Select';
 import { useRouter } from '@/libs/I18nNavigation';
 import {
   FILL_MODES,
@@ -56,33 +57,46 @@ const SectionFields = (props: { form: UseFormReturn<FormValues>; sectionIndex: n
               </div>
               <div>
                 <label className={labelClass}>{t('field_input_type')}</label>
-                <select
-                  className={inputClass}
-                  {...props.form.register(
-                    `definition.sections.${props.sectionIndex}.fields.${fieldIndex}.inputType`,
+                <Controller
+                  control={props.form.control}
+                  name={`definition.sections.${props.sectionIndex}.fields.${fieldIndex}.inputType`}
+                  render={({ field: ctl }) => (
+                    <Select
+                      ariaLabel={t('field_input_type')}
+                      onChange={ctl.onChange}
+                      options={INPUT_TYPES.map((type) => ({
+                        value: type,
+                        label: t(`input_${type}` as 'input_text'),
+                      }))}
+                      value={ctl.value ?? ''}
+                    />
                   )}
-                >
-                  {INPUT_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {t(`input_${type}` as 'input_text')}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
               <div>
                 <label className={labelClass}>{t('field_fill_mode')}</label>
-                <select
-                  className={inputClass}
-                  {...props.form.register(
-                    `definition.sections.${props.sectionIndex}.fields.${fieldIndex}.fillMode`,
+                <Controller
+                  control={props.form.control}
+                  name={`definition.sections.${props.sectionIndex}.fields.${fieldIndex}.fillMode`}
+                  render={({ field: ctl }) => (
+                    <Select
+                      ariaLabel={t('field_fill_mode')}
+                      groups={[
+                        { options: [{ value: 'manual', label: t('fill_manual') }] },
+                        {
+                          label: t('fill_group_auto'),
+                          options: FILL_MODES.filter((mode) => mode !== 'manual').map((mode) => ({
+                            value: mode,
+                            label: t(`fill_${mode}` as 'fill_manual'),
+                          })),
+                        },
+                      ]}
+                      onChange={ctl.onChange}
+                      value={ctl.value ?? ''}
+                    />
                   )}
-                >
-                  {FILL_MODES.map((mode) => (
-                    <option key={mode} value={mode}>
-                      {t(`fill_${mode}` as 'fill_manual')}
-                    </option>
-                  ))}
-                </select>
+                />
+                <p className="mt-1.5 text-xs text-ink-500">{t('field_fill_mode_hint')}</p>
               </div>
               <div className="sm:col-span-2">
                 <label className={labelClass}>{t('field_guide')}</label>
@@ -235,16 +249,21 @@ export const TemplateBuilder = (props: TemplateBuilderProps) => {
                       </div>
                       <div>
                         <label className={labelClass}>{t('section_type')}</label>
-                        <select
-                          className={inputClass}
-                          {...form.register(`definition.sections.${index}.type`)}
-                        >
-                          {SECTION_TYPES.map((type) => (
-                            <option key={type} value={type}>
-                              {t(`section_type_${type}` as 'section_type_header')}
-                            </option>
-                          ))}
-                        </select>
+                        <Controller
+                          control={form.control}
+                          name={`definition.sections.${index}.type`}
+                          render={({ field }) => (
+                            <Select
+                              ariaLabel={t('section_type')}
+                              onChange={field.onChange}
+                              options={SECTION_TYPES.map((type) => ({
+                                value: type,
+                                label: t(`section_type_${type}` as 'section_type_header'),
+                              }))}
+                              value={field.value ?? ''}
+                            />
+                          )}
+                        />
                       </div>
                     </div>
                     <div className="mt-3">

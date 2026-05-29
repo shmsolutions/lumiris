@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import * as z from 'zod';
-import { FileIcon } from '@/components/dashboard/Icons';
+import { ArrowRightIcon, FileIcon, SparkIcon } from '@/components/dashboard/Icons';
 import { NoteDetail } from '@/components/notes/NoteDetail';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
@@ -108,12 +108,13 @@ export default async function NoteDetailPage(props: NoteDetailPageProps) {
           </div>
         ) : (
           <Link
-            href="/dashboard/settings/"
-            className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-ink-300 px-3 py-2 text-xs font-medium text-ink-500 transition hover:border-ink-400"
+            href="/dashboard/settings/?tab=plano"
+            className="inline-flex items-center gap-1.5 rounded-md border border-brand-200 bg-brand-50 px-3 py-2 text-xs font-semibold text-brand-700 transition hover:bg-brand-100"
             title={t('export_locked_hint')}
           >
-            <FileIcon size={14} />
+            <SparkIcon size={14} />
             {t('export_locked')}
+            <ArrowRightIcon size={13} />
           </Link>
         )}
       </div>

@@ -26,6 +26,8 @@ export const userProfileSchema = pgTable('user_profile', {
   studentName: varchar('student_name', { length: 120 }),
   plan: varchar('plan', { length: 16 }).default('free').notNull(),
   onboarded: boolean('onboarded').default(false).notNull(),
+  // Gerações de IA já consumidas no trial gratuito (plano free). Vitalício.
+  aiTrialUsed: integer('ai_trial_used').default(0).notNull(),
   // CPF/CNPJ do cliente — exigido pelo Asaas pra criar a assinatura.
   taxId: varchar('tax_id', { length: 20 }),
   // Billing (Asaas) — cliente e assinatura recorrente.
@@ -84,6 +86,9 @@ export const patientSchema = pgTable(
     otherProfessionals: text('other_professionals'),
     notes: text('notes'),
     archivedAt: timestamp('archived_at', { mode: 'date' }),
+    // Quando o último lembrete de relatório trimestral foi enviado neste ciclo
+    // (anti-spam). Zera ao gerar um novo relatório.
+    reportReminderSentAt: timestamp('report_reminder_sent_at', { mode: 'date' }),
     updatedAt: timestamp('updated_at', { mode: 'date' })
       .defaultNow()
       .$onUpdate(() => new Date())

@@ -11,7 +11,7 @@ import { SignatureUploader } from '@/components/settings/SignatureUploader';
 import { TherapistProfileForm } from '@/components/settings/TherapistProfileForm';
 import { listPaymentsForUser } from '@/libs/Payments';
 import { getUserProfile, getUserSignature } from '@/libs/UserProfile';
-import { PLAN_LIMITS } from '@/utils/Plans';
+import { FREE_AI_TRIAL, PLAN_LIMITS } from '@/utils/Plans';
 
 const STATUS_BADGE: Record<string, string> = {
   paid: 'bg-success/15 text-success',
@@ -60,7 +60,12 @@ export default async function SettingsPage(props: SettingsPageProps) {
         therapistName: '',
         crefito: '',
         studentName: '',
+        aiTrialUsed: 0,
       };
+
+  const aiTrialRemaining = PLAN_LIMITS[profile.plan].ai
+    ? null
+    : Math.max(0, FREE_AI_TRIAL - profile.aiTrialUsed);
 
   const periodEndLabel = profile.currentPeriodEnd
     ? new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric' }).format(
@@ -113,6 +118,7 @@ export default async function SettingsPage(props: SettingsPageProps) {
         periodEndLabel={periodEndLabel}
         justPaid={search.paid === '1'}
         initialTaxId={profile.taxId}
+        aiTrialRemaining={aiTrialRemaining}
       />
       {payments.length > 0 ? (
         <div className="mt-10 rounded-xl border border-ink-200 bg-surface-elevated p-6">
@@ -174,7 +180,7 @@ export default async function SettingsPage(props: SettingsPageProps) {
 
   return (
     <>
-      <TopBar breadcrumb={tNav('section_account')} title={t('title')} />
+      <TopBar breadcrumb={tNav('section_account')} />
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-10">
         <PageHeader title={t('title')} description={t('description')} />
         <div className="mt-8">

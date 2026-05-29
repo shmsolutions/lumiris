@@ -79,5 +79,11 @@ export const POST = async (request: Request, context: RouteContext) => {
     })
     .returning({ id: reportSchema.id });
 
+  // Novo relatório → reinicia o ciclo de lembrete deste paciente.
+  await db
+    .update(patientSchema)
+    .set({ reportReminderSentAt: null })
+    .where(eq(patientSchema.id, id));
+
   return NextResponse.json({ report: created }, { status: 201 });
 };

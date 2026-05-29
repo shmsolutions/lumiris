@@ -1,0 +1,1 @@
+ALTER TABLE "user_profile" ADD COLUMN "ai_trial_used" integer DEFAULT 0 NOT NULL;

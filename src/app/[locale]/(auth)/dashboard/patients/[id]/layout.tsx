@@ -40,24 +40,34 @@ export default async function PatientLayout(props: PatientLayoutProps) {
     notFound();
   }
 
+  const birthDateLabel = patient.birthDate
+    ? new Intl.DateTimeFormat(locale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }).format(new Date(`${patient.birthDate}T12:00:00`))
+    : null;
+
   return (
     <>
       <TopBar
         breadcrumb={
-          <Link href="/dashboard/patients/" className="transition hover:text-ink-900">
-            {tList('title')}
+          <Link
+            href="/dashboard/patients/"
+            className="inline-flex items-center gap-1 font-medium transition hover:text-ink-900"
+          >
+            ← {tList('title')}
           </Link>
         }
-        title={patient.fullName}
       />
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
         <PatientHeader
           fullName={patient.fullName}
           diagnosis={patient.diagnosis}
-          birthDate={patient.birthDate}
+          birthDate={birthDateLabel}
           cid={patient.cid}
         />
-        <div className="mt-2">
+        <div className="mt-5">
           <PatientTabs patientId={patient.id} />
         </div>
         <div className="mt-6">{props.children}</div>

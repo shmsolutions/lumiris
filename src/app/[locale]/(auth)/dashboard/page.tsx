@@ -18,6 +18,8 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
+import { getPendingReports } from '@/libs/Reports';
+import { getUserProfile } from '@/libs/UserProfile';
 import { anamnesisSchema, appointmentSchema, patientSchema } from '@/models/Schema';
 
 type DashboardPageProps = { params: Promise<{ locale: string }> };
@@ -35,15 +37,26 @@ export default async function DashboardPage(props: DashboardPageProps) {
   const tNav = await getTranslations({ locale, namespace: 'DashboardNav' });
 
   const { userId } = await auth();
+
+  // Greeting name priority: the professional name the user set in Settings,
+  // then Clerk's first name, then the email prefix. The profile name is what
+  // they explicitly chose, so it wins.
+  const profile = userId ? await getUserProfile(userId) : null;
+  const profileFirstName = profile?.therapistName?.trim().split(/\s+/)[0] ?? '';
+
   // currentUser() hits the Clerk Backend API and can fail transiently — don't
   // let a Clerk hiccup crash the whole dashboard.
-  let firstName = '';
-  try {
-    const user = await currentUser();
-    firstName = user?.firstName ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? '';
-  } catch {
-    firstName = '';
+  let clerkName = '';
+  if (!profileFirstName) {
+    try {
+      const user = await currentUser();
+      clerkName = user?.firstName ?? user?.primaryEmailAddress?.emailAddress?.split('@')[0] ?? '';
+    } catch {
+      clerkName = '';
+    }
   }
+
+  const firstName = profileFirstName || clerkName;
 
   const today = new Date();
   const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
@@ -120,6 +133,8 @@ export default async function DashboardPage(props: DashboardPageProps) {
     month: 'long',
   }).format(today);
 
+  const pendingReports = userId ? await getPendingReports(userId) : [];
+
   return (
     <>
       <TopBar
@@ -176,7 +191,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
           />
           <StatCard
             label={t('stat_reports_label')}
-            value={0}
+            value={pendingReports.length}
             hint={t('stat_reports_hint')}
             tone="warning"
             icon={<ReportsIcon size={18} />}
@@ -252,11 +267,37 @@ export default async function DashboardPage(props: DashboardPageProps) {
               <span className="inline-flex size-9 items-center justify-center rounded-lg bg-brand-100 text-brand-700">
                 <AlertIcon size={18} />
               </span>
-              <div>
+              <div className="min-w-0 flex-1">
                 <h2 className="text-sm font-semibold tracking-wider text-brand-700 uppercase">
                   {t('alerts_title')}
                 </h2>
-                <p className="mt-2 text-sm text-ink-700">{t('alerts_none')}</p>
+                {pendingReports.length === 0 ? (
+                  <p className="mt-2 text-sm text-ink-700">{t('alerts_none')}</p>
+                ) : (
+                  <ul className="mt-3 space-y-1.5">
+                    {pendingReports.slice(0, 5).map((p) => (
+                      <li key={p.patientId}>
+                        <Link
+                          href={`/dashboard/patients/${p.patientId}/reports/`}
+                          className="flex items-center justify-between gap-2 rounded-lg bg-surface-elevated px-3 py-2 text-sm ring-1 ring-ink-200/60 transition hover:ring-brand-200"
+                        >
+                          <span className="truncate font-medium text-ink-800">{p.fullName}</span>
+                          <span
+                            className={`shrink-0 text-xs font-medium ${
+                              p.overdue ? 'text-danger' : 'text-brand-700'
+                            }`}
+                          >
+                            {p.overdue
+                              ? t('alert_overdue')
+                              : (p.daysUntil <= 0
+                                ? t('alert_due_today')
+                                : t('alert_due_in', { count: p.daysUntil }))}
+                          </span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           </div>

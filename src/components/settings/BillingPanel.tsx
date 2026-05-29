@@ -13,6 +13,8 @@ type BillingPanelProps = {
   periodEndLabel: string | null;
   justPaid: boolean;
   initialTaxId: string | null;
+  /** Free-trial AI generations left; null when the plan has unlimited AI. */
+  aiTrialRemaining?: number | null;
 };
 
 /** Conta os dígitos do CPF/CNPJ; 11 (CPF) ou 14 (CNPJ) é válido. */
@@ -132,6 +134,12 @@ export const BillingPanel = (props: BillingPanelProps) => {
             {isPaid && props.periodEndLabel ? (
               <p className="mt-1 text-xs text-ink-500">
                 {t('renews_on', { date: props.periodEndLabel })}
+              </p>
+            ) : null}
+            {!isPaid && typeof props.aiTrialRemaining === 'number' ? (
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700">
+                <StarIcon size={12} />
+                {t('free_trial_remaining', { count: props.aiTrialRemaining })}
               </p>
             ) : null}
           </div>
