@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
+import { ProcessingOverlay } from '@/components/feedback/ProcessingOverlay';
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
@@ -318,6 +319,13 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
   return (
     <div className="space-y-6">
+      {phase === 'processing' ? (
+        <ProcessingOverlay
+          title={t('processing_title')}
+          phrases={t('processing_phrases').split('|')}
+        />
+      ) : null}
+
       {templates.length > 0 ? (
         <div>
           <label

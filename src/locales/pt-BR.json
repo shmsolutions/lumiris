@@ -681,6 +681,8 @@
     "template_label": "Modelo",
     "template_default": "Modelo padrão (CREFITO)",
     "guide_title": "O que registrar nesta evolução",
+    "processing_title": "Estruturando sua evolução",
+    "processing_phrases": "Ouvindo a sessão…|Transcrevendo o áudio…|Identificando os procedimentos realizados…|Detectando intercorrências…|Organizando a evolução clínica…|Aplicando o formato do prontuário…|Revisando os termos técnicos…|Quase lá…",
     "mode_audio": "Áudio",
     "mode_text": "Texto",
     "text_label": "Anotações da sessão",

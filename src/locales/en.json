@@ -681,6 +681,8 @@
     "template_label": "Template",
     "template_default": "Default template (CREFITO)",
     "guide_title": "What to record in this note",
+    "processing_title": "Structuring your note",
+    "processing_phrases": "Listening to the session…|Transcribing the audio…|Identifying the procedures performed…|Detecting incidents…|Organizing the clinical evolution…|Applying the record format…|Reviewing the technical terms…|Almost there…",
     "mode_audio": "Audio",
     "mode_text": "Text",
     "text_label": "Session notes",
