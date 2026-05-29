@@ -55,7 +55,6 @@ export type CheckoutSession = { checkoutUrl: string };
 type CreateCheckoutInput = {
   userId: string;
   plan: PaidPlanId;
-  customer: { name: string; email: string; taxId: string };
 };
 
 /**
@@ -90,11 +89,9 @@ export const createCheckout = async (input: CreateCheckoutInput): Promise<Checko
         nextDueDate: today(),
         externalReference: input.userId,
       },
-      customerData: {
-        name: input.customer.name,
-        email: input.customer.email,
-        cpfCnpj: input.customer.taxId,
-      },
+      // Sem customerData: o próprio checkout coleta nome/CPF/endereço/telefone
+      // do pagador (Asaas exige endereço completo p/ cartão). Mapeamos o usuário
+      // pelo externalReference acima.
     },
   });
 

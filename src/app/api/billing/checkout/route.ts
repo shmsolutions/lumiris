@@ -1,27 +1,16 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
 import { createCheckout } from '@/libs/Asaas';
 import { logger } from '@/libs/Logger';
-import { getUserProfile, upsertUserProfile } from '@/libs/UserProfile';
+import { upsertUserProfile } from '@/libs/UserProfile';
 import { isPaidPlan } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
 
 const startCheckout = async (userId: string, plan: PaidPlanId, taxId: string) => {
-  const profile = await getUserProfile(userId);
-  const user = await currentUser().catch(() => null);
-  const name =
-    profile.therapistName ||
-    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
-    'Terapeuta Lumiris';
-  const email = user?.primaryEmailAddress?.emailAddress ?? '';
-
-  const result = await createCheckout({
-    userId,
-    plan,
-    customer: { name, email, taxId },
-  }).catch((error: unknown) => {
+  // O próprio checkout do Asaas coleta nome/CPF/endereço do pagador.
+  const result = await createCheckout({ userId, plan }).catch((error: unknown) => {
     logger.error(`Checkout failed for ${userId}: ${(error as Error).message}`);
     return null;
   });
