@@ -44,13 +44,15 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
         </span>
         <div>
           <p className="text-sm font-semibold text-ink-900">{props.title}</p>
-          <p
-            key={index}
-            style={{ animation: 'lumirisFade 0.5s ease' }}
-            className="mt-1.5 min-h-10 text-sm text-ink-600"
-          >
-            {phrase}
-          </p>
+          <span className="mt-1.5 flex min-h-10 items-center justify-center">
+            <span
+              key={index}
+              style={{ animation: 'lumirisFade 0.5s ease' }}
+              className="text-sm text-ink-600"
+            >
+              {phrase}
+            </span>
+          </span>
         </div>
       </div>
     </div>
