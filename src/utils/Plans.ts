@@ -9,6 +9,10 @@ export type PlanLimits = {
   ai: boolean;
   /** Which documents can be exported as PDF. */
   pdf: { anamnesis: boolean; note: boolean; report: boolean };
+  /** Upload a signature image embedded into exported documents. */
+  signature: boolean;
+  /** Create and edit custom document templates (form builder). */
+  customTemplates: boolean;
 };
 
 /** Preço mensal em centavos (BRL). Free não é cobrável. */
@@ -39,16 +43,22 @@ export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
     maxPatients: 3,
     ai: false,
     pdf: { anamnesis: true, note: false, report: false },
+    signature: false,
+    customTemplates: false,
   },
   student: {
     maxPatients: 10,
     ai: true,
     pdf: { anamnesis: true, note: true, report: true },
+    signature: true,
+    customTemplates: true,
   },
   pro: {
     maxPatients: Number.POSITIVE_INFINITY,
     ai: true,
     pdf: { anamnesis: true, note: true, report: true },
+    signature: true,
+    customTemplates: true,
   },
 };
 

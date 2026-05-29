@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
   CloseIcon,
+  FileIcon,
   HomeIcon,
   MenuIcon,
   NotesIcon,
@@ -185,6 +186,12 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
                   href="/dashboard/reports/"
                   label={t('item_reports')}
                   Icon={ReportsIcon}
+                  pathname={pathname}
+                />
+                <SheetItem
+                  href="/dashboard/modelos/"
+                  label={t('item_modelos')}
+                  Icon={FileIcon}
                   pathname={pathname}
                 />
               </ul>

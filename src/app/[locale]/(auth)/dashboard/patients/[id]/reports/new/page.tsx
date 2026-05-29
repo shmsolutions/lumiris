@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { ReportComposer } from '@/components/reports/ReportComposer';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
+import { listTemplates } from '@/libs/Templates';
 import { patientSchema } from '@/models/Schema';
+import { TemplateDefinitionValidation } from '@/validations/TemplateValidation';
 
 type NewReportPageProps = {
   params: Promise<{ locale: string; id: string }>;
@@ -31,6 +33,13 @@ export default async function NewReportPage(props: NewReportPageProps) {
     notFound();
   }
 
+  const templateRows = await listTemplates(userId, 'relatorio');
+  const templates = templateRows.map((tpl) => ({
+    id: tpl.id,
+    name: tpl.name,
+    definition: TemplateDefinitionValidation.parse(tpl.definition),
+  }));
+
   return (
     <div className="space-y-6">
       <div>
@@ -44,7 +53,7 @@ export default async function NewReportPage(props: NewReportPageProps) {
         <p className="text-sm text-ink-500">{t('description')}</p>
       </div>
 
-      <ReportComposer patientId={id} />
+      <ReportComposer patientId={id} templates={templates} />
     </div>
   );
 }

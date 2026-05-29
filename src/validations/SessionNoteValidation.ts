@@ -6,6 +6,11 @@ export const EvolutionValidation = z.object({
   evolucao: z.string().default(''),
 });
 
+const TemplateValuesValidation = z.record(
+  z.string(),
+  z.union([z.string(), z.array(z.object({ title: z.string(), progress: z.string() }))]),
+);
+
 export const SessionNoteCreateValidation = z.object({
   sessionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   appointmentId: z.uuid().optional().nullable(),
@@ -15,6 +20,8 @@ export const SessionNoteCreateValidation = z.object({
   intercorrencia: z.string().default(''),
   evolucao: z.string().default(''),
   linkedObjectives: z.array(z.uuid()).default([]),
+  templateId: z.uuid().nullable().optional(),
+  values: TemplateValuesValidation.optional(),
 });
 
 export const SessionNoteUpdateValidation = SessionNoteCreateValidation.partial();

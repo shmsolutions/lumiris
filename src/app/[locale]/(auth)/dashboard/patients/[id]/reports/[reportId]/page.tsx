@@ -66,15 +66,26 @@ export default async function ReportDetailPage(props: ReportDetailPageProps) {
           </p>
         </div>
         {canExportPdf ? (
-          <a
-            href={`/api/patients/${id}/reports/${report.id}/pdf?locale=${locale}`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
-          >
-            <FileIcon size={14} />
-            {t('export_pdf')}
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href={`/api/patients/${id}/reports/${report.id}/pdf?locale=${locale}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+            >
+              <FileIcon size={14} />
+              {t('export_pdf')}
+            </a>
+            <a
+              href={`/api/patients/${id}/reports/${report.id}/pdf?locale=${locale}&format=docx`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+            >
+              <FileIcon size={14} />
+              {t('export_docx')}
+            </a>
+          </div>
         ) : (
           <Link
             href="/dashboard/settings/"

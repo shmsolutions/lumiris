@@ -2,9 +2,15 @@ import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import { buildDraftFromAudio, buildDraftFromText } from '@/libs/AI';
+import {
+  buildDraftFromAudio,
+  buildDraftFromText,
+  buildValuesFromAudio,
+  buildValuesFromText,
+} from '@/libs/AI';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
+import { resolveTemplate } from '@/libs/Templates';
 import { patientSchema } from '@/models/Schema';
 import { DraftFromTextValidation } from '@/validations/SessionNoteValidation';
 
@@ -53,14 +59,30 @@ export const POST = async (request: Request, context: RouteContext) => {
         return NextResponse.json({ error: 'missing_audio' }, { status: 422 });
       }
 
+      const templateField = formData.get('templateId');
+      const overrideId = typeof templateField === 'string' ? templateField : undefined;
+      const resolved = await resolveTemplate(userId, 'evolucao', overrideId);
+      if (resolved.templateId) {
+        const result = await buildValuesFromAudio(audio, resolved.definition);
+        return NextResponse.json({ draft: { ...result, templateId: resolved.templateId } });
+      }
+
       const draft = await buildDraftFromAudio(audio);
       return NextResponse.json({ draft });
     }
 
-    const parse = DraftFromTextValidation.safeParse(await request.json());
+    const body = (await request.json()) as { templateId?: unknown };
+    const parse = DraftFromTextValidation.safeParse(body);
     if (!parse.success) {
       return NextResponse.json(z.treeifyError(parse.error), { status: 422 });
     }
+    const overrideId = typeof body.templateId === 'string' ? body.templateId : undefined;
+    const resolved = await resolveTemplate(userId, 'evolucao', overrideId);
+    if (resolved.templateId) {
+      const result = await buildValuesFromText(parse.data.text, resolved.definition);
+      return NextResponse.json({ draft: { ...result, templateId: resolved.templateId } });
+    }
+
     const draft = await buildDraftFromText(parse.data.text);
     return NextResponse.json({ draft });
   } catch (error) {

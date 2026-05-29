@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { NoteComposer } from '@/components/notes/NoteComposer';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
+import { listTemplates } from '@/libs/Templates';
 import { appointmentSchema, patientSchema, treatmentPlanSchema } from '@/models/Schema';
+import { TemplateDefinitionValidation } from '@/validations/TemplateValidation';
 import { TreatmentPlanUpsertValidation } from '@/validations/TreatmentPlanValidation';
 
 type NewNotePageProps = {
@@ -47,6 +49,13 @@ export default async function NewNotePage(props: NewNotePageProps) {
   const activeObjectives = allObjectives
     .filter((o) => o.status === 'active')
     .map(({ id: oid, title }) => ({ id: oid, title }));
+
+  const templateRows = await listTemplates(userId, 'evolucao');
+  const templates = templateRows.map((tpl) => ({
+    id: tpl.id,
+    name: tpl.name,
+    definition: TemplateDefinitionValidation.parse(tpl.definition),
+  }));
 
   // Verify the appointment belongs to this user (don't blindly trust the URL).
   let appointmentId: string | undefined;
@@ -100,7 +109,12 @@ export default async function NewNotePage(props: NewNotePageProps) {
         </div>
       ) : null}
 
-      <NoteComposer patientId={id} appointmentId={appointmentId} objectives={activeObjectives} />
+      <NoteComposer
+        patientId={id}
+        appointmentId={appointmentId}
+        objectives={activeObjectives}
+        templates={templates}
+      />
     </div>
   );
 }

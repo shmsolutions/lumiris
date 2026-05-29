@@ -1,6 +1,10 @@
 import OpenAI, { toFile } from 'openai';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
+import { compileJsonSchema, compileSystemPrompt, mapOutputToValues } from '@/libs/TemplateSchema';
+import type { TemplateValues } from '@/libs/TemplateSchema';
+import { DEFAULT_EVOLUCAO_TEMPLATE, DEFAULT_RELATORIO_TEMPLATE } from '@/models/defaultTemplates';
+import type { TemplateDefinition } from '@/validations/TemplateValidation';
 
 /** Text model used for structuring (SOAP) and report generation. */
 const TEXT_MODEL = 'gpt-4.1-mini';
@@ -124,16 +128,7 @@ const structureWithOpenAI = async (transcript: string): Promise<EvolutionDraft> 
       json_schema: {
         name: 'evolution_note',
         strict: true,
-        schema: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            procedimento: { type: 'string' },
-            intercorrencia: { type: 'string' },
-            evolucao: { type: 'string' },
-          },
-          required: ['procedimento', 'intercorrencia', 'evolucao'],
-        },
+        schema: compileJsonSchema(DEFAULT_EVOLUCAO_TEMPLATE),
       },
     },
   });
@@ -210,15 +205,7 @@ Diretrizes:
 - "Conclusão": síntese objetiva do estado atual e da continuidade do tratamento.
 - A responsabilidade clínica é sempre do terapeuta — você produz um rascunho para revisão.`;
 
-/**
- * Generate a structured progress report from the gathered source material.
- */
-export const generateReport = async (source: ReportSource): Promise<ReportContent> => {
-  const client = getOpenAI();
-  if (!client) {
-    throw new Error('OPENAI_API_KEY not configured');
-  }
-
+const reportUserContent = (source: ReportSource): string => {
   const notesText = source.notes
     .map(
       (n) =>
@@ -232,7 +219,7 @@ export const generateReport = async (source: ReportSource): Promise<ReportConten
     .map((o) => `- ${o.title}${o.description ? `: ${o.description}` : ''} [${o.status}]`)
     .join('\n');
 
-  const userContent = `Paciente: ${source.patientName}
+  return `Paciente: ${source.patientName}
 Período: ${source.periodStart} a ${source.periodEnd}
 Queixa principal: ${source.mainComplaint || 'não informada'}
 
@@ -244,50 +231,27 @@ ${objectivesText || 'nenhum objetivo cadastrado'}
 
 Evoluções do período:
 ${notesText || 'nenhuma evolução registrada no período'}`;
+};
+
+const runReportModel = async (
+  source: ReportSource,
+  definition: TemplateDefinition,
+  systemPrompt: string,
+): Promise<Record<string, unknown>> => {
+  const client = getOpenAI();
+  if (!client) {
+    throw new Error('OPENAI_API_KEY not configured');
+  }
 
   const completion = await client.chat.completions.create({
     model: TEXT_MODEL,
     messages: [
-      { role: 'system', content: REPORT_SYSTEM_PROMPT },
-      { role: 'user', content: userContent },
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: reportUserContent(source) },
     ],
     response_format: {
       type: 'json_schema',
-      json_schema: {
-        name: 'progress_report',
-        strict: true,
-        schema: {
-          type: 'object',
-          additionalProperties: false,
-          properties: {
-            initialComplaint: { type: 'string' },
-            generalEvolution: { type: 'string' },
-            objectiveProgress: {
-              type: 'array',
-              items: {
-                type: 'object',
-                additionalProperties: false,
-                properties: {
-                  title: { type: 'string' },
-                  progress: { type: 'string' },
-                },
-                required: ['title', 'progress'],
-              },
-            },
-            difficulties: { type: 'string' },
-            suggestions: { type: 'string' },
-            conclusion: { type: 'string' },
-          },
-          required: [
-            'initialComplaint',
-            'generalEvolution',
-            'objectiveProgress',
-            'difficulties',
-            'suggestions',
-            'conclusion',
-          ],
-        },
-      },
+      json_schema: { name: 'progress_report', strict: true, schema: compileJsonSchema(definition) },
     },
   });
 
@@ -295,16 +259,115 @@ ${notesText || 'nenhuma evolução registrada no período'}`;
   if (!content) {
     throw new Error('OpenAI did not return a structured report');
   }
+  return JSON.parse(content) as Record<string, unknown>;
+};
 
-  const input = JSON.parse(content) as ReportContent;
+/**
+ * Generate a structured progress report from the gathered source material.
+ */
+export const generateReport = async (source: ReportSource): Promise<ReportContent> => {
+  const input = await runReportModel(source, DEFAULT_RELATORIO_TEMPLATE, REPORT_SYSTEM_PROMPT);
   return {
-    initialComplaint: input.initialComplaint ?? '',
-    generalEvolution: input.generalEvolution ?? '',
-    objectiveProgress: Array.isArray(input.objectiveProgress) ? input.objectiveProgress : [],
-    difficulties: input.difficulties ?? '',
-    suggestions: input.suggestions ?? '',
-    conclusion: input.conclusion ?? '',
+    initialComplaint: typeof input.initialComplaint === 'string' ? input.initialComplaint : '',
+    generalEvolution: typeof input.generalEvolution === 'string' ? input.generalEvolution : '',
+    objectiveProgress: Array.isArray(input.objectiveProgress)
+      ? (input.objectiveProgress as ReportContent['objectiveProgress'])
+      : [],
+    difficulties: typeof input.difficulties === 'string' ? input.difficulties : '',
+    suggestions: typeof input.suggestions === 'string' ? input.suggestions : '',
+    conclusion: typeof input.conclusion === 'string' ? input.conclusion : '',
   };
+};
+
+/** Gera um relatório nos campos de um modelo custom, devolvendo o mapa de valores. */
+export const generateReportValues = async (
+  source: ReportSource,
+  template: TemplateDefinition,
+): Promise<TemplateValues> => {
+  const parsed = await runReportModel(
+    source,
+    template,
+    compileSystemPrompt(template, REPORT_SYSTEM_PROMPT),
+  );
+  return mapOutputToValues(template, parsed);
+};
+
+export type TemplateDraftResult = {
+  transcript: string;
+  values: TemplateValues;
+  structured: boolean;
+};
+
+/** Estrutura uma transcrição nos campos de um modelo custom de evolução. */
+const structureWithTemplate = async (
+  transcript: string,
+  template: TemplateDefinition,
+): Promise<TemplateValues> => {
+  const client = getOpenAI();
+  if (!client) {
+    throw new Error('OPENAI_API_KEY not configured');
+  }
+  const completion = await client.chat.completions.create({
+    model: TEXT_MODEL,
+    messages: [
+      { role: 'system', content: compileSystemPrompt(template, STRUCTURE_SYSTEM_PROMPT) },
+      { role: 'user', content: `Estruture a seguinte transcrição:\n\n${transcript}` },
+    ],
+    response_format: {
+      type: 'json_schema',
+      json_schema: { name: 'evolution_note', strict: true, schema: compileJsonSchema(template) },
+    },
+  });
+  const content = completion.choices[0]?.message.content;
+  if (!content) {
+    throw new Error('OpenAI did not return a structured evolution');
+  }
+  return mapOutputToValues(template, JSON.parse(content) as Record<string, unknown>);
+};
+
+export const buildValuesFromAudio = async (
+  audio: File,
+  template: TemplateDefinition,
+): Promise<TemplateDraftResult> => {
+  let transcript = '';
+  try {
+    transcript = await transcribeWithOpenAI(audio);
+  } catch (error) {
+    logger.error(`Transcription failed: ${describeError(error)}`);
+    throw new Error('transcription_failed', { cause: error });
+  }
+  if (!transcript.trim()) {
+    return { transcript: '', values: {}, structured: false };
+  }
+  try {
+    return {
+      transcript,
+      values: await structureWithTemplate(transcript, template),
+      structured: true,
+    };
+  } catch (error) {
+    logger.error(`Evolution structuring failed: ${describeError(error)}`);
+    return { transcript, values: {}, structured: false };
+  }
+};
+
+export const buildValuesFromText = async (
+  text: string,
+  template: TemplateDefinition,
+): Promise<TemplateDraftResult> => {
+  if (!text.trim()) {
+    return { transcript: '', values: {}, structured: false };
+  }
+  try {
+    return {
+      transcript: text,
+      values: await structureWithTemplate(text, template),
+      structured: true,
+    };
+  } catch (error) {
+    logger.error(`Evolution structuring failed: ${describeError(error)}`);
+    return { transcript: text, values: {}, structured: false };
+  }
 };
 
 /**

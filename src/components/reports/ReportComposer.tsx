@@ -4,11 +4,17 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { ReportEditor } from '@/components/reports/ReportEditor';
+import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
 import { useRouter } from '@/libs/I18nNavigation';
+import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { ReportContent } from '@/validations/ReportValidation';
+import type { TemplateDefinition } from '@/validations/TemplateValidation';
+
+type ReportTemplateOption = { id: string; name: string; definition: TemplateDefinition };
 
 type ReportComposerProps = {
   patientId: string;
+  templates: ReportTemplateOption[];
 };
 
 type Phase = 'setup' | 'generating' | 'review' | 'saving';
@@ -44,8 +50,12 @@ export const ReportComposer = (props: ReportComposerProps) => {
   const [periodStart, setPeriodStart] = useState(initial.start);
   const [periodEnd, setPeriodEnd] = useState(initial.end);
   const [content, setContent] = useState<ReportContent>(emptyContent);
+  const [values, setValues] = useState<TemplateValues>({});
+  const [templateId, setTemplateId] = useState('');
   const [meta, setMeta] = useState<{ notesCount: number; objectivesCount: number } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const selectedTemplate = props.templates.find((tpl) => tpl.id === templateId) ?? null;
 
   const generate = async () => {
     setErrorMessage(null);
@@ -57,7 +67,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
     const response = await fetch(`/api/patients/${props.patientId}/reports/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ periodStart, periodEnd }),
+      body: JSON.stringify({ periodStart, periodEnd, templateId: templateId || undefined }),
     });
     if (!response.ok) {
       const { error } = (await response.json().catch(() => ({}))) as { error?: string };
@@ -66,10 +76,15 @@ export const ReportComposer = (props: ReportComposerProps) => {
       return;
     }
     const data = (await response.json()) as {
-      content: ReportContent;
+      content?: ReportContent;
+      values?: TemplateValues;
       meta: { notesCount: number; objectivesCount: number };
     };
-    setContent(data.content);
+    if (data.values) {
+      setValues(data.values);
+    } else if (data.content) {
+      setContent(data.content);
+    }
     setMeta(data.meta);
     setPhase('review');
   };
@@ -77,10 +92,13 @@ export const ReportComposer = (props: ReportComposerProps) => {
   const save = async () => {
     setErrorMessage(null);
     setPhase('saving');
+    const body = selectedTemplate
+      ? { periodStart, periodEnd, content: emptyContent, templateId, values }
+      : { periodStart, periodEnd, content };
     const response = await fetch(`/api/patients/${props.patientId}/reports`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ periodStart, periodEnd, content }),
+      body: JSON.stringify(body),
     });
     if (!response.ok) {
       setErrorMessage(t('error_save'));
@@ -114,7 +132,16 @@ export const ReportComposer = (props: ReportComposerProps) => {
           </div>
         </div>
 
-        <ReportEditor value={content} onChange={setContent} disabled={phase === 'saving'} />
+        {selectedTemplate ? (
+          <TemplateValuesEditor
+            definition={selectedTemplate.definition}
+            values={values}
+            onChange={setValues}
+            disabled={phase === 'saving'}
+          />
+        ) : (
+          <ReportEditor value={content} onChange={setContent} disabled={phase === 'saving'} />
+        )}
 
         {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}
 
@@ -145,6 +172,28 @@ export const ReportComposer = (props: ReportComposerProps) => {
     <div className="space-y-6">
       <section className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
         <p className="text-sm text-ink-600">{t('description')}</p>
+        {props.templates.length > 0 ? (
+          <div className="mt-5">
+            <label className={labelClass} htmlFor="reportTemplate">
+              {t('template_label')}
+            </label>
+            <select
+              id="reportTemplate"
+              className={inputClass}
+              value={templateId}
+              onChange={(e) => {
+                setTemplateId(e.target.value);
+              }}
+            >
+              <option value="">{t('template_default')}</option>
+              {props.templates.map((tpl) => (
+                <option key={tpl.id} value={tpl.id}>
+                  {tpl.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : null}
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div>
             <label className={labelClass} htmlFor="periodStart">

@@ -59,12 +59,16 @@ export const PUT = async (request: Request, context: RouteContext) => {
     return NextResponse.json(z.treeifyError(parse.error), { status: 422 });
   }
 
+  const fields = parse.data.templateId
+    ? { templateId: parse.data.templateId, values: parse.data.values ?? {} }
+    : { data: parse.data.data ?? {} };
+
   const [upserted] = await db
     .insert(anamnesisSchema)
-    .values({ patientId: id, ownerId: userId, data: parse.data.data })
+    .values({ patientId: id, ownerId: userId, ...fields })
     .onConflictDoUpdate({
       target: anamnesisSchema.patientId,
-      set: { data: parse.data.data },
+      set: fields,
     })
     .returning();
 

@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import {
   boolean,
   date,
+  index,
   integer,
   jsonb,
   pgTable,
@@ -32,6 +33,11 @@ export const userProfileSchema = pgTable('user_profile', {
   asaasSubscriptionId: varchar('asaas_subscription_id', { length: 64 }),
   // Legado Woovi — mantido pra não exigir migração destrutiva; não é mais usado.
   wooviSubscriptionId: varchar('woovi_subscription_id', { length: 120 }),
+  // Assinatura (imagem) embutida nos exports — base64 + mime. Recurso pago.
+  signatureData: text('signature_data'),
+  signatureMime: varchar('signature_mime', { length: 40 }),
+  // Modelo padrão por tipo de documento: { relatorio, evolucao, avaliacao } → templateId.
+  defaultTemplates: jsonb('default_templates'),
   subscriptionStatus: varchar('subscription_status', { length: 32 }),
   currentPeriodEnd: timestamp('current_period_end', { mode: 'date' }),
   updatedAt: timestamp('updated_at', { mode: 'date' })
@@ -102,6 +108,9 @@ export const anamnesisSchema = pgTable(
     data: jsonb('data')
       .notNull()
       .default(sql`'{}'::jsonb`),
+    // Modelo custom (Fase 4). null = formato padrão lendo `data`.
+    templateId: uuid('template_id').references(() => templateSchema.id, { onDelete: 'set null' }),
+    values: jsonb('values'),
     updatedAt: timestamp('updated_at', { mode: 'date' })
       .defaultNow()
       .$onUpdate(() => new Date())
@@ -153,6 +162,9 @@ export const reportSchema = pgTable('report', {
   content: jsonb('content')
     .notNull()
     .default(sql`'{}'::jsonb`),
+  // Modelo custom (Fase 4). null = formato padrão lendo `content`.
+  templateId: uuid('template_id').references(() => templateSchema.id, { onDelete: 'set null' }),
+  values: jsonb('values'),
   status: varchar('status', { length: 24 }).default('draft').notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
@@ -218,6 +230,9 @@ export const sessionNoteSchema = pgTable('session_note', {
   procedimento: text('procedimento'),
   intercorrencia: text('intercorrencia'),
   evolucao: text('evolucao'),
+  // Modelo custom (Fase 4). null = formato padrão lendo as colunas acima.
+  templateId: uuid('template_id').references(() => templateSchema.id, { onDelete: 'set null' }),
+  values: jsonb('values'),
   linkedObjectives: jsonb('linked_objectives').default(sql`'[]'::jsonb`),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .defaultNow()
@@ -248,3 +263,29 @@ export const paymentSchema = pgTable('payment', {
   paidAt: timestamp('paid_at', { mode: 'date' }),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+/**
+ * Modelo de documento personalizado do terapeuta (form builder). `docType`
+ * separa relatório/evolução/avaliação; `definition` (JSONB) guarda as seções e
+ * campos. Owner-scoped. Os modelos padrão CREFITO ficam em código, não aqui.
+ */
+export const templateSchema = pgTable(
+  'template',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    ownerId: varchar('owner_id', { length: 64 }).notNull(),
+    docType: varchar('doc_type', { length: 16 }).notNull(),
+    name: varchar('name', { length: 120 }).notNull(),
+    description: text('description'),
+    definition: jsonb('definition')
+      .notNull()
+      .default(sql`'{"version":1,"sections":[]}'::jsonb`),
+    archivedAt: timestamp('archived_at', { mode: 'date' }),
+    updatedAt: timestamp('updated_at', { mode: 'date' })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+    createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  },
+  (table) => [index('template_owner_doctype_idx').on(table.ownerId, table.docType)],
+);

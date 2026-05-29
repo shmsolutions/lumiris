@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 type SessionNotePDFProps = {
   patientName: string;
@@ -14,6 +14,7 @@ type SessionNotePDFProps = {
   therapistName: string;
   therapistCrefito: string;
   studentName?: string | null;
+  signatureImage?: string | null;
   labels: {
     title: string;
     reference: string;
@@ -158,6 +159,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Helvetica-Bold',
     marginBottom: 2,
   },
+  signatureImage: {
+    height: 36,
+    width: 130,
+    objectFit: 'contain',
+    marginBottom: 2,
+  },
   signatureLine: {
     borderBottomWidth: 1,
     borderBottomColor: '#21211D',
@@ -286,7 +293,11 @@ export const SessionNotePDF = (props: SessionNotePDFProps) => (
 
       <View style={styles.signatureRow}>
         <View style={styles.signatureBlock}>
-          <Text style={styles.signatureMark}>X</Text>
+          {props.signatureImage ? (
+            <Image src={props.signatureImage} style={styles.signatureImage} />
+          ) : (
+            <Text style={styles.signatureMark}>X</Text>
+          )}
           <View style={styles.signatureLine} />
           <Text style={styles.signatureCaption}>
             {props.therapistName}

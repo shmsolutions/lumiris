@@ -4,11 +4,19 @@ import { and, eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import { NextResponse } from 'next/server';
 import { AvaliacaoPDF } from '@/components/pdf/AvaliacaoPDF';
+import { TemplatedDocumentPDF } from '@/components/pdf/TemplatedDocumentPDF';
 import { db } from '@/libs/DB';
-import { getUserProfile } from '@/libs/UserProfile';
+import { buildAnamnesisResolved, buildResolvedFromTemplate } from '@/libs/documents/buildResolved';
+import { renderDocx } from '@/libs/documents/renderDocx';
+import { DOCX_CONTENT_TYPE } from '@/libs/documents/response';
+import { getTemplate } from '@/libs/Templates';
+import type { TemplateValues } from '@/libs/TemplateSchema';
+import { getUserProfile, getUserSignature } from '@/libs/UserProfile';
 import { anamnesisSchema, patientSchema, treatmentPlanSchema } from '@/models/Schema';
+import { PLAN_LIMITS } from '@/utils/Plans';
 import { AnamnesisDataValidation } from '@/validations/AnamnesisValidation';
 import type { AnamnesisData } from '@/validations/AnamnesisValidation';
+import { TemplateDefinitionValidation } from '@/validations/TemplateValidation';
 import { TreatmentPlanUpsertValidation } from '@/validations/TreatmentPlanValidation';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -93,6 +101,7 @@ export const GET = async (request: Request, context: RouteContext) => {
     [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
     user?.primaryEmailAddress?.emailAddress ||
     '';
+  const signature = PLAN_LIMITS[profile.plan].signature ? await getUserSignature(userId) : null;
 
   const generatedAt = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
@@ -163,6 +172,136 @@ export const GET = async (request: Request, context: RouteContext) => {
       [tForm('field_initialAssessment_observations'), data.initialAssessment.observations],
     ]);
 
+  const wantsDocx = new URL(request.url).searchParams.get('format') === 'docx';
+
+  // Avaliação com modelo custom: renderiza pelo modelo + valores capturados.
+  if (anamnesisRow?.templateId) {
+    const template = await getTemplate(userId, anamnesisRow.templateId);
+    if (template) {
+      const doc = buildResolvedFromTemplate(
+        TemplateDefinitionValidation.parse(template.definition),
+        (anamnesisRow.values ?? {}) as TemplateValues,
+        {
+          title: template.name,
+          emptyLabel: tPdf('empty_field'),
+          therapistLine: tPdf('therapist_line'),
+          studentLine: tPdf('student_line'),
+          therapist: {
+            name: therapistName,
+            crefito: profile.crefito,
+            studentName: profile.studentName || null,
+          },
+          signatureImageDataUrl: signature?.dataUrl,
+          patient: {
+            fullName: patient.fullName,
+            birthDate: patient.birthDate ?? '',
+            diagnosis: patient.diagnosis ?? '',
+            cid: patient.cid ?? '',
+          },
+          today: '',
+          periodStart: '',
+          periodEnd: '',
+          sessionDate: '',
+        },
+      );
+      const ext = wantsDocx ? 'docx' : 'pdf';
+      const buffer = wantsDocx
+        ? await renderDocx(doc)
+        : await renderToBuffer(<TemplatedDocumentPDF doc={doc} />);
+      const name = `avaliacao-${slug(patient.fullName)}.${ext}`;
+      return new NextResponse(buffer as unknown as BodyInit, {
+        headers: {
+          'Content-Type': wantsDocx ? DOCX_CONTENT_TYPE : 'application/pdf',
+          'Content-Disposition': `attachment; filename="${name}"`,
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+  }
+
+  if (wantsDocx) {
+    const docxBuffer = await renderDocx(
+      buildAnamnesisResolved({
+        patient: {
+          fullName: patient.fullName,
+          age: computeAge(patient.birthDate, tPdf('age_suffix')),
+          naturality: patient.naturality ?? '',
+          maritalStatus: patient.maritalStatus ?? '',
+          gender: patient.gender ?? '',
+          profession: patient.profession ?? '',
+          residentialAddress: patient.residentialAddress ?? '',
+          commercialAddress: patient.commercialAddress ?? '',
+        },
+        clinicalHistory: {
+          mainComplaint: data.clinicalHistory.mainComplaint || patient.mainComplaint || '',
+          diseaseHistory,
+          lifeHabits,
+          treatments: data.clinicalHistory.previousTreatments ?? '',
+          antecedents,
+          others,
+        },
+        clinicalExam,
+        complementaryExams: data.complementaryExams.results ?? '',
+        otDiagnosis: data.otDiagnosis.text ?? '',
+        otPrognosis: data.otPrognosis.text ?? '',
+        plan: {
+          frequency: planRow?.frequency ?? '',
+          objectives: objectives.map((o) => ({
+            title: o.title,
+            estimatedSessions: o.estimatedSessions,
+            procedures: o.description ?? '',
+          })),
+        },
+        therapist: {
+          name: therapistName,
+          crefito: profile.crefito,
+          studentName: profile.studentName || null,
+        },
+        signatureImageDataUrl: signature?.dataUrl,
+        labels: {
+          title: tPdf('title'),
+          reference: tPdf('reference'),
+          section_identification: tPdf('section_identification'),
+          section_clinical_history: tPdf('section_clinical_history'),
+          section_clinical_exam: tPdf('section_clinical_exam'),
+          section_complementary_exams: tPdf('section_complementary_exams'),
+          section_ot_diagnosis: tPdf('section_ot_diagnosis'),
+          section_ot_prognosis: tPdf('section_ot_prognosis'),
+          section_plan: tPdf('section_plan'),
+          field_full_name: tPdf('field_full_name'),
+          field_age: tPdf('field_age'),
+          field_naturality: tPdf('field_naturality'),
+          field_marital_status: tPdf('field_marital_status'),
+          field_gender: tPdf('field_gender'),
+          field_profession: tPdf('field_profession'),
+          field_residential_address: tPdf('field_residential_address'),
+          field_commercial_address: tPdf('field_commercial_address'),
+          field_main_complaint: tPdf('field_main_complaint'),
+          field_disease_history: tPdf('field_disease_history'),
+          field_life_habits: tPdf('field_life_habits'),
+          field_treatments: tPdf('field_treatments'),
+          field_antecedents: tPdf('field_antecedents'),
+          field_others: tPdf('field_others'),
+          field_frequency: tPdf('field_frequency'),
+          plan_objectives: tPdf('plan_objectives'),
+          plan_sessions: tPdf('plan_sessions'),
+          plan_procedures: tPdf('plan_procedures'),
+          therapist_line: tPdf('therapist_line'),
+          student_line: tPdf('student_line'),
+          empty_field: tPdf('empty_field'),
+        },
+      }),
+    );
+    const docxName = `avaliacao-${slug(patient.fullName)}.docx`;
+    return new NextResponse(docxBuffer as unknown as BodyInit, {
+      headers: {
+        'Content-Type': DOCX_CONTENT_TYPE,
+        'Content-Disposition': `attachment; filename="${docxName}"`,
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
   const pdfBuffer = await renderToBuffer(
     <AvaliacaoPDF
       generatedAtLabel={tPdf('generated_at', { datetime: generatedAt })}
@@ -201,6 +340,7 @@ export const GET = async (request: Request, context: RouteContext) => {
         crefito: profile.crefito,
         studentName: profile.studentName || null,
       }}
+      signatureImage={signature?.dataUrl ?? null}
       labels={{
         title: tPdf('title'),
         reference: tPdf('reference'),

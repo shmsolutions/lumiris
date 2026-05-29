@@ -84,8 +84,15 @@ export const AnamnesisDataValidation = z.object({
     .default({}),
 });
 
+const TemplateValuesValidation = z.record(
+  z.string(),
+  z.union([z.string(), z.array(z.object({ title: z.string(), progress: z.string() }))]),
+);
+
 export const AnamnesisUpsertValidation = z.object({
-  data: AnamnesisDataValidation,
+  data: AnamnesisDataValidation.optional(),
+  templateId: z.uuid().nullable().optional(),
+  values: TemplateValuesValidation.optional(),
 });
 
 export type AnamnesisData = z.infer<typeof AnamnesisDataValidation>;

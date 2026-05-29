@@ -73,6 +73,8 @@ export const POST = async (request: Request, context: RouteContext) => {
       periodStart: parse.data.periodStart,
       periodEnd: parse.data.periodEnd,
       content: parse.data.content,
+      templateId: parse.data.templateId ?? null,
+      values: parse.data.values ?? null,
       status: 'final',
     })
     .returning({ id: reportSchema.id });

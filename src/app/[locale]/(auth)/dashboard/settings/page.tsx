@@ -7,9 +7,11 @@ import { TopBar } from '@/components/dashboard/TopBar';
 import { BillingPanel } from '@/components/settings/BillingPanel';
 import { SettingsTabs } from '@/components/settings/SettingsTabs';
 import type { SettingsTabId } from '@/components/settings/SettingsTabs';
+import { SignatureUploader } from '@/components/settings/SignatureUploader';
 import { TherapistProfileForm } from '@/components/settings/TherapistProfileForm';
 import { listPaymentsForUser } from '@/libs/Payments';
-import { getUserProfile } from '@/libs/UserProfile';
+import { getUserProfile, getUserSignature } from '@/libs/UserProfile';
+import { PLAN_LIMITS } from '@/utils/Plans';
 
 const STATUS_BADGE: Record<string, string> = {
   paid: 'bg-success/15 text-success',
@@ -67,6 +69,8 @@ export default async function SettingsPage(props: SettingsPageProps) {
     : null;
 
   const payments = userId ? await listPaymentsForUser(userId) : [];
+  const signature = userId ? await getUserSignature(userId) : null;
+  const canUseSignature = PLAN_LIMITS[profile.plan].signature;
   const currency = new Intl.NumberFormat(locale, { style: 'currency', currency: 'BRL' });
   const shortDate = new Intl.DateTimeFormat(locale, {
     day: '2-digit',
@@ -91,6 +95,12 @@ export default async function SettingsPage(props: SettingsPageProps) {
           studentName: profile.studentName ?? '',
         }}
       />
+      <div className="mt-6">
+        <SignatureUploader
+          allowed={canUseSignature}
+          initialSignatureUrl={signature?.dataUrl ?? null}
+        />
+      </div>
     </section>
   );
 

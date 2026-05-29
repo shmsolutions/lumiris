@@ -6,12 +6,17 @@ import { FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Ic
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
+import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
 import { useRouter } from '@/libs/I18nNavigation';
+import type { TemplateValues } from '@/libs/TemplateSchema';
+import type { TemplateDefinition } from '@/validations/TemplateValidation';
 
 type LinkableObjective = {
   id: string;
   title: string;
 };
+
+type NoteTemplateOption = { id: string; name: string; definition: TemplateDefinition };
 
 type NoteComposerProps = {
   patientId: string;
@@ -19,6 +24,7 @@ type NoteComposerProps = {
   appointmentId?: string;
   /** Active objectives from the treatment plan, shown as checklist on review. */
   objectives?: LinkableObjective[];
+  templates?: NoteTemplateOption[];
 };
 
 type Mode = 'audio' | 'text';
@@ -52,6 +58,11 @@ export const NoteComposer = (props: NoteComposerProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [linkedObjectiveIds, setLinkedObjectiveIds] = useState<string[]>([]);
   const [aiLocked, setAiLocked] = useState(false);
+  const [templateId, setTemplateId] = useState('');
+  const [values, setValues] = useState<TemplateValues>({});
+
+  const templates = props.templates ?? [];
+  const selectedTemplate = templates.find((tpl) => tpl.id === templateId) ?? null;
 
   const toggleObjective = (id: string) => {
     setLinkedObjectiveIds((prev) =>
@@ -69,6 +80,9 @@ export const NoteComposer = (props: NoteComposerProps) => {
         const formData = new FormData();
         const ext = audioMime.includes('mp4') ? 'm4a' : (audioMime.includes('ogg') ? 'ogg' : 'webm');
         formData.append('audio', new File([audioBlob], `recording.${ext}`, { type: audioMime }));
+        if (templateId) {
+          formData.append('templateId', templateId);
+        }
         response = await fetch(`/api/patients/${props.patientId}/notes/draft`, {
           method: 'POST',
           body: formData,
@@ -77,7 +91,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
         response = await fetch(`/api/patients/${props.patientId}/notes/draft`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: textInput }),
+          body: JSON.stringify({ text: textInput, templateId: templateId || undefined }),
         });
       } else {
         setPhase('capture');
@@ -107,9 +121,17 @@ export const NoteComposer = (props: NoteComposerProps) => {
       }
 
       const data = (await response.json()) as {
-        draft: { transcript: string; evolution: EvolutionValues; structured: boolean };
+        draft: {
+          transcript: string;
+          evolution?: EvolutionValues;
+          values?: TemplateValues;
+          structured: boolean;
+        };
       };
 
+      if (data.draft.values) {
+        setValues(data.draft.values);
+      }
       setDraft({
         transcript: data.draft.transcript ?? '',
         evolution: data.draft.evolution ?? emptyEvolution,
@@ -129,17 +151,20 @@ export const NoteComposer = (props: NoteComposerProps) => {
     setErrorMessage(null);
     setPhase('saving');
 
+    const base = {
+      sessionDate,
+      appointmentId: props.appointmentId ?? null,
+      transcript: draft.transcript,
+      rawText: mode === 'text' ? textInput : '',
+      linkedObjectives: linkedObjectiveIds,
+    };
+    const body = selectedTemplate
+      ? { ...base, templateId, values }
+      : { ...base, ...draft.evolution };
     const response = await fetch(`/api/patients/${props.patientId}/notes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionDate,
-        appointmentId: props.appointmentId ?? null,
-        transcript: draft.transcript,
-        rawText: mode === 'text' ? textInput : '',
-        linkedObjectives: linkedObjectiveIds,
-        ...draft.evolution,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -208,12 +233,21 @@ export const NoteComposer = (props: NoteComposerProps) => {
           </details>
         ) : null}
 
-        <EvolutionEditor
-          value={draft.evolution}
-          onChange={(evolution) => {
-            setDraft({ ...draft, evolution });
-          }}
-        />
+        {selectedTemplate ? (
+          <TemplateValuesEditor
+            definition={selectedTemplate.definition}
+            values={values}
+            onChange={setValues}
+            disabled={isSaving}
+          />
+        ) : (
+          <EvolutionEditor
+            value={draft.evolution}
+            onChange={(evolution) => {
+              setDraft({ ...draft, evolution });
+            }}
+          />
+        )}
 
         {props.objectives && props.objectives.length > 0 ? (
           <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
@@ -278,8 +312,53 @@ export const NoteComposer = (props: NoteComposerProps) => {
     );
   }
 
+  const guideSections = selectedTemplate
+    ? selectedTemplate.definition.sections.filter((s) => s.guide?.trim())
+    : [];
+
   return (
     <div className="space-y-6">
+      {templates.length > 0 ? (
+        <div>
+          <label
+            className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
+            htmlFor="noteTemplate"
+          >
+            {t('template_label')}
+          </label>
+          <select
+            id="noteTemplate"
+            value={templateId}
+            onChange={(e) => {
+              setTemplateId(e.target.value);
+            }}
+            className="mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+          >
+            <option value="">{t('template_default')}</option>
+            {templates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
+
+      {guideSections.length > 0 ? (
+        <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-4">
+          <h3 className="text-xs font-semibold tracking-wider text-brand-800 uppercase">
+            {t('guide_title')}
+          </h3>
+          <ul className="mt-2 space-y-1.5">
+            {guideSections.map((section) => (
+              <li key={section.key} className="text-xs text-ink-700">
+                <span className="font-semibold text-ink-900">{section.title}:</span> {section.guide}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       <div className="inline-flex rounded-md bg-ink-100 p-1">
         <button
           type="button"

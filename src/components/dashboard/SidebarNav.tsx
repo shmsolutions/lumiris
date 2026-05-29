@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/brand/Logo';
 import {
+  FileIcon,
   HomeIcon,
   NotesIcon,
   PatientsIcon,
@@ -34,6 +35,12 @@ const navItems = [
     href: '/dashboard/reports/',
     key: 'reports',
     Icon: ReportsIcon,
+    exact: false,
+  },
+  {
+    href: '/dashboard/modelos/',
+    key: 'modelos',
+    Icon: FileIcon,
     exact: false,
   },
 ] as const;

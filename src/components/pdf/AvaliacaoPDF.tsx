@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 type PlanObjective = {
   title: string;
@@ -35,6 +35,7 @@ type AvaliacaoPDFProps = {
     objectives: PlanObjective[];
   };
   therapist: { name: string; crefito: string; studentName: string | null };
+  signatureImage?: string | null;
   labels: Record<string, string>;
 };
 
@@ -167,6 +168,7 @@ const styles = StyleSheet.create({
   },
   signatureBlock: { flex: 1 },
   signatureMark: { fontSize: 15, fontFamily: 'Helvetica-Bold', marginBottom: 2 },
+  signatureImage: { height: 36, width: 130, objectFit: 'contain', marginBottom: 2 },
   signatureLine: {
     borderBottomWidth: 1,
     borderBottomColor: '#21211D',
@@ -353,7 +355,11 @@ export const AvaliacaoPDF = (props: AvaliacaoPDFProps) => {
         {/* IDENTIFICAÇÃO DO PROFISSIONAL ASSISTENTE */}
         <View style={styles.signatureRow}>
           <View style={styles.signatureBlock}>
-            <Text style={styles.signatureMark}>X</Text>
+            {props.signatureImage ? (
+              <Image src={props.signatureImage} style={styles.signatureImage} />
+            ) : (
+              <Text style={styles.signatureMark}>X</Text>
+            )}
             <View style={styles.signatureLine} />
             <Text style={styles.signatureCaption}>
               {props.therapist.name}

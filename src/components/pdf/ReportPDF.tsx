@@ -1,4 +1,4 @@
-import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
 type ReportPDFProps = {
   patientName: string;
@@ -15,6 +15,7 @@ type ReportPDFProps = {
     conclusion: string;
   };
   therapist: { name: string; crefito: string; studentName: string | null };
+  signatureImage?: string | null;
   labels: Record<string, string>;
 };
 
@@ -82,6 +83,7 @@ const styles = StyleSheet.create({
   signatureRow: { flexDirection: 'row', gap: 24, marginTop: 36 },
   signatureBlock: { flex: 1 },
   signatureMark: { fontSize: 15, fontFamily: 'Helvetica-Bold', marginBottom: 2 },
+  signatureImage: { height: 36, width: 130, objectFit: 'contain', marginBottom: 2 },
   signatureLine: { borderBottomWidth: 1, borderBottomColor: '#21211D', marginBottom: 4 },
   signatureCaption: { fontSize: 8, color: '#4F4E47', lineHeight: 1.4 },
   footer: {
@@ -171,7 +173,11 @@ export const ReportPDF = (props: ReportPDFProps) => {
 
         <View style={styles.signatureRow}>
           <View style={styles.signatureBlock}>
-            <Text style={styles.signatureMark}>X</Text>
+            {props.signatureImage ? (
+              <Image src={props.signatureImage} style={styles.signatureImage} />
+            ) : (
+              <Text style={styles.signatureMark}>X</Text>
+            )}
             <View style={styles.signatureLine} />
             <Text style={styles.signatureCaption}>
               {props.therapist.name}

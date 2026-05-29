@@ -2,10 +2,11 @@ import { auth } from '@clerk/nextjs/server';
 import { and, asc, eq, gte, lte } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 import * as z from 'zod';
-import { generateReport } from '@/libs/AI';
+import { generateReport, generateReportValues } from '@/libs/AI';
 import type { ReportSource } from '@/libs/AI';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
+import { resolveTemplate } from '@/libs/Templates';
 import {
   anamnesisSchema,
   patientSchema,
@@ -111,12 +112,16 @@ export const POST = async (request: Request, context: RouteContext) => {
     periodEnd: parse.data.periodEnd,
   };
 
+  const resolved = await resolveTemplate(userId, 'relatorio', parse.data.templateId);
+  const meta = { notesCount: notes.length, objectivesCount: objectives.length };
+
   try {
+    if (resolved.templateId) {
+      const values = await generateReportValues(source, resolved.definition);
+      return NextResponse.json({ values, templateId: resolved.templateId, meta });
+    }
     const content = await generateReport(source);
-    return NextResponse.json({
-      content,
-      meta: { notesCount: notes.length, objectivesCount: objectives.length },
-    });
+    return NextResponse.json({ content, meta });
   } catch {
     return NextResponse.json({ error: 'generation_failed' }, { status: 500 });
   }

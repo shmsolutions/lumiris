@@ -4,11 +4,18 @@ import { and, eq } from 'drizzle-orm';
 import { getTranslations } from 'next-intl/server';
 import { NextResponse } from 'next/server';
 import { ReportPDF } from '@/components/pdf/ReportPDF';
+import { TemplatedDocumentPDF } from '@/components/pdf/TemplatedDocumentPDF';
 import { db } from '@/libs/DB';
-import { getUserProfile } from '@/libs/UserProfile';
+import { buildReportResolved, buildResolvedFromTemplate } from '@/libs/documents/buildResolved';
+import { renderDocx } from '@/libs/documents/renderDocx';
+import { DOCX_CONTENT_TYPE } from '@/libs/documents/response';
+import { getTemplate } from '@/libs/Templates';
+import type { TemplateValues } from '@/libs/TemplateSchema';
+import { getUserProfile, getUserSignature } from '@/libs/UserProfile';
 import { patientSchema, reportSchema } from '@/models/Schema';
 import { PLAN_LIMITS } from '@/utils/Plans';
 import { ReportContentValidation } from '@/validations/ReportValidation';
+import { TemplateDefinitionValidation } from '@/validations/TemplateValidation';
 
 type RouteContext = { params: Promise<{ id: string; reportId: string }> };
 
@@ -61,6 +68,7 @@ export const GET = async (request: Request, context: RouteContext) => {
     [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
     user?.primaryEmailAddress?.emailAddress ||
     '';
+  const signature = PLAN_LIMITS[profile.plan].signature ? await getUserSignature(userId) : null;
 
   const parsedContent = ReportContentValidation.safeParse(row.report.content);
   if (!parsedContent.success) {
@@ -85,6 +93,92 @@ export const GET = async (request: Request, context: RouteContext) => {
     minute: '2-digit',
   }).format(new Date());
 
+  const wantsDocx = new URL(request.url).searchParams.get('format') === 'docx';
+
+  // Relatório com modelo custom: renderiza pelo modelo + valores capturados.
+  if (row.report.templateId) {
+    const template = await getTemplate(userId, row.report.templateId);
+    if (template) {
+      const doc = buildResolvedFromTemplate(
+        TemplateDefinitionValidation.parse(template.definition),
+        (row.report.values ?? {}) as TemplateValues,
+        {
+          title: template.name,
+          emptyLabel: tPdf('empty'),
+          therapistLine: tPdf('therapist_line'),
+          studentLine: tPdf('student_line'),
+          therapist: {
+            name: therapistName,
+            crefito: profile.crefito,
+            studentName: profile.studentName || null,
+          },
+          signatureImageDataUrl: signature?.dataUrl,
+          patient: {
+            fullName: row.patient.fullName,
+            birthDate: row.patient.birthDate ?? '',
+            diagnosis: row.patient.diagnosis ?? '',
+            cid: row.patient.cid ?? '',
+          },
+          today: fmtDate(new Date().toISOString().slice(0, 10)),
+          periodStart: fmtDate(row.report.periodStart),
+          periodEnd: fmtDate(row.report.periodEnd),
+          sessionDate: '',
+        },
+      );
+      const ext = wantsDocx ? 'docx' : 'pdf';
+      const buffer = wantsDocx
+        ? await renderDocx(doc)
+        : await renderToBuffer(<TemplatedDocumentPDF doc={doc} />);
+      const name = `relatorio-${slug(row.patient.fullName)}-${row.report.periodEnd}.${ext}`;
+      return new NextResponse(buffer as unknown as BodyInit, {
+        headers: {
+          'Content-Type': wantsDocx ? DOCX_CONTENT_TYPE : 'application/pdf',
+          'Content-Disposition': `attachment; filename="${name}"`,
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
+  }
+
+  if (wantsDocx) {
+    const docxBuffer = await renderDocx(
+      buildReportResolved({
+        patientName: row.patient.fullName,
+        periodLabel,
+        cid: row.patient.cid,
+        content,
+        therapist: {
+          name: therapistName,
+          crefito: profile.crefito,
+          studentName: profile.studentName || null,
+        },
+        signatureImageDataUrl: signature?.dataUrl,
+        labels: {
+          title: tPdf('title'),
+          period: tPdf('period'),
+          cid: tPatient('field_cid'),
+          initial_complaint: tPdf('initial_complaint'),
+          general_evolution: tPdf('general_evolution'),
+          objective_progress: tPdf('objective_progress'),
+          difficulties: tPdf('difficulties'),
+          suggestions: tPdf('suggestions'),
+          conclusion: tPdf('conclusion'),
+          therapist_line: tPdf('therapist_line'),
+          student_line: tPdf('student_line'),
+          empty: tPdf('empty'),
+        },
+      }),
+    );
+    const docxName = `relatorio-${slug(row.patient.fullName)}-${row.report.periodEnd}.docx`;
+    return new NextResponse(docxBuffer as unknown as BodyInit, {
+      headers: {
+        'Content-Type': DOCX_CONTENT_TYPE,
+        'Content-Disposition': `attachment; filename="${docxName}"`,
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
+
   const pdfBuffer = await renderToBuffer(
     <ReportPDF
       patientName={row.patient.fullName}
@@ -98,6 +192,7 @@ export const GET = async (request: Request, context: RouteContext) => {
         crefito: profile.crefito,
         studentName: profile.studentName || null,
       }}
+      signatureImage={signature?.dataUrl ?? null}
       labels={{
         title: tPdf('title'),
         period: tPdf('period'),
