@@ -37,21 +37,19 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
           '@keyframes lumirisFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}'
         }
       </style>
-      <div className="flex w-full max-w-sm flex-col items-center gap-6 rounded-2xl border border-ink-200 bg-surface-elevated px-8 py-10 text-center shadow-xl">
+      <div className="flex w-full max-w-sm flex-col items-center gap-5 rounded-2xl border border-ink-200 bg-surface-elevated px-8 py-8 text-center shadow-xl">
         <span className="relative flex size-16 items-center justify-center">
           <span className="absolute inset-0 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500" />
           <FlameIcon size={26} className="text-brand-500 motion-safe:animate-pulse" />
         </span>
         <div>
           <p className="text-sm font-semibold text-ink-900">{props.title}</p>
-          <span className="mt-1.5 flex min-h-10 items-center justify-center">
-            <span
-              key={index}
-              style={{ animation: 'lumirisFade 0.5s ease' }}
-              className="text-sm text-ink-600"
-            >
-              {phrase}
-            </span>
+          <span
+            key={index}
+            style={{ animation: 'lumirisFade 0.5s ease' }}
+            className="mt-1.5 block text-sm text-ink-600"
+          >
+            {phrase}
           </span>
         </div>
       </div>
