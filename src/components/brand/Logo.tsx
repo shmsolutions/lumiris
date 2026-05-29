@@ -14,9 +14,9 @@ const sizes = {
 };
 
 /**
- * Lume logo — a chama (ícone) acompanhada da wordmark em texto. O ícone usa o
- * PNG oficial; a wordmark é texto pra ficar nítida e consistente em qualquer
- * tamanho. `tone="light"` para fundos escuros.
+ * Lumiris logo — a marca (ícone "L" geométrico) acompanhada da wordmark em
+ * texto. O ícone é SVG pra ficar nítido em qualquer tamanho; a wordmark é
+ * texto pra consistência. `tone="light"` para fundos escuros.
  */
 export const Logo = (props: LogoProps) => {
   const size = sizes[props.size ?? 'md'];
@@ -25,7 +25,7 @@ export const Logo = (props: LogoProps) => {
   return (
     <span className={`inline-flex items-center gap-2 ${props.className ?? ''}`}>
       <Image
-        src="/assets/images/lume-mark.png"
+        src="/assets/images/lumiris-mark.png"
         alt={props.variant === 'mark' ? 'Lumiris' : ''}
         width={size.mark}
         height={size.mark}

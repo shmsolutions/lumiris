@@ -38,10 +38,9 @@ export const metadata: Metadata = {
     description,
   },
   icons: [
-    { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
     { rel: 'icon', type: 'image/png', sizes: '96x96', url: '/favicon-96x96.png' },
     { rel: 'icon', type: 'image/png', sizes: '32x32', url: '/favicon-32x32.png' },
-    { rel: 'icon', url: '/favicon.ico' },
+    { rel: 'apple-touch-icon', url: '/apple-touch-icon.png' },
   ],
 };
 

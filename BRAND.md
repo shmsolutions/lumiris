@@ -1,20 +1,20 @@
-# Lume — Guia de Marca
+# Lumiris — Guia de Marca
 
 > A luz que ilumina o cuidado terapêutico.
 
-Esta é a fonte da verdade pra tudo que envolve a identidade do Lume: nome, voz, paleta, tipografia, logo e como aplicá-los em produto, marketing e materiais externos.
+Esta é a fonte da verdade pra tudo que envolve a identidade do Lumiris: nome, voz, paleta, tipografia, logo e como aplicá-los em produto, marketing e materiais externos.
 
 ---
 
 ## 1. Essência
 
 ### Nome
-**Lume** — do português antigo, significa **luz**, **brasa**, **clarão**. É o que a gente acende pra enxergar no escuro. É também o que um terapeuta faz pelo paciente: ilumina caminhos que pareciam fechados.
+**Lumiris** — do português antigo, significa **luz**, **brasa**, **clarão**. É o que a gente acende pra enxergar no escuro. É também o que um terapeuta faz pelo paciente: ilumina caminhos que pareciam fechados.
 
 Pronúncia: `/'lu.mi/` (lú-mi).
 
 ### Promessa de marca
-**Devolver tempo ao terapeuta.** Lume transforma horas de burocracia (anamnese, evolução, relatório) em minutos — sem perder rigor clínico.
+**Devolver tempo ao terapeuta.** Lumiris transforma horas de burocracia (anamnese, evolução, relatório) em minutos — sem perder rigor clínico.
 
 ### Tagline
 **O prontuário que evolui com você.**
@@ -24,7 +24,7 @@ Variações curtas pra uso pontual:
 - "Menos papel. Mais paciente."
 
 ### Posicionamento
-Lume é o **assistente clínico inteligente para Terapeutas Ocupacionais** (e, em breve, outras especialidades) que automatiza prontuário e relatórios via IA, sem comprometer a qualidade técnica exigida pelos conselhos (CREFITO, CRP, etc.).
+Lumiris é o **assistente clínico inteligente para Terapeutas Ocupacionais** (e, em breve, outras especialidades) que automatiza prontuário e relatórios via IA, sem comprometer a qualidade técnica exigida pelos conselhos (CREFITO, CRP, etc.).
 
 Não somos um ERP. Não somos uma agenda. Somos o **prontuário inteligente** — e tudo gira em volta disso.
 
@@ -42,11 +42,11 @@ Não somos um ERP. Não somos uma agenda. Somos o **prontuário inteligente** �
 2. **Acolhedor, sem ser bobinho.** Sem emojis em produto. Sem "Oi, querida!". Sem infantilização.
 3. **Técnico quando precisa.** "Anamnese" é anamnese. "Evolução" é evolução. Não traduzimos jargão clínico — respeitamos.
 4. **Brasileiro.** Português do Brasil sempre. Sem "obrigado por aguardar" — é "valeu pela paciência" quando for adequado. Sem formalidade europeia.
-5. **Honesto sobre IA.** A gente diz "Lume sugere", "Lume estruturou um rascunho". A responsabilidade clínica é sempre do terapeuta.
+5. **Honesto sobre IA.** A gente diz "Lumiris sugere", "Lumiris estruturou um rascunho". A responsabilidade clínica é sempre do terapeuta.
 
 ### Faça
 - ✅ "Pronto. Sua evolução foi salva."
-- ✅ "Lume estruturou um rascunho a partir do seu áudio. Revise antes de salvar."
+- ✅ "Lumiris estruturou um rascunho a partir do seu áudio. Revise antes de salvar."
 - ✅ "Não foi possível salvar. Tente de novo em alguns segundos."
 
 ### Não faça
@@ -63,7 +63,7 @@ Não somos um ERP. Não somos uma agenda. Somos o **prontuário inteligente** �
 
 ## 3. Paleta
 
-A paleta da Lume gira em torno de uma única ideia: **calor controlado**. Âmbar como cor da chama (lume), apoiado em neutros quentes e um teal sereno pra ações secundárias e elementos clínicos.
+A paleta da Lumiris gira em torno de uma única ideia: **calor controlado**. Âmbar como cor da chama (Lumiris), apoiado em neutros quentes e um teal sereno pra ações secundárias e elementos clínicos.
 
 ### Cores principais
 
@@ -164,10 +164,10 @@ Evite 800/900 — fica pesado demais pra contexto clínico.
 ## 5. Logo
 
 ### Construção
-O símbolo é **uma chama dentro de um círculo** — síntese de "lume" (a luz que se contém e ilumina). Wordmark `lume` em lowercase, peso semibold, tracking levemente apertado.
+O símbolo é **uma chama dentro de um círculo** — síntese de "Lumiris" (a luz que se contém e ilumina). Wordmark `Lumiris` em lowercase, peso semibold, tracking levemente apertado.
 
 ```
-   ◉   lume
+   ◉   Lumiris
   (chama)
 ```
 
@@ -189,7 +189,7 @@ Mantenha sempre um padding equivalente à altura do "l" do wordmark em volta de 
 - ❌ Trocar a cor do símbolo por uma cor fora da paleta.
 - ❌ Colocar sobre foto sem overlay.
 - ❌ Adicionar sombra, gradiente exagerado, contorno.
-- ❌ Mudar capitalização (`Lume` no wordmark — só em texto corrido).
+- ❌ Mudar capitalização (`Lumiris` no wordmark — só em texto corrido).
 
 ---
 
@@ -222,7 +222,7 @@ Mantenha sempre um padding equivalente à altura do "l" do wordmark em volta de 
 ### E-mail
 - Assunto curto, sem emoji, sem "Re:" forçado.
 - Saudação: "Oi, [nome]" (sem ponto, sem vírgula seguida de linha em branco).
-- Assinatura: "Equipe Lume" (não "Atenciosamente").
+- Assinatura: "Equipe Lumiris" (não "Atenciosamente").
 
 ### Redes sociais
 - Mostrar produto, mostrar gente.
