@@ -67,7 +67,9 @@ export const createCheckout = async (input: CreateCheckoutInput): Promise<Checko
   const checkout = await asaasFetch<AsaasCheckout>('/checkouts', {
     method: 'POST',
     body: {
-      billingTypes: ['CREDIT_CARD', 'PIX'],
+      // Asaas: cobrança RECURRENT (cartão na recorrência) só aceita CREDIT_CARD;
+      // PIX exigiria DETACHED (avulso) e não existe Pix recorrente.
+      billingTypes: ['CREDIT_CARD'],
       chargeTypes: ['RECURRENT'],
       minutesToExpire: 60,
       externalReference: input.userId,
