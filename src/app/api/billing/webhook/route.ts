@@ -61,22 +61,17 @@ export const POST = async (request: Request) => {
 
   try {
     if (event.kind === 'paid' && event.plan && event.plan !== 'free') {
-      // Upgrade/downgrade: cancela a assinatura anterior (se for outra) pra não
-      // cobrar em duplicidade quando o usuário troca de plano.
       const profile = await getUserProfile(userId);
-      if (
-        event.subscriptionId &&
-        profile.asaasSubscriptionId &&
-        profile.asaasSubscriptionId !== event.subscriptionId
-      ) {
-        await cancelSubscription(profile.asaasSubscriptionId);
-        logger.info(`Assinatura anterior ${profile.asaasSubscriptionId} cancelada (upgrade)`);
-      }
+      const previousSubscriptionId = profile.asaasSubscriptionId;
+
+      // 1) Ativa o plano novo PRIMEIRO (e zera a sessão de checkout consumida),
+      // pra que um eventual webhook de cancelamento da assinatura antiga não
+      // ache este perfil como "assinatura atual".
       await upsertUserProfile(userId, {
         plan: event.plan,
         subscriptionStatus: 'active',
         currentPeriodEnd: oneMonthFromNow(),
-        // Guarda ids do Asaas vindos do checkout pra cancelamento/futuros webhooks.
+        asaasCheckoutId: null,
         ...(event.subscriptionId ? { asaasSubscriptionId: event.subscriptionId } : {}),
         ...(event.customerId ? { asaasCustomerId: event.customerId } : {}),
       });
@@ -91,18 +86,40 @@ export const POST = async (request: Request) => {
           status: 'paid',
         });
       }
+
+      // 2) Upgrade: cancela a assinatura anterior (se for outra) pra não cobrar 2x.
+      if (
+        event.subscriptionId &&
+        previousSubscriptionId &&
+        previousSubscriptionId !== event.subscriptionId
+      ) {
+        await cancelSubscription(previousSubscriptionId);
+        logger.info(`Assinatura anterior ${previousSubscriptionId} cancelada (upgrade)`);
+      }
+
       logger.info(`Plano ${event.plan} liberado para ${userId} via Asaas`);
       await notifyPlanActivated(userId, event.plan);
     } else if (event.kind === 'past_due') {
       await upsertUserProfile(userId, { subscriptionStatus: 'past_due' });
       logger.info(`Pagamento em atraso para ${userId} — assinatura marcada past_due`);
     } else if (event.kind === 'canceled') {
-      await upsertUserProfile(userId, { plan: 'free', subscriptionStatus: 'canceled' });
-      if (event.paymentId) {
-        await markPaymentCanceled(event.paymentId);
+      // Só derruba pro free se for a assinatura ATUAL. Ignora o cancelamento da
+      // assinatura antiga disparado por um upgrade (senão zera o plano novo).
+      const profile = await getUserProfile(userId);
+      if (
+        event.subscriptionId &&
+        profile.asaasSubscriptionId &&
+        event.subscriptionId !== profile.asaasSubscriptionId
+      ) {
+        logger.info(`Cancelamento da assinatura antiga ${event.subscriptionId} ignorado (upgrade)`);
+      } else {
+        await upsertUserProfile(userId, { plan: 'free', subscriptionStatus: 'canceled' });
+        if (event.paymentId) {
+          await markPaymentCanceled(event.paymentId);
+        }
+        logger.info(`Assinatura cancelada/estornada para ${userId} — voltou pro free`);
+        await notifyPlanCanceled(userId);
       }
-      logger.info(`Assinatura cancelada/estornada para ${userId} — voltou pro free`);
-      await notifyPlanCanceled(userId);
     }
   } catch (error) {
     // Não estoura 500: loga e devolve 200 pra evitar retentativas em loop.
