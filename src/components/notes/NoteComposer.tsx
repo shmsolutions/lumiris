@@ -17,7 +17,11 @@ type LinkableObjective = {
   title: string;
 };
 
-type NoteTemplateOption = { id: string; name: string; definition: TemplateDefinition };
+type NoteTemplateOption = {
+  id: string;
+  name: string;
+  definition: TemplateDefinition;
+};
 
 type NoteComposerProps = {
   patientId: string;
@@ -92,7 +96,10 @@ export const NoteComposer = (props: NoteComposerProps) => {
         response = await fetch(`/api/patients/${props.patientId}/notes/draft`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: textInput, templateId: templateId || undefined }),
+          body: JSON.stringify({
+            text: textInput,
+            templateId: templateId || undefined,
+          }),
         });
       } else {
         setPhase('capture');
@@ -100,7 +107,9 @@ export const NoteComposer = (props: NoteComposerProps) => {
       }
 
       if (!response.ok) {
-        const { error } = (await response.json().catch(() => ({}))) as { error?: string };
+        const { error } = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
         if (error === 'plan_ai_locked') {
           // Free plan: skip AI, let the user fill SOAP manually and save.
           setAiLocked(true);
