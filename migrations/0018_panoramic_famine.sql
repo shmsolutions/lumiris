@@ -1,0 +1,1 @@
+ALTER TABLE "user_profile" ADD COLUMN "asaas_checkout_id" varchar(64);

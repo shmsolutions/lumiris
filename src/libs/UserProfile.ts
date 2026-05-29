@@ -19,6 +19,7 @@ export type UserProfile = {
   taxId: string | null;
   asaasCustomerId: string | null;
   asaasSubscriptionId: string | null;
+  asaasCheckoutId: string | null;
   subscriptionStatus: string | null;
   currentPeriodEnd: Date | null;
 };
@@ -48,6 +49,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
     taxId: row?.taxId ?? null,
     asaasCustomerId: row?.asaasCustomerId ?? null,
     asaasSubscriptionId: row?.asaasSubscriptionId ?? null,
+    asaasCheckoutId: row?.asaasCheckoutId ?? null,
     subscriptionStatus: row?.subscriptionStatus ?? null,
     currentPeriodEnd: row?.currentPeriodEnd ?? null,
   };
@@ -62,6 +64,7 @@ type UpsertInput = {
   taxId?: string | null;
   asaasCustomerId?: string | null;
   asaasSubscriptionId?: string | null;
+  asaasCheckoutId?: string | null;
   signatureData?: string | null;
   signatureMime?: string | null;
   defaultTemplates?: DefaultTemplates | null;
@@ -106,6 +109,16 @@ export const getUserIdByAsaasSubscription = async (
     .select({ userId: userProfileSchema.userId })
     .from(userProfileSchema)
     .where(eq(userProfileSchema.asaasSubscriptionId, subscriptionId))
+    .limit(1);
+  return row?.userId ?? null;
+};
+
+/** Mapeia a sessão de checkout (do payload do webhook) de volta pro userId. */
+export const getUserIdByAsaasCheckout = async (checkoutId: string): Promise<string | null> => {
+  const [row] = await db
+    .select({ userId: userProfileSchema.userId })
+    .from(userProfileSchema)
+    .where(eq(userProfileSchema.asaasCheckoutId, checkoutId))
     .limit(1);
   return row?.userId ?? null;
 };

@@ -127,6 +127,13 @@
       "when": 1780069175952,
       "tag": "0017_complete_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1780097866987,
+      "tag": "0018_panoramic_famine",
+      "breakpoints": true
     }
   ]
 }

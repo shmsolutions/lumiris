@@ -4,6 +4,7 @@ import { notifyPlanActivated, notifyPlanCanceled } from '@/libs/Email';
 import { logger } from '@/libs/Logger';
 import { markPaymentCanceled, recordPayment } from '@/libs/Payments';
 import {
+  getUserIdByAsaasCheckout,
   getUserIdByAsaasSubscription,
   getUserProfile,
   upsertUserProfile,
@@ -41,15 +42,18 @@ export const POST = async (request: Request) => {
     kind: event.kind,
     plan: event.plan,
     externalReference: event.externalReference,
+    checkoutId: event.checkoutId,
     subscriptionId: event.subscriptionId,
     customerId: event.customerId,
     paymentId: event.paymentId,
   });
 
-  // Mapeia o usuário: preferimos o externalReference (userId) propagado pelo
-  // Checkout; caímos pra subscriptionId no fluxo legado de assinatura direta.
+  // Mapeia o usuário: externalReference (quando o Asaas propaga) → sessão de
+  // checkout (caso do checkout, que não devolve externalReference no pagamento)
+  // → subscriptionId (fluxo legado de assinatura direta).
   const userId =
     event.externalReference ??
+    (event.checkoutId ? await getUserIdByAsaasCheckout(event.checkoutId) : null) ??
     (event.subscriptionId ? await getUserIdByAsaasSubscription(event.subscriptionId) : null);
   if (!userId) {
     return NextResponse.json({ ok: true });

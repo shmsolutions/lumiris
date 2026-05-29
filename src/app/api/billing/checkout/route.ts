@@ -19,8 +19,14 @@ const startCheckout = async (userId: string, plan: PaidPlanId, taxId?: string) =
     return null;
   }
 
-  // Marca pendente; assinatura/cliente são capturados no webhook ao concluir.
-  await upsertUserProfile(userId, { subscriptionStatus: 'pending', ...(taxId ? { taxId } : {}) });
+  // Guarda o id da sessão de checkout — é por ele que o webhook nos acha
+  // (o Asaas não devolve o externalReference no pagamento). Assinatura/cliente
+  // vêm no webhook ao concluir.
+  await upsertUserProfile(userId, {
+    subscriptionStatus: 'pending',
+    asaasCheckoutId: result.checkoutId,
+    ...(taxId ? { taxId } : {}),
+  });
   return result;
 };
 

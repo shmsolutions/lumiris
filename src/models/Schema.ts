@@ -33,6 +33,9 @@ export const userProfileSchema = pgTable('user_profile', {
   // Billing (Asaas) — cliente e assinatura recorrente.
   asaasCustomerId: varchar('asaas_customer_id', { length: 64 }),
   asaasSubscriptionId: varchar('asaas_subscription_id', { length: 64 }),
+  // Sessão de checkout pendente — mapeia o webhook de volta pro usuário, já que
+  // o Asaas não propaga o externalReference pro pagamento do checkout.
+  asaasCheckoutId: varchar('asaas_checkout_id', { length: 64 }),
   // Legado Woovi — mantido pra não exigir migração destrutiva; não é mais usado.
   wooviSubscriptionId: varchar('woovi_subscription_id', { length: 120 }),
   // Assinatura (imagem) embutida nos exports — base64 + mime. Recurso pago.

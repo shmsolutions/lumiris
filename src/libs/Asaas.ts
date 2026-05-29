@@ -50,7 +50,7 @@ const asaasFetch = async <T>(path: string, init: AsaasFetchInit): Promise<T> => 
 
 type AsaasCheckout = { id?: string; link?: string; url?: string; invoiceUrl?: string };
 
-export type CheckoutSession = { checkoutUrl: string };
+export type CheckoutSession = { checkoutUrl: string; checkoutId: string | null };
 
 type CreateCheckoutInput = {
   userId: string;
@@ -105,7 +105,7 @@ export const createCheckout = async (input: CreateCheckoutInput): Promise<Checko
     throw new Error('asaas_no_checkout_url');
   }
   logger.info('[billing] checkout criado', { id: checkout.id ?? null, checkoutUrl });
-  return { checkoutUrl };
+  return { checkoutUrl, checkoutId: checkout.id ?? null };
 };
 
 /** Cancela a assinatura recorrente no Asaas. Ignora ids inválidos. */
@@ -133,7 +133,9 @@ export type BillingEvent = {
   subscriptionId: string | null;
   /** id do cliente no Asaas (cus_xxx). */
   customerId: string | null;
-  /** Nosso userId, propagado via externalReference no checkout. */
+  /** Sessão de checkout que originou o pagamento — mapeia de volta pro usuário. */
+  checkoutId: string | null;
+  /** Nosso userId, propagado via externalReference (quando o Asaas propaga). */
   externalReference: string | null;
   plan: PlanId | null;
 };
@@ -143,6 +145,7 @@ type AsaasWebhookPayment = {
   value?: number;
   subscription?: string;
   customer?: string;
+  checkoutSession?: string;
   externalReference?: string;
 };
 
@@ -173,6 +176,7 @@ export const parseWebhookEvent = (raw: unknown): BillingEvent => {
     paymentId: payment.id ?? null,
     subscriptionId: payment.subscription ?? null,
     customerId: payment.customer ?? null,
+    checkoutId: payment.checkoutSession ?? null,
     externalReference: payment.externalReference ?? null,
     plan: getPlanByValueCents(valueCents),
   };
