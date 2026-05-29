@@ -8,7 +8,7 @@ import { isPaidPlan } from '@/utils/Plans';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 import { CheckoutValidation } from '@/validations/BillingValidation';
 
-const startCheckout = async (userId: string, plan: PaidPlanId, taxId: string) => {
+const startCheckout = async (userId: string, plan: PaidPlanId, taxId?: string) => {
   // O próprio checkout do Asaas coleta nome/CPF/endereço do pagador.
   const result = await createCheckout({ userId, plan }).catch((error: unknown) => {
     logger.error(`Checkout failed for ${userId}: ${(error as Error).message}`);
@@ -19,9 +19,8 @@ const startCheckout = async (userId: string, plan: PaidPlanId, taxId: string) =>
     return null;
   }
 
-  // Guardamos o CPF/CNPJ e marcamos pendente; assinatura/cliente são
-  // capturados no webhook quando o pagamento conclui.
-  await upsertUserProfile(userId, { taxId, subscriptionStatus: 'pending' });
+  // Marca pendente; assinatura/cliente são capturados no webhook ao concluir.
+  await upsertUserProfile(userId, { subscriptionStatus: 'pending', ...(taxId ? { taxId } : {}) });
   return result;
 };
 

@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
-import { parseWebhookEvent, verifyWebhookToken } from '@/libs/Asaas';
+import { cancelSubscription, parseWebhookEvent, verifyWebhookToken } from '@/libs/Asaas';
 import { notifyPlanActivated, notifyPlanCanceled } from '@/libs/Email';
 import { logger } from '@/libs/Logger';
 import { markPaymentCanceled, recordPayment } from '@/libs/Payments';
-import { getUserIdByAsaasSubscription, upsertUserProfile } from '@/libs/UserProfile';
+import {
+  getUserIdByAsaasSubscription,
+  getUserProfile,
+  upsertUserProfile,
+} from '@/libs/UserProfile';
 import { PLAN_PRICE_CENTS } from '@/utils/Plans';
 
 /** Soma um mês à data atual — fim do ciclo de cobrança. */
@@ -53,6 +57,17 @@ export const POST = async (request: Request) => {
 
   try {
     if (event.kind === 'paid' && event.plan && event.plan !== 'free') {
+      // Upgrade/downgrade: cancela a assinatura anterior (se for outra) pra não
+      // cobrar em duplicidade quando o usuário troca de plano.
+      const profile = await getUserProfile(userId);
+      if (
+        event.subscriptionId &&
+        profile.asaasSubscriptionId &&
+        profile.asaasSubscriptionId !== event.subscriptionId
+      ) {
+        await cancelSubscription(profile.asaasSubscriptionId);
+        logger.info(`Assinatura anterior ${profile.asaasSubscriptionId} cancelada (upgrade)`);
+      }
       await upsertUserProfile(userId, {
         plan: event.plan,
         subscriptionStatus: 'active',

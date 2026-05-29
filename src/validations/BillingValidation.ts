@@ -10,7 +10,8 @@ const taxId = z
 
 export const CheckoutValidation = z.object({
   plan: z.enum(['student', 'pro']),
-  taxId,
+  // O CPF/CNPJ agora é coletado na própria página do checkout do Asaas.
+  taxId: taxId.optional(),
 });
 
 export type CheckoutInput = z.infer<typeof CheckoutValidation>;

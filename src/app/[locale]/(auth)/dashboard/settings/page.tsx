@@ -117,7 +117,6 @@ export default async function SettingsPage(props: SettingsPageProps) {
         subscriptionStatus={profile.subscriptionStatus}
         periodEndLabel={periodEndLabel}
         justPaid={search.paid === '1'}
-        initialTaxId={profile.taxId}
         aiTrialRemaining={aiTrialRemaining}
       />
       {payments.length > 0 ? (
