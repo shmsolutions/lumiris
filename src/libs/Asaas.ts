@@ -108,6 +108,111 @@ export const createCheckout = async (input: CreateCheckoutInput): Promise<Checko
   return { checkoutUrl, checkoutId: checkout.id ?? null };
 };
 
+type AsaasCustomer = { id: string };
+
+/** Cria (ou reaproveita) o cliente no Asaas e devolve o id (cus_xxx). */
+const ensureCustomer = async (input: {
+  userId: string;
+  name: string;
+  email: string;
+  taxId: string;
+  existingCustomerId: string | null;
+}): Promise<string> => {
+  if (input.existingCustomerId?.startsWith('cus_')) {
+    return input.existingCustomerId;
+  }
+  const customer = await asaasFetch<AsaasCustomer>('/customers', {
+    method: 'POST',
+    body: {
+      name: input.name,
+      cpfCnpj: input.taxId,
+      email: input.email,
+      externalReference: input.userId,
+      notificationDisabled: false,
+    },
+  });
+  return customer.id;
+};
+
+type AsaasSubscription = { id: string };
+type AsaasPaymentList = { data?: { id: string }[] };
+type AsaasPixQr = { encodedImage?: string; payload?: string; expirationDate?: string };
+
+export type PixCharge = {
+  subscriptionId: string;
+  customerId: string;
+  /** PNG do QR Code em base64 (sem o prefixo data:). */
+  qrImage: string;
+  /** Código copia-e-cola do Pix. */
+  qrPayload: string;
+  expiresAt: string | null;
+};
+
+/**
+ * Cria uma assinatura mensal cobrada por Pix e devolve o QR da primeira
+ * cobrança. Pix não é débito automático: a cada ciclo o Asaas gera um novo Pix
+ * e lembra o cliente. Mapeamos o usuário pela subscriptionId no webhook.
+ */
+export const createPixSubscription = async (input: {
+  userId: string;
+  plan: PaidPlanId;
+  customerId: string;
+}): Promise<PixCharge> => {
+  const subscription = await asaasFetch<AsaasSubscription>('/subscriptions', {
+    method: 'POST',
+    body: {
+      customer: input.customerId,
+      billingType: 'PIX',
+      value: planValueReais(input.plan),
+      nextDueDate: today(),
+      cycle: 'MONTHLY',
+      description: `Lumiris — plano ${input.plan}`,
+      externalReference: input.userId,
+    },
+  });
+
+  const payments = await asaasFetch<AsaasPaymentList>(
+    `/subscriptions/${subscription.id}/payments`,
+    { method: 'GET' },
+  );
+  const firstPaymentId = payments.data?.[0]?.id;
+  if (!firstPaymentId) {
+    throw new Error('asaas_no_pix_payment');
+  }
+
+  const qr = await asaasFetch<AsaasPixQr>(`/payments/${firstPaymentId}/pixQrCode`, {
+    method: 'GET',
+  });
+  if (!(qr.encodedImage && qr.payload)) {
+    throw new Error('asaas_no_pix_qr');
+  }
+
+  return {
+    subscriptionId: subscription.id,
+    customerId: input.customerId,
+    qrImage: qr.encodedImage,
+    qrPayload: qr.payload,
+    expiresAt: qr.expirationDate ?? null,
+  };
+};
+
+/** Cria assinatura Pix garantindo o cliente. Conveniência usada pela rota. */
+export const startPixSubscription = async (input: {
+  userId: string;
+  plan: PaidPlanId;
+  customer: { name: string; email: string; taxId: string };
+  existingCustomerId: string | null;
+}): Promise<PixCharge> => {
+  const customerId = await ensureCustomer({
+    userId: input.userId,
+    name: input.customer.name,
+    email: input.customer.email,
+    taxId: input.customer.taxId,
+    existingCustomerId: input.existingCustomerId,
+  });
+  return await createPixSubscription({ userId: input.userId, plan: input.plan, customerId });
+};
+
 /** Cancela a assinatura recorrente no Asaas. Ignora ids inválidos. */
 export const cancelSubscription = async (subscriptionId: string | null): Promise<void> => {
   if (!subscriptionId?.startsWith('sub_')) {

@@ -1,9 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
-import { CheckIcon, StarIcon } from '@/components/dashboard/Icons';
+import { CheckIcon, CloseIcon, StarIcon } from '@/components/dashboard/Icons';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
@@ -31,8 +31,35 @@ export const BillingPanel = (props: BillingPanelProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [canceling, setCanceling] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
+  const [pixPlan, setPixPlan] = useState<PaidPlanId | null>(null);
+  const [pixCpf, setPixCpf] = useState('');
+  const [pixData, setPixData] = useState<{ qrImage: string; qrPayload: string } | null>(null);
+  const [pixLoading, setPixLoading] = useState(false);
+  const [pixError, setPixError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const isPaid = props.currentPlan !== 'free';
+
+  // Enquanto o QR está aberto, atualiza o plano periodicamente (o webhook do
+  // Pix ativa em background).
+  useEffect(() => {
+    if (!(pixPlan && pixData)) {
+      return;
+    }
+    const id = setInterval(() => {
+      router.refresh();
+    }, 4000);
+    return () => {
+      clearInterval(id);
+    };
+  }, [pixPlan, pixData, router]);
+
+  // Pix caiu → plano ativou → fecha o modal.
+  useEffect(() => {
+    if (pixPlan && props.currentPlan === pixPlan) {
+      setPixPlan(null);
+    }
+  }, [props.currentPlan, pixPlan]);
 
   const cancelPlan = async () => {
     setCanceling(true);
@@ -69,6 +96,48 @@ export const BillingPanel = (props: BillingPanelProps) => {
     // Abre em nova aba pra o usuário não perder o contexto do app.
     window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
     setLoadingPlan(null);
+  };
+
+  const openPix = (plan: PaidPlanId) => {
+    setPixPlan(plan);
+    setPixData(null);
+    setPixError(null);
+    setPixCpf('');
+    setCopied(false);
+  };
+
+  const generatePix = async () => {
+    if (!pixPlan) {
+      return;
+    }
+    setPixError(null);
+    setPixLoading(true);
+    const response = await fetch('/api/billing/pix', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan: pixPlan, taxId: pixCpf }),
+    });
+    setPixLoading(false);
+    if (!response.ok) {
+      setPixError(t('error_pix'));
+      return;
+    }
+    const data = (await response.json()) as { qrImage?: string; qrPayload?: string };
+    if (!(data.qrImage && data.qrPayload)) {
+      setPixError(t('error_pix'));
+      return;
+    }
+    setPixData({ qrImage: data.qrImage, qrPayload: data.qrPayload });
+  };
+
+  const copyPix = async () => {
+    if (!pixData) {
+      return;
+    }
+    await navigator.clipboard.writeText(pixData.qrPayload).catch(() => {
+      // clipboard pode falhar em contexto inseguro — ignora.
+    });
+    setCopied(true);
   };
 
   return (
@@ -193,6 +262,18 @@ export const BillingPanel = (props: BillingPanelProps) => {
                     ? t('button_loading')
                     : t('button_subscribe'))}
               </button>
+
+              {isCurrent ? null : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    openPix(plan);
+                  }}
+                  className="mt-2 inline-flex items-center justify-center text-xs font-medium text-brand-700 transition hover:text-brand-800"
+                >
+                  {t('pix_pay')}
+                </button>
+              )}
             </div>
           );
         })}
@@ -201,6 +282,97 @@ export const BillingPanel = (props: BillingPanelProps) => {
       {errorMessage ? <p className="text-sm text-danger">{errorMessage}</p> : null}
 
       <p className="text-xs text-ink-500">{t('pix_note')}</p>
+
+      {pixPlan ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/50 p-4 backdrop-blur-sm"
+          aria-modal="true"
+          role="dialog"
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-ink-200 bg-surface-elevated p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-semibold text-ink-900">
+                {t('pix_modal_title', { plan: t(`plan_${pixPlan}_name` as 'plan_student_name') })}
+              </h3>
+              <button
+                type="button"
+                aria-label={tCommon('cancel')}
+                onClick={() => {
+                  setPixPlan(null);
+                }}
+                className="inline-flex size-8 items-center justify-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-ink-900"
+              >
+                <CloseIcon size={16} />
+              </button>
+            </div>
+
+            {pixData ? (
+              <div className="mt-4 text-center">
+                {/* QR vem do Asaas como PNG base64 (data URL em runtime). */}
+                <img
+                  alt="QR Code Pix"
+                  className="mx-auto size-52 rounded-lg border border-ink-200 bg-white p-2"
+                  src={`data:image/png;base64,${pixData.qrImage}`}
+                />
+                <p className="mt-3 text-xs text-ink-500">{t('pix_scan')}</p>
+                <div className="mt-3 flex items-center gap-2">
+                  <input
+                    aria-label={t('pix_copy')}
+                    className="min-w-0 flex-1 truncate rounded-md border border-ink-200 bg-surface px-2 py-1.5 text-xs text-ink-600"
+                    readOnly
+                    value={pixData.qrPayload}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void copyPix();
+                    }}
+                    className="shrink-0 rounded-md bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600"
+                  >
+                    {copied ? t('pix_copied') : t('pix_copy')}
+                  </button>
+                </div>
+                <p className="mt-4 inline-flex items-center gap-2 text-xs text-ink-500">
+                  <span className="size-3.5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500" />
+                  {t('pix_waiting')}
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4">
+                <label
+                  className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
+                  htmlFor="pix-cpf"
+                >
+                  {t('pix_cpf_label')}
+                </label>
+                <input
+                  className="mt-1.5 w-full rounded-md border border-ink-200 bg-surface px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+                  id="pix-cpf"
+                  inputMode="numeric"
+                  onChange={(e) => {
+                    setPixCpf(e.target.value);
+                    setPixError(null);
+                  }}
+                  placeholder={t('pix_cpf_placeholder')}
+                  value={pixCpf}
+                />
+                {pixError ? <p className="mt-2 text-xs text-danger">{pixError}</p> : null}
+                <button
+                  type="button"
+                  disabled={pixLoading}
+                  onClick={() => {
+                    void generatePix();
+                  }}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
+                >
+                  {pixLoading ? <Spinner /> : null}
+                  {t('pix_generate')}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

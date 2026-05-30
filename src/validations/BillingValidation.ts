@@ -15,3 +15,9 @@ export const CheckoutValidation = z.object({
 });
 
 export type CheckoutInput = z.infer<typeof CheckoutValidation>;
+
+/** Pix gera a cobrança via API (QR no app), então o CPF/CNPJ é obrigatório. */
+export const PixCheckoutValidation = z.object({
+  plan: z.enum(['student', 'pro']),
+  taxId,
+});
