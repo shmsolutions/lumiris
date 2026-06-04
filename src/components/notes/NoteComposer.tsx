@@ -260,6 +260,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
               <input
                 id="session-date"
                 type="date"
+                aria-label={t('field_session_date')}
                 value={sessionDate}
                 onChange={(event) => {
                   setSessionDate(event.target.value);
@@ -291,6 +292,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
               <input
                 id="session-date"
                 type="date"
+                aria-label={t('field_session_date')}
                 value={sessionDate}
                 onChange={(event) => {
                   setSessionDate(event.target.value);
@@ -335,6 +337,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
                     >
                       <input
                         type="checkbox"
+                        aria-label={objective.title}
                         checked={checked}
                         onChange={() => {
                           toggleObjective(objective.id);
@@ -486,6 +489,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
               />
             ) : (
               <textarea
+                aria-label={t('capture_headline')}
                 value={textInput}
                 onChange={(event) => {
                   setTextInput(event.target.value);

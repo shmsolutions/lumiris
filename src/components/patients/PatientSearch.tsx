@@ -39,6 +39,7 @@ export const PatientSearch = () => {
   return (
     <div className="relative">
       <input
+        aria-label={t('search_placeholder')}
         type="search"
         value={value}
         onChange={(event) => {

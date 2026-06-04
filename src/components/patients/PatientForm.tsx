@@ -355,6 +355,7 @@ export const PatientForm = (props: PatientFormProps) => {
       {isEdit ? null : (
         <label className="flex items-start gap-3 rounded-lg border border-ink-200 bg-ink-50/60 px-4 py-3 text-sm text-ink-600">
           <input
+            aria-label={t('aria_consent')}
             type="checkbox"
             checked={consent}
             onChange={(event) => {
@@ -364,6 +365,7 @@ export const PatientForm = (props: PatientFormProps) => {
           />
           <span>
             {t.rich('consent_label', {
+              // oxlint-disable-next-line react/no-unstable-nested-components
               priv: (chunks) => (
                 <Link
                   href="/privacy/"

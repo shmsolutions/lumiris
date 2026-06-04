@@ -79,6 +79,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
               </label>
               <input
                 id="therapistName"
+                aria-label={t('label_name')}
                 className={inputClass}
                 placeholder={t('placeholder_name')}
                 value={therapistName}

@@ -232,7 +232,12 @@ export const AudioRecorder = (props: AudioRecorderProps) => {
             {t('record_again')}
           </button>
         </div>
-        <audio src={previewUrl} controls className="relative mt-4 w-full">
+        <audio
+          src={previewUrl}
+          controls
+          aria-label={t('recorded_title')}
+          className="relative mt-4 w-full"
+        >
           <track kind="captions" />
         </audio>
       </div>

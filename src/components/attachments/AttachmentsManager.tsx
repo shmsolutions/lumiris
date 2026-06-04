@@ -114,6 +114,7 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
 
           <input
             ref={fileInputRef}
+            aria-label={t('upload_button')}
             type="file"
             accept="application/pdf,image/jpeg,image/png,image/webp"
             className="hidden"

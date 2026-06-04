@@ -125,6 +125,7 @@ export const Select = (props: SelectProps) => {
           aria-label={props.ariaLabel}
           className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto rounded-lg border border-ink-200 bg-surface-elevated py-1 shadow-lg shadow-brand-900/5"
           id={`${baseId}-listbox`}
+          // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
           role="listbox"
         >
           {groups.map((group, groupIdx) => (
@@ -152,6 +153,7 @@ export const Select = (props: SelectProps) => {
                       onMouseEnter={() => {
                         setHighlight(index);
                       }}
+                      // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
                       role="option"
                     >
                       <span className="truncate">{option.label}</span>

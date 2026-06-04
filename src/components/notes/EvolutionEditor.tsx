@@ -33,6 +33,7 @@ export const EvolutionEditor = (props: EvolutionEditorProps) => {
           </label>
           <textarea
             id={`evolution-${key}`}
+            aria-label={t(`label_${key}` as 'label_procedimento')}
             rows={key === 'evolucao' ? 6 : 4}
             className={fieldClass}
             value={props.value[key]}

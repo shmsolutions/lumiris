@@ -145,6 +145,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
               <ClockIcon size={14} className="text-ink-400" />
               <input
                 type="time"
+                aria-label={tCommon('time')}
                 value={parsedTime}
                 onChange={(event) => {
                   handleTimeChange(event.target.value);

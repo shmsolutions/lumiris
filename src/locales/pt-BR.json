@@ -2,6 +2,7 @@
   "Common": {
     "cancel": "Cancelar",
     "calendar": "Calendário",
+    "time": "Horário",
     "done": "Pronto"
   },
   "RootLayout": {
@@ -1054,6 +1055,7 @@
     "confirm_archive": "Arquivar este paciente? Ele sai da sua lista mas as evoluções continuam acessíveis na linha do tempo.",
     "error_full_name": "Nome completo é obrigatório",
     "error_contact_email": "E-mail inválido.",
+    "aria_consent": "Confirmo a base legal para registrar dados de saúde",
     "consent_label": "Confirmo que tenho base legal para registrar os dados de saúde deste paciente, conforme a <priv>Política de Privacidade</priv> e a LGPD.",
     "error_generic": "Não foi possível salvar. Tente de novo.",
     "error_archive": "Não foi possível arquivar. Tente de novo.",

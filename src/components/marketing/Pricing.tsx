@@ -120,6 +120,7 @@ export const Pricing = () => {
 
       <p className="mt-10 text-center text-sm text-ink-500">
         {t.rich('pricing_clinic_line', {
+          // oxlint-disable-next-line react/no-unstable-nested-components
           link: (chunks) => (
             <a
               href="mailto:oi@lumiris.com.br"

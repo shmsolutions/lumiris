@@ -203,6 +203,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
             <input
               id="periodStart"
               type="date"
+              aria-label={t('period_start')}
               className={inputClass}
               value={periodStart}
               onChange={(e) => {
@@ -217,6 +218,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
             <input
               id="periodEnd"
               type="date"
+              aria-label={t('period_end')}
               className={inputClass}
               value={periodEnd}
               onChange={(e) => {

@@ -59,6 +59,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                   <li key={`${section.key}-${index}`} className="flex items-start gap-3">
                     <div className="min-w-0 flex-1 space-y-2">
                       <input
+                        aria-label={t('row_title')}
                         className={inputClass}
                         placeholder={t('row_title')}
                         value={row.title}
@@ -70,6 +71,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                         }}
                       />
                       <textarea
+                        aria-label={t('row_progress')}
                         className={inputClass}
                         rows={2}
                         placeholder={t('row_progress')}
@@ -121,6 +123,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                   </label>
                   <textarea
                     id={`tpl-${field.key}`}
+                    aria-label={field.label}
                     rows={3}
                     className={inputClass}
                     disabled={props.disabled}

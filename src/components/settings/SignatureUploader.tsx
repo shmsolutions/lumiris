@@ -63,6 +63,7 @@ export const SignatureUploader = (props: SignatureUploaderProps) => {
 
           <input
             ref={inputRef}
+            aria-label={t('upload')}
             type="file"
             accept="image/png,image/jpeg"
             className="hidden"

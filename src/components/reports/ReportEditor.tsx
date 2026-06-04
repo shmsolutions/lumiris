@@ -41,6 +41,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           </label>
           <textarea
             id="initialComplaint"
+            aria-label={t('initial_complaint')}
             rows={2}
             className={fieldClass}
             disabled={props.disabled}
@@ -56,6 +57,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           </label>
           <textarea
             id="generalEvolution"
+            aria-label={t('general_evolution')}
             rows={4}
             className={fieldClass}
             disabled={props.disabled}
@@ -77,6 +79,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
               <div key={index} className="rounded-lg border border-ink-200 bg-surface p-4">
                 <div className="text-sm font-semibold text-ink-900">{o.title}</div>
                 <textarea
+                  aria-label={o.title}
                   rows={3}
                   className={fieldClass}
                   disabled={props.disabled}
@@ -98,6 +101,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           </label>
           <textarea
             id="difficulties"
+            aria-label={t('difficulties')}
             rows={3}
             className={fieldClass}
             disabled={props.disabled}
@@ -113,6 +117,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           </label>
           <textarea
             id="suggestions"
+            aria-label={t('suggestions')}
             rows={3}
             className={fieldClass}
             disabled={props.disabled}
@@ -128,6 +133,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           </label>
           <textarea
             id="conclusion"
+            aria-label={t('conclusion')}
             rows={3}
             className={fieldClass}
             disabled={props.disabled}
