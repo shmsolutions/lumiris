@@ -136,7 +136,10 @@ export const SidebarNav = (props: SidebarNavProps) => {
         ) : (
           <>
             <p className="text-xs text-ink-500">{t('upgrade_tagline')}</p>
-            <Link href="/#plano" className={buttonClasses('primary', 'mt-3 w-full', 'sm')}>
+            <Link
+              href="/dashboard/settings/?tab=plano"
+              className={buttonClasses('primary', 'mt-3 w-full', 'sm')}
+            >
               {t('upgrade_cta')}
             </Link>
           </>
