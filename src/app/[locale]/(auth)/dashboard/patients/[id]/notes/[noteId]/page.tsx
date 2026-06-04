@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import * as z from 'zod';
 import { ArrowRightIcon, FileIcon, SparkIcon } from '@/components/dashboard/Icons';
 import { NoteDetail } from '@/components/notes/NoteDetail';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
 import { Link } from '@/libs/I18nNavigation';
@@ -91,7 +92,7 @@ export default async function NoteDetailPage(props: NoteDetailPageProps) {
               href={`/api/patients/${id}/notes/${note.id}/pdf?locale=${locale}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', '', 'sm')}
             >
               <FileIcon size={14} />
               {t('export_pdf')}
@@ -100,7 +101,7 @@ export default async function NoteDetailPage(props: NoteDetailPageProps) {
               href={`/api/patients/${id}/notes/${note.id}/pdf?locale=${locale}&format=docx`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', '', 'sm')}
             >
               <FileIcon size={14} />
               {t('export_docx')}
@@ -121,9 +122,7 @@ export default async function NoteDetailPage(props: NoteDetailPageProps) {
 
       {linkedObjectives.length > 0 ? (
         <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
-          <h3 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-            {t('linked_objectives_title')}
-          </h3>
+          <h3 className="editorial-label text-ink-500">{t('linked_objectives_title')}</h3>
           <div className="mt-3 flex flex-wrap gap-2">
             {linkedObjectives.map((objective) => (
               <span

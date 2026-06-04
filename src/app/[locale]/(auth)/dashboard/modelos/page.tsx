@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/dashboard/PageHeader';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { DeleteTemplateButton } from '@/components/templates/DeleteTemplateButton';
 import { SetDefaultButton } from '@/components/templates/SetDefaultButton';
+import { buttonClasses } from '@/components/ui/Button';
 import { getEntitlements } from '@/libs/Entitlements';
 import { Link } from '@/libs/I18nNavigation';
 import { listTemplates } from '@/libs/Templates';
@@ -61,7 +62,7 @@ export default async function ModelosPage(props: ModelosPageProps) {
                   {canEdit ? (
                     <Link
                       href={`/dashboard/modelos/novo/?docType=${docType}`}
-                      className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold whitespace-nowrap text-white shadow-sm transition hover:bg-brand-600"
+                      className={buttonClasses('primary', 'whitespace-nowrap', 'sm')}
                     >
                       <PlusIcon size={14} />
                       {t('new_template')}

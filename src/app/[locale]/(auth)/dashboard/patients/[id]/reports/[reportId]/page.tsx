@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ArrowRightIcon, FileIcon, SparkIcon } from '@/components/dashboard/Icons';
 import { ReportDetail } from '@/components/reports/ReportDetail';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { getEntitlements } from '@/libs/Entitlements';
 import { Link } from '@/libs/I18nNavigation';
@@ -71,7 +72,7 @@ export default async function ReportDetailPage(props: ReportDetailPageProps) {
               href={`/api/patients/${id}/reports/${report.id}/pdf?locale=${locale}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', '', 'sm')}
             >
               <FileIcon size={14} />
               {t('export_pdf')}
@@ -80,7 +81,7 @@ export default async function ReportDetailPage(props: ReportDetailPageProps) {
               href={`/api/patients/${id}/reports/${report.id}/pdf?locale=${locale}&format=docx`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', '', 'sm')}
             >
               <FileIcon size={14} />
               {t('export_docx')}

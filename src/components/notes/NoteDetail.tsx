@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 
 type NoteDetailProps = {
@@ -69,7 +70,7 @@ export const NoteDetail = (props: NoteDetailProps) => {
 
       {props.initialValues.transcript ? (
         <details className="rounded-xl border border-ink-200 bg-surface-elevated">
-          <summary className="cursor-pointer list-none px-5 py-3 text-xs font-semibold tracking-wider text-ink-500 uppercase">
+          <summary className="editorial-label cursor-pointer list-none px-5 py-3 text-ink-500">
             {t('transcript_title')}
           </summary>
           <p className="border-t border-ink-200 px-5 py-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-700">
@@ -88,7 +89,7 @@ export const NoteDetail = (props: NoteDetailProps) => {
             type="button"
             onClick={save}
             disabled={saving || deleting}
-            className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+            className={buttonClasses('primary', '', 'sm')}
           >
             {saving ? t('saving') : t('save')}
           </button>

@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import { TherapistProfileValidation } from '@/validations/TherapistProfileValidation';
 
@@ -18,7 +19,7 @@ type TherapistProfileFormProps = {
 const inputClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
 
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 export const TherapistProfileForm = (props: TherapistProfileFormProps) => {
   const t = useTranslations('TherapistProfileForm');
@@ -99,7 +100,7 @@ export const TherapistProfileForm = (props: TherapistProfileFormProps) => {
         <button
           type="submit"
           disabled={form.formState.isSubmitting}
-          className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+          className={buttonClasses('primary', '', 'sm')}
         >
           {form.formState.isSubmitting ? t('button_saving') : t('button_save')}
         </button>

@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { TemplateDefinition } from '@/validations/TemplateValidation';
 
@@ -14,7 +15,7 @@ type TemplateValuesEditorProps = {
 
 const inputClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 type ObjectiveRow = { title: string; progress: string };
 
@@ -47,7 +48,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                   onClick={() => {
                     setValue(section.key, [...rows, { title: '', progress: '' }]);
                   }}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:border-ink-300 disabled:opacity-50"
+                  className={buttonClasses('secondary', '', 'sm')}
                 >
                   <PlusIcon size={14} />
                   {t('add_row')}

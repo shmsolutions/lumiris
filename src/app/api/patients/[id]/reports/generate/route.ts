@@ -5,8 +5,9 @@ import * as z from 'zod';
 import { generateReport, generateReportValues } from '@/libs/AI';
 import type { ReportSource } from '@/libs/AI';
 import { db } from '@/libs/DB';
-import { getEntitlements } from '@/libs/Entitlements';
+import { currentAiPeriod, getAiAccess } from '@/libs/Entitlements';
 import { resolveTemplate } from '@/libs/Templates';
+import { consumeAiCredit, getUserProfile } from '@/libs/UserProfile';
 import {
   anamnesisSchema,
   patientSchema,
@@ -27,11 +28,17 @@ export const POST = async (request: Request, context: RouteContext) => {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
-  // Gate: report generation requires a paid plan.
-  const { limits } = await getEntitlements(userId);
-  if (!limits.ai) {
+  // Gate: report generation spends an AI credit (unlimited plan or monthly quota).
+  const profile = await getUserProfile(userId);
+  const access = getAiAccess(profile);
+  if (!access.allowed) {
     return NextResponse.json({ error: 'plan_ai_locked' }, { status: 403 });
   }
+  const consume = async () => {
+    if (!access.unlimited) {
+      await consumeAiCredit(userId, currentAiPeriod());
+    }
+  };
 
   const json = await request.json();
   const parse = ReportGenerateValidation.safeParse(json);
@@ -118,9 +125,11 @@ export const POST = async (request: Request, context: RouteContext) => {
   try {
     if (resolved.templateId) {
       const values = await generateReportValues(source, resolved.definition);
+      await consume();
       return NextResponse.json({ values, templateId: resolved.templateId, meta });
     }
     const content = await generateReport(source);
+    await consume();
     return NextResponse.json({ content, meta });
   } catch {
     return NextResponse.json({ error: 'generation_failed' }, { status: 500 });

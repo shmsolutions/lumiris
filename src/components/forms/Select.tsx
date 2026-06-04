@@ -130,9 +130,7 @@ export const Select = (props: SelectProps) => {
           {groups.map((group, groupIdx) => (
             <li key={group.label ?? `group-${groupIdx}`}>
               {group.label ? (
-                <div className="px-3 pt-2 pb-1 text-[10px] font-semibold tracking-wider text-ink-400 uppercase">
-                  {group.label}
-                </div>
+                <div className="editorial-label px-3 pt-2 pb-1 text-ink-400">{group.label}</div>
               ) : null}
               <ul>
                 {group.options.map((option) => {

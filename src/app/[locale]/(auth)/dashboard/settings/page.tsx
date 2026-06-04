@@ -9,9 +9,10 @@ import { SettingsTabs } from '@/components/settings/SettingsTabs';
 import type { SettingsTabId } from '@/components/settings/SettingsTabs';
 import { SignatureUploader } from '@/components/settings/SignatureUploader';
 import { TherapistProfileForm } from '@/components/settings/TherapistProfileForm';
+import { currentAiPeriod } from '@/libs/Entitlements';
 import { listPaymentsForUser } from '@/libs/Payments';
 import { getUserProfile, getUserSignature } from '@/libs/UserProfile';
-import { FREE_AI_TRIAL, PLAN_LIMITS } from '@/utils/Plans';
+import { PLAN_LIMITS } from '@/utils/Plans';
 
 const STATUS_BADGE: Record<string, string> = {
   paid: 'bg-success/15 text-success',
@@ -60,12 +61,13 @@ export default async function SettingsPage(props: SettingsPageProps) {
         therapistName: '',
         crefito: '',
         studentName: '',
-        aiTrialUsed: 0,
+        aiUsed: 0,
+        aiPeriod: null,
       };
 
-  const aiTrialRemaining = PLAN_LIMITS[profile.plan].ai
-    ? null
-    : Math.max(0, FREE_AI_TRIAL - profile.aiTrialUsed);
+  const aiLimit = PLAN_LIMITS[profile.plan].aiPerMonth;
+  const aiUsedNow = profile.aiPeriod === currentAiPeriod() ? profile.aiUsed : 0;
+  const aiTrialRemaining = Number.isFinite(aiLimit) ? Math.max(0, aiLimit - aiUsedNow) : null;
 
   const periodEndLabel = profile.currentPeriodEnd
     ? new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric' }).format(

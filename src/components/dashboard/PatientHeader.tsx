@@ -56,9 +56,7 @@ export const PatientHeader = (props: PatientHeaderProps) => {
 
       {props.diagnosis ? (
         <div className="relative flex items-baseline gap-2 border-t border-ink-200/70 bg-ink-50/50 px-5 py-3">
-          <span className="shrink-0 text-[10px] font-semibold tracking-wider text-ink-400 uppercase">
-            {t('field_diagnosis')}
-          </span>
+          <span className="editorial-label shrink-0 text-ink-400">{t('field_diagnosis')}</span>
           <span className="min-w-0 text-sm text-ink-700">{props.diagnosis}</span>
         </div>
       ) : null}

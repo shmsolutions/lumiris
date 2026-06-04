@@ -8,6 +8,7 @@ import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
 import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
+import { buttonClasses } from '@/components/ui/Button';
 import { Link, useRouter } from '@/libs/I18nNavigation';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { TemplateDefinition } from '@/validations/TemplateValidation';
@@ -271,7 +272,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
         {draft.transcript ? (
           <details className="rounded-xl border border-ink-200 bg-surface-elevated">
-            <summary className="cursor-pointer list-none px-5 py-3 text-xs font-semibold tracking-wider text-ink-500 uppercase">
+            <summary className="editorial-label cursor-pointer list-none px-5 py-3 text-ink-500">
               {t('transcript_title')}
             </summary>
             <p className="border-t border-ink-200 px-5 py-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-700">
@@ -282,9 +283,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
         {aiLocked ? (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-200 pt-5">
-            <span className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('upgrade_manual')}
-            </span>
+            <span className="editorial-label text-ink-500">{t('upgrade_manual')}</span>
             <div className="flex items-center gap-2">
               <label className="text-xs text-ink-600" htmlFor="session-date">
                 {t('field_session_date')}
@@ -320,9 +319,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
         {props.objectives && props.objectives.length > 0 ? (
           <section className="rounded-xl border border-ink-200 bg-surface-elevated p-5">
-            <h3 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('objectives_title')}
-            </h3>
+            <h3 className="editorial-label text-ink-500">{t('objectives_title')}</h3>
             <p className="mt-1 text-xs text-ink-500">{t('objectives_hint')}</p>
             <ul className="mt-4 space-y-2">
               {props.objectives.map((objective) => {
@@ -362,7 +359,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
             type="button"
             onClick={save}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+            className={buttonClasses('primary', '', 'sm')}
           >
             {isSaving ? t('saving') : t('save')}
           </button>
@@ -465,9 +462,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
 
           {guideSections.length > 0 ? (
             <div className="mt-4 rounded-xl border border-brand-200 bg-brand-50/40 p-4 text-left">
-              <h3 className="text-xs font-semibold tracking-wider text-brand-800 uppercase">
-                {t('guide_title')}
-              </h3>
+              <h3 className="editorial-label text-brand-800">{t('guide_title')}</h3>
               <ul className="mt-2 space-y-1.5">
                 {guideSections.map((section) => (
                   <li key={section.key} className="text-xs text-ink-700">

@@ -16,6 +16,7 @@ import {
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { TopBar } from '@/components/dashboard/TopBar';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import { getPendingReports } from '@/libs/Reports';
@@ -141,10 +142,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
         breadcrumb={tNav('section_workspace')}
         title={t('topbar_title')}
         actions={
-          <Link
-            href="/dashboard/patients/new/"
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
-          >
+          <Link href="/dashboard/patients/new/" className={buttonClasses('primary', '', 'sm')}>
             <PlusIcon size={14} />
             <span className="hidden sm:inline">{t('quick_new_patient')}</span>
           </Link>
@@ -159,7 +157,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
           actions={
             <Link
               href="/dashboard/patients/"
-              className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold whitespace-nowrap text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', 'whitespace-nowrap', 'sm')}
             >
               {t('quick_view_patients')}
               <ArrowRightIcon size={14} />
@@ -202,9 +200,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
           <div className="lg:col-span-2">
             <div className="rounded-xl border border-ink-200 bg-surface-elevated">
               <div className="flex items-center justify-between border-b border-ink-200 px-5 py-4">
-                <h2 className="text-sm font-semibold tracking-wider text-ink-500 uppercase">
-                  {t('schedule_title')}
-                </h2>
+                <h2 className="editorial-label text-ink-500">{t('schedule_title')}</h2>
                 <Link
                   href="/dashboard/schedule/"
                   className="text-xs font-semibold text-brand-700 transition hover:text-brand-800"
@@ -221,7 +217,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
                     action={
                       <Link
                         href="/dashboard/schedule/new/"
-                        className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                        className={buttonClasses('primary', '', 'sm')}
                       >
                         <PlusIcon size={14} />
                         {t('schedule_new')}
@@ -268,9 +264,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
                 <AlertIcon size={18} />
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="text-sm font-semibold tracking-wider text-brand-700 uppercase">
-                  {t('alerts_title')}
-                </h2>
+                <h2 className="editorial-label text-brand-700">{t('alerts_title')}</h2>
                 {pendingReports.length === 0 ? (
                   <p className="mt-2 text-sm text-ink-700">{t('alerts_none')}</p>
                 ) : (
@@ -305,9 +299,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
 
         <section className="mt-8">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold tracking-wider text-ink-500 uppercase">
-              {t('recent_title')}
-            </h2>
+            <h2 className="editorial-label text-ink-500">{t('recent_title')}</h2>
             <Link
               href="/dashboard/patients/"
               className="text-xs font-semibold text-brand-700 transition hover:text-brand-800"
@@ -324,7 +316,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
               action={
                 <Link
                   href="/dashboard/patients/new/"
-                  className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                  className={buttonClasses('primary', '', 'sm')}
                 >
                   <PlusIcon size={14} />
                   {t('quick_new_patient')}

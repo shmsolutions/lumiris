@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { ReportEditor } from '@/components/reports/ReportEditor';
 import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { ReportContent } from '@/validations/ReportValidation';
@@ -39,7 +40,7 @@ const emptyContent: ReportContent = {
 
 const inputClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 export const ReportComposer = (props: ReportComposerProps) => {
   const t = useTranslations('ReportComposer');
@@ -150,7 +151,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
             type="button"
             onClick={save}
             disabled={phase === 'saving'}
-            className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+            className={buttonClasses('primary', '', 'sm')}
           >
             {phase === 'saving' ? t('saving') : t('save')}
           </button>
@@ -233,7 +234,7 @@ export const ReportComposer = (props: ReportComposerProps) => {
           type="button"
           onClick={generate}
           disabled={phase === 'generating'}
-          className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+          className={buttonClasses('primary', '', 'sm')}
         >
           {phase === 'generating' ? <Spinner size={14} /> : <SparkIcon size={14} />}
           {phase === 'generating' ? t('generating') : t('generate')}

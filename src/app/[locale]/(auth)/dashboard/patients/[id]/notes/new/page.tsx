@@ -126,7 +126,7 @@ export default async function NewNotePage(props: NewNotePageProps) {
         patientId={id}
         patientName={patient.fullName}
         aiAvailable={aiAccess.allowed}
-        trialRemaining={aiAccess.unlimited ? null : aiAccess.trialRemaining}
+        trialRemaining={aiAccess.unlimited ? null : aiAccess.remaining}
         appointmentId={appointmentId}
         objectives={activeObjectives}
         templates={templates}

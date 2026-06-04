@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 import { FileIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import { patientSchema, reportSchema } from '@/models/Schema';
@@ -57,7 +58,7 @@ export default async function PatientReportsListPage(props: ReportsPageProps) {
         </div>
         <Link
           href={`/dashboard/patients/${id}/reports/new/`}
-          className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+          className={buttonClasses('primary', '', 'sm')}
         >
           <PlusIcon size={14} />
           {t('new_report')}
@@ -72,7 +73,7 @@ export default async function PatientReportsListPage(props: ReportsPageProps) {
           action={
             <Link
               href={`/dashboard/patients/${id}/reports/new/`}
-              className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+              className={buttonClasses('primary', '', 'sm')}
             >
               <PlusIcon size={14} />
               {t('new_report')}

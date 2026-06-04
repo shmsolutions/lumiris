@@ -3,6 +3,7 @@ import { and, count, desc, eq } from 'drizzle-orm';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { AlertIcon, ArrowRightIcon, CheckIcon, MicIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import {
@@ -20,7 +21,7 @@ type PatientOverviewPageProps = {
 
 const FieldRow = (props: { label: string; value: React.ReactNode }) => (
   <div className="grid grid-cols-1 gap-0.5 border-b border-ink-200/70 px-5 py-3 last:border-b-0 sm:grid-cols-[140px_1fr] sm:gap-4">
-    <div className="text-xs font-medium tracking-wider text-ink-500 uppercase">{props.label}</div>
+    <div className="editorial-label text-ink-500">{props.label}</div>
     <div className="min-w-0 text-sm break-words text-ink-800">{props.value}</div>
   </div>
 );
@@ -126,9 +127,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-2">
                 <span className="size-2 rounded-full bg-accent-500" />
-                <span className="text-xs font-semibold tracking-wider text-accent-700 uppercase">
-                  {t('hub_last_session')}
-                </span>
+                <span className="editorial-label text-accent-700">{t('hub_last_session')}</span>
               </span>
               <span className="text-xs text-ink-400">{lastSessionLabel}</span>
             </div>
@@ -168,9 +167,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
 
         <section className="overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
           <header className="border-b border-ink-200 px-5 py-3">
-            <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('section_personal')}
-            </h2>
+            <h2 className="editorial-label text-ink-500">{t('section_personal')}</h2>
           </header>
           <FieldRow label={t('field_full_name')} value={patient.fullName} />
           <FieldRow label={t('field_birth_date')} value={patient.birthDate ?? empty} />
@@ -185,9 +182,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
 
         <section className="overflow-hidden rounded-2xl border border-ink-200 bg-surface-elevated">
           <header className="border-b border-ink-200 px-5 py-3">
-            <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('section_clinical')}
-            </h2>
+            <h2 className="editorial-label text-ink-500">{t('section_clinical')}</h2>
           </header>
           <FieldRow label={t('field_diagnosis')} value={patient.diagnosis ?? empty} />
           <FieldRow label={t('field_cid')} value={patient.cid ?? empty} />
@@ -207,9 +202,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
           <section className="rounded-2xl border border-brand-200/70 bg-brand-50/40 p-5">
             <div className="flex items-center gap-2">
               <AlertIcon className="text-brand-600" size={18} />
-              <h2 className="text-xs font-semibold tracking-wider text-brand-700 uppercase">
-                {t('hub_attention_title')}
-              </h2>
+              <h2 className="editorial-label text-brand-700">{t('hub_attention_title')}</h2>
             </div>
             <ul className="mt-3 space-y-2">
               {attentionItems.map((item) => (
@@ -231,9 +224,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
         )}
 
         <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
-          <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-            {t('status_title')}
-          </h2>
+          <h2 className="editorial-label text-ink-500">{t('status_title')}</h2>
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex items-center justify-between">
               <span className="text-ink-700">{t('status_anamnesis')}</span>
@@ -277,9 +268,7 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
         {/* Objetivos em andamento — puxados do plano terapêutico. */}
         <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('hub_goals_title')}
-            </h2>
+            <h2 className="editorial-label text-ink-500">{t('hub_goals_title')}</h2>
             <Link
               href={`/dashboard/patients/${id}/plan/`}
               className="text-xs font-semibold text-brand-700 transition hover:text-brand-800"
@@ -316,19 +305,17 @@ export default async function PatientOverviewPage(props: PatientOverviewPageProp
         </section>
 
         <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5">
-          <h2 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-            {t('actions_title')}
-          </h2>
+          <h2 className="editorial-label text-ink-500">{t('actions_title')}</h2>
           <div className="mt-4 space-y-2">
             <Link
               href={`/dashboard/patients/${patient.id}/anamnesis/`}
-              className="block w-full rounded-md bg-brand-500 px-3 py-2 text-center text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+              className={buttonClasses('primary', 'w-full text-center', 'sm')}
             >
               {anamnesis ? t('actions_edit_anamnesis') : t('actions_fill_anamnesis')}
             </Link>
             <Link
               href={`/dashboard/patients/${patient.id}/plan/`}
-              className="block w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-center text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+              className={buttonClasses('secondary', 'w-full text-center', 'sm')}
             >
               {t('actions_open_plan')}
             </Link>
