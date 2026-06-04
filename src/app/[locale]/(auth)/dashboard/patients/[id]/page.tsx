@@ -34,7 +34,9 @@ const notePreview = (note: {
   const fields = [note.procedimento, note.evolucao, note.intercorrencia].filter((s): s is string =>
     Boolean(s?.trim()),
   );
-  return fields[0]?.slice(0, 220) ?? '';
+  // Corte folgado (> 3 linhas) para o line-clamp-3 truncar com o "…" do CSS,
+  // em vez de parar no meio da palavra sem reticências.
+  return fields[0]?.slice(0, 400) ?? '';
 };
 
 export default async function PatientOverviewPage(props: PatientOverviewPageProps) {
