@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Fraunces, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { MetaPixel } from '@/components/analytics/MetaPixel';
 import { Env } from '@/libs/Env';
 import { routing } from '@/libs/I18nRouting';
 import { AppConfig } from '@/utils/AppConfig';
@@ -112,6 +113,7 @@ export default async function RootLayout(props: {
   return (
     <html lang={locale} className={`${inter.variable} ${fraunces.variable}`}>
       <body className="bg-surface text-ink-700">
+        <MetaPixel />
         <NextIntlClientProvider>{props.children}</NextIntlClientProvider>
       </body>
     </html>

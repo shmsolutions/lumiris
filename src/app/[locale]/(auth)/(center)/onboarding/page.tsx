@@ -2,6 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from 'next/navigation';
+import { MetaPixelEvent } from '@/components/analytics/MetaPixelEvent';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { getUserProfile } from '@/libs/UserProfile';
 
@@ -33,9 +34,12 @@ export default async function OnboardingPage(props: OnboardingPageProps) {
   const clerkFullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim();
 
   return (
-    <OnboardingWizard
-      firstName={firstName}
-      initial={{ therapistName: profile.therapistName || clerkFullName }}
-    />
+    <>
+      <MetaPixelEvent event="CompleteRegistration" once />
+      <OnboardingWizard
+        firstName={firstName}
+        initial={{ therapistName: profile.therapistName || clerkFullName }}
+      />
+    </>
   );
 }

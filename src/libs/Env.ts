@@ -23,6 +23,8 @@ export const Env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().optional(),
     // Token de verificação do Google Search Console (meta tag google-site-verification).
     NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: z.string().optional(),
+    // ID do Meta Pixel (Facebook/Instagram Ads). Sem ele, o Pixel não carrega.
+    NEXT_PUBLIC_META_PIXEL_ID: z.string().optional(),
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_LOGGING_LEVEL: z
       .enum(['error', 'info', 'debug', 'warning', 'trace', 'fatal'])
@@ -48,6 +50,7 @@ export const Env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    NEXT_PUBLIC_META_PIXEL_ID: process.env.NEXT_PUBLIC_META_PIXEL_ID,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_LOGGING_LEVEL: process.env.NEXT_PUBLIC_LOGGING_LEVEL,
     NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN: process.env.NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN,
