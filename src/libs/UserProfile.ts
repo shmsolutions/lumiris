@@ -63,6 +63,8 @@ type UpsertInput = {
   studentName?: string | null;
   plan?: PlanId;
   onboarded?: boolean;
+  aiUsed?: number;
+  aiPeriod?: string | null;
   taxId?: string | null;
   asaasCustomerId?: string | null;
   asaasSubscriptionId?: string | null;

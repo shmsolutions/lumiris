@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cancelSubscription, parseWebhookEvent, verifyWebhookToken } from '@/libs/Asaas';
 import { notifyPlanActivated, notifyPlanCanceled } from '@/libs/Email';
+import { currentAiPeriod } from '@/libs/Entitlements';
 import { logger } from '@/libs/Logger';
 import { markPaymentCanceled, recordPayment } from '@/libs/Payments';
 import {
@@ -66,11 +67,14 @@ export const POST = async (request: Request) => {
 
       // 1) Ativa o plano novo PRIMEIRO (e zera a sessão de checkout consumida),
       // pra que um eventual webhook de cancelamento da assinatura antiga não
-      // ache este perfil como "assinatura atual".
+      // ache este perfil como "assinatura atual". Zera a cota de IA do mês: quem
+      // acabou de pagar recebe a franquia cheia, e cada renovação reinicia o ciclo.
       await upsertUserProfile(userId, {
         plan: event.plan,
         subscriptionStatus: 'active',
         currentPeriodEnd: oneMonthFromNow(),
+        aiUsed: 0,
+        aiPeriod: currentAiPeriod(),
         asaasCheckoutId: null,
         ...(event.subscriptionId ? { asaasSubscriptionId: event.subscriptionId } : {}),
         ...(event.customerId ? { asaasCustomerId: event.customerId } : {}),
