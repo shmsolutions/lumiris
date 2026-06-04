@@ -268,7 +268,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
                   onClick={() => {
                     openPix(plan);
                   }}
-                  className="mt-2 inline-flex items-center justify-center text-xs font-medium text-brand-700 transition hover:text-brand-800"
+                  className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-brand-300 px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50"
                 >
                   {t('pix_pay')}
                 </button>
@@ -289,17 +289,23 @@ export const BillingPanel = (props: BillingPanelProps) => {
           role="dialog"
         >
           <div className="w-full max-w-sm rounded-2xl border border-ink-200 bg-surface-elevated p-6 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-ink-900">
-                {t('pix_modal_title', { plan: t(`plan_${pixPlan}_name` as 'plan_student_name') })}
-              </h3>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-base font-semibold text-ink-900">
+                  {t('pix_modal_title', { plan: t(`plan_${pixPlan}_name` as 'plan_student_name') })}
+                </h3>
+                <p className="mt-0.5 text-sm font-medium text-brand-700">
+                  {t(`plan_${pixPlan}_amount` as 'plan_student_amount')}
+                  <span className="text-ink-500">{t('per_month')}</span>
+                </p>
+              </div>
               <button
                 type="button"
                 aria-label={tCommon('cancel')}
                 onClick={() => {
                   setPixPlan(null);
                 }}
-                className="inline-flex size-8 items-center justify-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-ink-900"
+                className="-mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-ink-400 transition hover:bg-ink-100 hover:text-ink-900"
               >
                 <CloseIcon size={16} />
               </button>
@@ -354,13 +360,14 @@ export const BillingPanel = (props: BillingPanelProps) => {
                   value={pixCpf}
                 />
                 {pixError ? <p className="mt-2 text-xs text-danger">{pixError}</p> : null}
+                <p className="mt-3 text-xs text-ink-500">{t('pix_help')}</p>
                 <button
                   type="button"
                   disabled={pixLoading}
                   onClick={() => {
                     void generatePix();
                   }}
-                  className={buttonClasses('primary', 'mt-4 w-full', 'sm')}
+                  className={buttonClasses('primary', 'mt-3 w-full', 'sm')}
                 >
                   {pixLoading ? <Spinner /> : null}
                   {t('pix_generate')}
