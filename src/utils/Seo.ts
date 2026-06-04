@@ -10,12 +10,15 @@ const CONTACT_EMAIL = 'oi@lumiris.com.br';
  * x-default pointing at the default-locale URL — what Google wants for i18n.
  */
 export const alternatesFor = (locale: string, path = ''): Metadata['alternates'] => {
+  // getI18nPath returns '' for the default locale at the root — an empty href
+  // breaks Next's metadata resolution, so normalize it to '/'.
+  const norm = (value: string) => value || '/';
   const languages: Record<string, string> = {};
   for (const loc of routing.locales) {
-    languages[loc] = getI18nPath(path, loc);
+    languages[loc] = norm(getI18nPath(path, loc));
   }
-  languages['x-default'] = getI18nPath(path, routing.defaultLocale);
-  return { canonical: getI18nPath(path, locale), languages };
+  languages['x-default'] = norm(getI18nPath(path, routing.defaultLocale));
+  return { canonical: norm(getI18nPath(path, locale)), languages };
 };
 
 /** Organization node — identity, logo and contact for knowledge-panel signals. */
