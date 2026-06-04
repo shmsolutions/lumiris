@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 
 export type EvolutionValues = {
   procedimento: string;
@@ -31,7 +32,7 @@ export const EvolutionEditor = (props: EvolutionEditorProps) => {
           <label className={labelClass} htmlFor={`evolution-${key}`}>
             {t(`label_${key}` as 'label_procedimento')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id={`evolution-${key}`}
             aria-label={t(`label_${key}` as 'label_procedimento')}
             rows={key === 'evolucao' ? 6 : 4}

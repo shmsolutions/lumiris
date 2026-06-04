@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import type { ReportContent } from '@/validations/ReportValidation';
 
 type ReportEditorProps = {
@@ -39,7 +40,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           <label className={labelClass} htmlFor="initialComplaint">
             {t('initial_complaint')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="initialComplaint"
             aria-label={t('initial_complaint')}
             rows={2}
@@ -55,7 +56,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           <label className={labelClass} htmlFor="generalEvolution">
             {t('general_evolution')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="generalEvolution"
             aria-label={t('general_evolution')}
             rows={4}
@@ -78,7 +79,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
             {v.objectiveProgress.map((o, index) => (
               <div key={index} className="rounded-lg border border-ink-200 bg-surface p-4">
                 <div className="text-sm font-semibold text-ink-900">{o.title}</div>
-                <textarea
+                <AutoGrowTextarea
                   aria-label={o.title}
                   rows={3}
                   className={fieldClass}
@@ -99,7 +100,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           <label className={labelClass} htmlFor="difficulties">
             {t('difficulties')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="difficulties"
             aria-label={t('difficulties')}
             rows={3}
@@ -115,7 +116,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           <label className={labelClass} htmlFor="suggestions">
             {t('suggestions')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="suggestions"
             aria-label={t('suggestions')}
             rows={3}
@@ -131,7 +132,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
           <label className={labelClass} htmlFor="conclusion">
             {t('conclusion')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="conclusion"
             aria-label={t('conclusion')}
             rows={3}
