@@ -79,6 +79,19 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
         });
       }
 
+      // Authenticated users hitting the sign-in/sign-up pages get redirected to
+      // the dashboard server-side, before render — avoids the flash of the auth
+      // page that Clerk's client-side fallback redirect would otherwise cause.
+      if (isAuthPage(req)) {
+        const { userId } = await auth();
+
+        if (userId) {
+          const locale = req.nextUrl.pathname.match(/^(\/[^/]+)\/sign-(?:in|up)/u)?.at(1) ?? '';
+
+          return NextResponse.redirect(new URL(`${locale}/dashboard`, publicOrigin(req)));
+        }
+      }
+
       return handleI18nRouting(req);
     })(request, event);
   }
