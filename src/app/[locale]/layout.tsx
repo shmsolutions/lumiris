@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { Fraunces, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
+import { Env } from '@/libs/Env';
 import { routing } from '@/libs/I18nRouting';
 import { AppConfig } from '@/utils/AppConfig';
 import { getBaseUrl } from '@/utils/Helpers';
@@ -35,6 +36,36 @@ export const metadata: Metadata = {
   },
   description,
   applicationName: AppConfig.name,
+  authors: [{ name: AppConfig.name, url: getBaseUrl() }],
+  creator: AppConfig.name,
+  publisher: AppConfig.name,
+  category: 'health',
+  keywords: [
+    'prontuário eletrônico',
+    'terapia ocupacional',
+    'terapeuta ocupacional',
+    'prontuário para T.O.',
+    'anamnese terapia ocupacional',
+    'evolução por áudio',
+    'relatório CREFITO',
+    'prontuário com IA',
+    'software para terapeuta ocupacional',
+  ],
+  formatDetection: { telephone: false },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  verification: Env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: Env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
   openGraph: {
     type: 'website',
     siteName: AppConfig.name,

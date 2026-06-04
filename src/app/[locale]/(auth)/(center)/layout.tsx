@@ -1,6 +1,12 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Logo } from '@/components/brand/Logo';
 import { Link } from '@/libs/I18nNavigation';
+
+// Sign-in / sign-up carry no SEO value — keep them out of the index.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 const Bullet = (props: { children: React.ReactNode }) => (
   <li className="flex items-start gap-3">
