@@ -167,6 +167,10 @@ export const PatientForm = (props: PatientFormProps) => {
             </div>
           </div>
 
+          <h2 className="text-sm font-semibold text-ink-900 sm:col-span-2">
+            {t('section_patient')}
+          </h2>
+
           <div className="sm:col-span-2">
             <label className={labelClass} htmlFor="fullName">
               {t('label_full_name')}
@@ -190,50 +194,17 @@ export const PatientForm = (props: PatientFormProps) => {
           </div>
 
           <div>
-            <label className={labelClass} htmlFor="contactPhone">
-              {t('label_contact_phone')}
-            </label>
-            <input id="contactPhone" className={inputClass} {...form.register('contactPhone')} />
-          </div>
-
-          <div>
-            <label className={labelClass} htmlFor="guardianName">
-              {t('label_guardian_name')}
-            </label>
-            <input id="guardianName" className={inputClass} {...form.register('guardianName')} />
-          </div>
-
-          <div>
-            <label className={labelClass} htmlFor="guardianRelation">
-              {t('label_guardian_relation')}
-            </label>
-            <input
-              id="guardianRelation"
-              className={inputClass}
-              {...form.register('guardianRelation')}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass} htmlFor="contactEmail">
-              {t('label_contact_email')}
-            </label>
-            <input
-              id="contactEmail"
-              type="email"
-              className={inputClass}
-              {...form.register('contactEmail')}
-            />
-            {form.formState.errors.contactEmail ? (
-              <p className="mt-1.5 text-xs text-danger">{t('error_contact_email')}</p>
-            ) : null}
-          </div>
-
-          <div>
             <label className={labelClass} htmlFor="gender">
               {t('label_gender')}
             </label>
             <input id="gender" className={inputClass} {...form.register('gender')} />
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="naturality">
+              {t('label_naturality')}
+            </label>
+            <input id="naturality" className={inputClass} {...form.register('naturality')} />
           </div>
 
           {isAdult ? (
@@ -249,13 +220,6 @@ export const PatientForm = (props: PatientFormProps) => {
             </div>
           ) : null}
 
-          <div>
-            <label className={labelClass} htmlFor="naturality">
-              {t('label_naturality')}
-            </label>
-            <input id="naturality" className={inputClass} {...form.register('naturality')} />
-          </div>
-
           {isAdult ? (
             <div>
               <label className={labelClass} htmlFor="profession">
@@ -264,6 +228,74 @@ export const PatientForm = (props: PatientFormProps) => {
               <input id="profession" className={inputClass} {...form.register('profession')} />
             </div>
           ) : null}
+
+          <div>
+            <label className={labelClass} htmlFor="cid">
+              {t('label_cid')}
+            </label>
+            <input id="cid" className={inputClass} {...form.register('cid')} />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <h2 className="text-sm font-semibold text-ink-900">
+              {isAdult ? t('section_contact') : t('section_guardian')}
+            </h2>
+            {isAdult ? null : (
+              <p className="mt-1 text-xs text-ink-500">{t('section_guardian_hint')}</p>
+            )}
+          </div>
+
+          {isAdult ? null : (
+            <>
+              <div>
+                <label className={labelClass} htmlFor="guardianName">
+                  {t('label_guardian_name')}
+                </label>
+                <input
+                  id="guardianName"
+                  className={inputClass}
+                  {...form.register('guardianName')}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass} htmlFor="guardianRelation">
+                  {t('label_guardian_relation')}
+                </label>
+                <input
+                  id="guardianRelation"
+                  className={inputClass}
+                  {...form.register('guardianRelation')}
+                />
+              </div>
+            </>
+          )}
+
+          <div>
+            <label className={labelClass} htmlFor="contactPhone">
+              {isAdult ? t('label_contact_phone') : t('label_guardian_phone')}
+            </label>
+            <input id="contactPhone" className={inputClass} {...form.register('contactPhone')} />
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="contactEmail">
+              {isAdult ? t('label_contact_email') : t('label_guardian_email')}
+            </label>
+            <input
+              id="contactEmail"
+              type="email"
+              className={inputClass}
+              {...form.register('contactEmail')}
+            />
+            {form.formState.errors.contactEmail ? (
+              <p className="mt-1.5 text-xs text-danger">{t('error_contact_email')}</p>
+            ) : null}
+          </div>
 
           <div className="sm:col-span-2">
             <label className={labelClass} htmlFor="residentialAddress">
@@ -276,27 +308,24 @@ export const PatientForm = (props: PatientFormProps) => {
             />
           </div>
 
-          <div className="sm:col-span-2">
-            <label className={labelClass} htmlFor="commercialAddress">
-              {t('label_commercial_address')}
-            </label>
-            <input
-              id="commercialAddress"
-              className={inputClass}
-              {...form.register('commercialAddress')}
-            />
-          </div>
-
-          <div>
-            <label className={labelClass} htmlFor="cid">
-              {t('label_cid')}
-            </label>
-            <input id="cid" className={inputClass} {...form.register('cid')} />
-          </div>
+          {isAdult ? (
+            <div className="sm:col-span-2">
+              <label className={labelClass} htmlFor="commercialAddress">
+                {t('label_commercial_address')}
+              </label>
+              <input
+                id="commercialAddress"
+                className={inputClass}
+                {...form.register('commercialAddress')}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 
       <section className="space-y-5 rounded-xl border border-ink-200 bg-surface-elevated p-6">
+        <h2 className="text-sm font-semibold text-ink-900">{t('section_clinical')}</h2>
+
         <div>
           <label className={labelClass} htmlFor="diagnosis">
             {t('label_diagnosis')}
