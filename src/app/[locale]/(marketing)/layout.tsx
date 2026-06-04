@@ -2,7 +2,9 @@ import { setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import { MarketingFooter } from '@/components/marketing/MarketingFooter';
 import { MarketingHeader } from '@/components/marketing/MarketingHeader';
+import { JsonLd } from '@/components/seo/JsonLd';
 import { BaseTemplate } from '@/templates/BaseTemplate';
+import { organizationSchema, websiteSchema } from '@/utils/Seo';
 
 // The marketing pages run without the Clerk middleware/provider (so the
 // landing stays cheap and i18n-friendly). We detect a likely-signed-in
@@ -26,8 +28,14 @@ export default async function MarketingLayout(props: {
   const isSignedIn = await hasClerkSession();
 
   return (
-    <BaseTemplate header={<MarketingHeader isSignedIn={isSignedIn} />} footer={<MarketingFooter />}>
-      {props.children}
-    </BaseTemplate>
+    <>
+      <JsonLd data={[organizationSchema(), websiteSchema()]} />
+      <BaseTemplate
+        header={<MarketingHeader isSignedIn={isSignedIn} />}
+        footer={<MarketingFooter />}
+      >
+        {props.children}
+      </BaseTemplate>
+    </>
   );
 }

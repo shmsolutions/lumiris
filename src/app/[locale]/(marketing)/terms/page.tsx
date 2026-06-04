@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LegalPage } from '@/components/marketing/LegalPage';
+import { alternatesFor } from '@/utils/Seo';
 
 type TermsPageProps = { params: Promise<{ locale: string }> };
 
@@ -22,7 +23,7 @@ const SECTIONS = [
 export async function generateMetadata(props: TermsPageProps): Promise<Metadata> {
   const { locale } = await props.params;
   const t = await getTranslations({ locale, namespace: 'TermsPage' });
-  return { title: t('meta_title') };
+  return { title: t('meta_title'), alternates: alternatesFor(locale, '/terms') };
 }
 
 export default async function TermsPage(props: TermsPageProps) {
