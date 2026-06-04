@@ -1,5 +1,6 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import { setRequestLocale } from 'next-intl/server';
+import { PostHogIdentify } from '@/components/analytics/PostHogIdentify';
 import { ClerkLocalizations } from '@/utils/AppConfig';
 
 export default async function AuthLayout(props: {
@@ -24,6 +25,7 @@ export default async function AuthLayout(props: {
       signUpFallbackRedirectUrl="/dashboard"
       afterSignOutUrl="/"
     >
+      <PostHogIdentify />
       {props.children}
     </ClerkProvider>
   );
