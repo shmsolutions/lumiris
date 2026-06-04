@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { Link, useRouter } from '@/libs/I18nNavigation';
 import { PatientCreateValidation } from '@/validations/PatientValidation';
@@ -330,7 +331,7 @@ export const PatientForm = (props: PatientFormProps) => {
           <label className={labelClass} htmlFor="diagnosis">
             {t('label_diagnosis')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="diagnosis"
             rows={2}
             className={inputClass}
@@ -342,7 +343,7 @@ export const PatientForm = (props: PatientFormProps) => {
           <label className={labelClass} htmlFor="mainComplaint">
             {t('label_main_complaint')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="mainComplaint"
             rows={3}
             className={inputClass}
@@ -361,7 +362,7 @@ export const PatientForm = (props: PatientFormProps) => {
           <label className={labelClass} htmlFor="otherProfessionals">
             {t('label_other_professionals')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="otherProfessionals"
             rows={2}
             className={inputClass}
@@ -373,7 +374,12 @@ export const PatientForm = (props: PatientFormProps) => {
           <label className={labelClass} htmlFor="notes">
             {t('label_notes')}
           </label>
-          <textarea id="notes" rows={3} className={inputClass} {...form.register('notes')} />
+          <AutoGrowTextarea
+            id="notes"
+            rows={3}
+            className={inputClass}
+            {...form.register('notes')}
+          />
         </div>
       </section>
 

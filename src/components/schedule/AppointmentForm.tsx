@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { DateTimePicker } from '@/components/forms/DateTimePicker';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import { AppointmentCreateValidation } from '@/validations/AppointmentValidation';
@@ -196,7 +197,7 @@ export const AppointmentForm = (props: AppointmentFormProps) => {
           <label className={labelClass} htmlFor="notes">
             {t('label_notes')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="notes"
             rows={3}
             placeholder={t('placeholder_notes')}

@@ -8,6 +8,7 @@ import { AudioRecorder } from '@/components/notes/AudioRecorder';
 import { EvolutionEditor } from '@/components/notes/EvolutionEditor';
 import type { EvolutionValues } from '@/components/notes/EvolutionEditor';
 import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { Link, useRouter } from '@/libs/I18nNavigation';
 import type { TemplateValues } from '@/libs/TemplateSchema';
@@ -488,7 +489,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
                 disabled={phase === 'processing'}
               />
             ) : (
-              <textarea
+              <AutoGrowTextarea
                 aria-label={t('capture_headline')}
                 value={textInput}
                 onChange={(event) => {

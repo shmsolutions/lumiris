@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { TemplateDefinition } from '@/validations/TemplateValidation';
@@ -70,7 +71,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                           setValue(section.key, next);
                         }}
                       />
-                      <textarea
+                      <AutoGrowTextarea
                         aria-label={t('row_progress')}
                         className={inputClass}
                         rows={2}
@@ -121,7 +122,7 @@ export const TemplateValuesEditor = (props: TemplateValuesEditorProps) => {
                   <label className={labelClass} htmlFor={`tpl-${field.key}`}>
                     {field.label}
                   </label>
-                  <textarea
+                  <AutoGrowTextarea
                     id={`tpl-${field.key}`}
                     aria-label={field.label}
                     rows={3}

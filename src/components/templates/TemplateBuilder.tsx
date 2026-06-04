@@ -8,6 +8,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
 import { Select } from '@/components/forms/Select';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import {
@@ -101,7 +102,7 @@ const SectionFields = (props: { form: UseFormReturn<FormValues>; sectionIndex: n
               </div>
               <div className="sm:col-span-2">
                 <label className={labelClass}>{t('field_guide')}</label>
-                <textarea
+                <AutoGrowTextarea
                   rows={2}
                   className={inputClass}
                   placeholder={t('field_guide_placeholder')}
@@ -193,7 +194,7 @@ export const TemplateBuilder = (props: TemplateBuilderProps) => {
           <label className={labelClass} htmlFor="template-description">
             {t('label_description')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="template-description"
             rows={2}
             className={inputClass}
@@ -269,7 +270,7 @@ export const TemplateBuilder = (props: TemplateBuilderProps) => {
                     </div>
                     <div className="mt-3">
                       <label className={labelClass}>{t('section_guide')}</label>
-                      <textarea
+                      <AutoGrowTextarea
                         rows={2}
                         className={inputClass}
                         placeholder={t('section_guide_placeholder')}

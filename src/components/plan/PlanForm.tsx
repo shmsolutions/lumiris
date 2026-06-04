@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import { TreatmentPlanUpsertValidation } from '@/validations/TreatmentPlanValidation';
@@ -84,7 +85,7 @@ export const PlanForm = (props: PlanFormProps) => {
           <label className={labelClass} htmlFor="procedures">
             {t('label_procedures')}
           </label>
-          <textarea
+          <AutoGrowTextarea
             id="procedures"
             rows={3}
             className={inputClass}
@@ -165,7 +166,7 @@ export const PlanForm = (props: PlanFormProps) => {
                       <label className={labelClass} htmlFor={`objectives-${index}-description`}>
                         {t('objective_label_description')}
                       </label>
-                      <textarea
+                      <AutoGrowTextarea
                         id={`objectives-${index}-description`}
                         rows={2}
                         className={inputClass}
@@ -242,7 +243,7 @@ export const PlanForm = (props: PlanFormProps) => {
         <label className={labelClass} htmlFor="notes">
           {t('label_notes')}
         </label>
-        <textarea
+        <AutoGrowTextarea
           id="notes"
           rows={3}
           className={inputClass}

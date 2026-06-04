@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { FieldPath } from 'react-hook-form';
 import type * as z from 'zod';
+import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
 import { AnamnesisUpsertValidation } from '@/validations/AnamnesisValidation';
 import type { AnamnesisData } from '@/validations/AnamnesisValidation';
@@ -131,7 +132,7 @@ export const AnamnesisForm = (props: AnamnesisFormProps) => {
                     {t(`field_${section}_${field.key}` as Parameters<typeof t>[0])}
                   </label>
                   {field.rows ? (
-                    <textarea
+                    <AutoGrowTextarea
                       id={fieldName}
                       rows={field.rows}
                       className={inputClass}
