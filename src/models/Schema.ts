@@ -26,8 +26,10 @@ export const userProfileSchema = pgTable('user_profile', {
   studentName: varchar('student_name', { length: 120 }),
   plan: varchar('plan', { length: 16 }).default('free').notNull(),
   onboarded: boolean('onboarded').default(false).notNull(),
-  // Gerações de IA já consumidas no trial gratuito (plano free). Vitalício.
-  aiTrialUsed: integer('ai_trial_used').default(0).notNull(),
+  // Gerações de IA consumidas no mês corrente; reseta quando aiPeriod muda.
+  aiUsed: integer('ai_trial_used').default(0).notNull(),
+  // Mês (YYYY-MM, UTC) a que o contador aiUsed se refere; null = nunca usou.
+  aiPeriod: varchar('ai_period', { length: 7 }),
   // CPF/CNPJ do cliente — exigido pelo Asaas pra criar a assinatura.
   taxId: varchar('tax_id', { length: 20 }),
   // Billing (Asaas) — cliente e assinatura recorrente.

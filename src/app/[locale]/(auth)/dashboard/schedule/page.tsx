@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { ClockIcon, PlusIcon, ScheduleIcon } from '@/components/dashboard/Icons';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { TopBar } from '@/components/dashboard/TopBar';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import { appointmentSchema, patientSchema } from '@/models/Schema';
@@ -119,10 +120,7 @@ export default async function SchedulePage(props: SchedulePageProps) {
         breadcrumb={tNav('section_workspace')}
         title={t('title')}
         actions={
-          <Link
-            href="/dashboard/schedule/new/"
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
-          >
+          <Link href="/dashboard/schedule/new/" className={buttonClasses('primary', '', 'sm')}>
             <PlusIcon size={14} />
             <span className="hidden sm:inline">{t('new_appointment')}</span>
           </Link>
@@ -134,10 +132,7 @@ export default async function SchedulePage(props: SchedulePageProps) {
           title={t('title')}
           description={t('description')}
           actions={
-            <Link
-              href="/dashboard/schedule/new/"
-              className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
-            >
+            <Link href="/dashboard/schedule/new/" className={buttonClasses('primary', '', 'sm')}>
               <PlusIcon size={14} />
               {t('new_appointment')}
             </Link>
@@ -153,7 +148,7 @@ export default async function SchedulePage(props: SchedulePageProps) {
               action={
                 <Link
                   href="/dashboard/schedule/new/"
-                  className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                  className={buttonClasses('primary', '', 'sm')}
                 >
                   <PlusIcon size={14} />
                   {t('new_appointment')}

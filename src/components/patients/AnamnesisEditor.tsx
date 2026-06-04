@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AnamnesisForm } from '@/components/patients/AnamnesisForm';
 import { TemplateValuesEditor } from '@/components/templates/TemplateValuesEditor';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { TemplateValues } from '@/libs/TemplateSchema';
 import type { AnamnesisData } from '@/validations/AnamnesisValidation';
@@ -19,7 +20,7 @@ type AnamnesisEditorProps = {
   initialValues: TemplateValues;
 };
 
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 const selectClass =
   'mt-1.5 w-full max-w-md rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
 
@@ -89,7 +90,7 @@ export const AnamnesisEditor = (props: AnamnesisEditorProps) => {
               type="button"
               disabled={busy}
               onClick={saveCustom}
-              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+              className={buttonClasses('primary', '', 'sm')}
             >
               {busy ? t('tpl_saving') : t('tpl_save')}
             </button>

@@ -1,6 +1,6 @@
 import { getUserProfile } from '@/libs/UserProfile';
 import type { UserProfile } from '@/libs/UserProfile';
-import { FREE_AI_TRIAL, PLAN_LIMITS } from '@/utils/Plans';
+import { PLAN_LIMITS } from '@/utils/Plans';
 import type { PlanId, PlanLimits } from '@/utils/Plans';
 
 export type Entitlements = {
@@ -14,18 +14,30 @@ export const getEntitlements = async (userId: string): Promise<Entitlements> => 
   return { plan: profile.plan, limits: PLAN_LIMITS[profile.plan] };
 };
 
-export type AiAccess = {
-  /** AI can be used right now (paid plan or free trial credits left). */
-  allowed: boolean;
-  /** Plan includes unlimited AI (paid). */
-  unlimited: boolean;
-  /** Free-trial generations still available (0 when paid or exhausted). */
-  trialRemaining: number;
+/** Janela mensal da cota de IA, ex. "2026-06" (UTC). */
+export const currentAiPeriod = (): string => {
+  const now = new Date();
+  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
+  return `${now.getUTCFullYear()}-${month}`;
 };
 
-/** Resolve whether the user can run an AI generation, counting the free trial. */
+/** Gerações já consumidas no mês corrente (0 se o contador é de um mês passado). */
+const aiUsedThisPeriod = (profile: UserProfile): number =>
+  profile.aiPeriod === currentAiPeriod() ? profile.aiUsed : 0;
+
+export type AiAccess = {
+  /** AI can be used right now (unlimited plan or monthly credits left). */
+  allowed: boolean;
+  /** Plan includes unlimited AI (pro). */
+  unlimited: boolean;
+  /** Generations still available this month (0 when unlimited or exhausted). */
+  remaining: number;
+};
+
+/** Resolve whether the user can run an AI generation, counting the monthly quota. */
 export const getAiAccess = (profile: UserProfile): AiAccess => {
-  const unlimited = PLAN_LIMITS[profile.plan].ai;
-  const trialRemaining = unlimited ? 0 : Math.max(0, FREE_AI_TRIAL - profile.aiTrialUsed);
-  return { allowed: unlimited || trialRemaining > 0, unlimited, trialRemaining };
+  const limit = PLAN_LIMITS[profile.plan].aiPerMonth;
+  const unlimited = !Number.isFinite(limit);
+  const remaining = unlimited ? 0 : Math.max(0, limit - aiUsedThisPeriod(profile));
+  return { allowed: unlimited || remaining > 0, unlimited, remaining };
 };

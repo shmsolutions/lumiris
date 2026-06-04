@@ -1,0 +1,1 @@
+ALTER TABLE "user_profile" ADD COLUMN "ai_period" varchar(7);

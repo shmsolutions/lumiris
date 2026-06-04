@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import { ptBR } from 'react-day-picker/locale';
 import { ClockIcon, ScheduleIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 
 type DateTimePickerProps = {
   /** Value in `yyyy-MM-ddTHH:mm` format (datetime-local compatible). */
@@ -156,7 +157,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
               onClick={() => {
                 setOpen(false);
               }}
-              className="rounded-md bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600"
+              className={buttonClasses('primary', '', 'sm')}
             >
               {tCommon('done')}
             </button>

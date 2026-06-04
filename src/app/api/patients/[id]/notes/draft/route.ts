@@ -9,9 +9,9 @@ import {
   buildValuesFromText,
 } from '@/libs/AI';
 import { db } from '@/libs/DB';
-import { getAiAccess } from '@/libs/Entitlements';
+import { currentAiPeriod, getAiAccess } from '@/libs/Entitlements';
 import { resolveTemplate } from '@/libs/Templates';
-import { getUserProfile, incrementAiTrial } from '@/libs/UserProfile';
+import { consumeAiCredit, getUserProfile } from '@/libs/UserProfile';
 import { patientSchema } from '@/models/Schema';
 import { DraftFromTextValidation } from '@/validations/SessionNoteValidation';
 
@@ -43,19 +43,18 @@ export const POST = async (request: Request, context: RouteContext) => {
     return NextResponse.json({ error: 'not_found' }, { status: 404 });
   }
 
-  // Gate: AI structuring needs a paid plan or remaining free-trial credits.
+  // Gate: AI structuring needs an unlimited plan or remaining monthly credits.
   const profile = await getUserProfile(userId);
   const access = getAiAccess(profile);
   if (!access.allowed) {
     return NextResponse.json({ error: 'plan_ai_locked' }, { status: 403 });
   }
 
-  // A free user spending a trial credit: only count it once the generation
+  // Metered plans spend a monthly credit; only count it once the generation
   // actually succeeds, so a failed transcription never burns a credit.
-  const viaTrial = !access.unlimited;
   const consume = async () => {
-    if (viaTrial) {
-      await incrementAiTrial(userId);
+    if (!access.unlimited) {
+      await consumeAiCredit(userId, currentAiPeriod());
     }
   };
 

@@ -1,16 +1,12 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { Anamnese } from '@/components/marketing/Anamnese';
 import { CallToAction } from '@/components/marketing/CallToAction';
-import { Comparison } from '@/components/marketing/Comparison';
+import { Evolucao } from '@/components/marketing/Evolucao';
 import { Faq } from '@/components/marketing/Faq';
-import { Features } from '@/components/marketing/Features';
 import { Hero } from '@/components/marketing/Hero';
-import { HowItWorks } from '@/components/marketing/HowItWorks';
 import { Pricing } from '@/components/marketing/Pricing';
-import { Problem } from '@/components/marketing/Problem';
-import { ProductPreview } from '@/components/marketing/ProductPreview';
-import { Solution } from '@/components/marketing/Solution';
-import { Trust } from '@/components/marketing/Trust';
+import { Relatorio } from '@/components/marketing/Relatorio';
 
 type IndexPageProps = { params: Promise<{ locale: string }> };
 
@@ -30,16 +26,10 @@ export default async function IndexPage(props: IndexPageProps) {
   return (
     <>
       <Hero />
-      <Problem />
-      <Solution />
-      <ProductPreview />
-      <HowItWorks />
-      <div id="features" className="scroll-mt-20">
-        <Features />
-      </div>
-      <Comparison />
+      <Anamnese />
+      <Evolucao />
+      <Relatorio />
       <Pricing />
-      <Trust />
       <Faq />
       <CallToAction />
     </>

@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { TopBar } from '@/components/dashboard/TopBar';
 import { AppointmentForm } from '@/components/schedule/AppointmentForm';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import { appointmentSchema, patientSchema, sessionNoteSchema } from '@/models/Schema';
@@ -100,14 +101,14 @@ export default async function EditAppointmentPage(props: EditAppointmentPageProp
             linkedNote ? (
               <Link
                 href={`/dashboard/patients/${linkedNote.patientId}/notes/${linkedNote.id}/`}
-                className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+                className={buttonClasses('secondary', '', 'sm')}
               >
                 {t('view_note')}
               </Link>
             ) : (
               <Link
                 href={`/dashboard/patients/${appointment.patientId}/notes/new/?appointment=${appointment.id}`}
-                className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+                className={buttonClasses('primary', '', 'sm')}
               >
                 {t('record_note')}
               </Link>

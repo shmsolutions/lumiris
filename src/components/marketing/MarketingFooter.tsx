@@ -20,17 +20,17 @@ export const MarketingFooter = () => {
         </h3>
         <ul className="mt-4 space-y-2 text-sm text-ink-700">
           <li>
-            <a href="#features" className="transition hover:text-ink-900">
+            <a href="#relatorio" className="transition hover:text-ink-900">
               {t('link_features')}
             </a>
           </li>
           <li>
-            <a href="#how-it-works" className="transition hover:text-ink-900">
+            <a href="#evolucao" className="transition hover:text-ink-900">
               {t('link_how_it_works')}
             </a>
           </li>
           <li>
-            <a href="#pricing" className="transition hover:text-ink-900">
+            <a href="#plano" className="transition hover:text-ink-900">
               {t('link_pricing')}
             </a>
           </li>

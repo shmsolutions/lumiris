@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/dashboard/EmptyState';
 import { MicIcon, PlusIcon } from '@/components/dashboard/Icons';
 import { PageHeader } from '@/components/dashboard/PageHeader';
 import { TopBar } from '@/components/dashboard/TopBar';
+import { buttonClasses } from '@/components/ui/Button';
 import { db } from '@/libs/DB';
 import { Link } from '@/libs/I18nNavigation';
 import { patientSchema, sessionNoteSchema } from '@/models/Schema';
@@ -76,10 +77,7 @@ export default async function NotesTimelinePage(props: NotesPageProps) {
               title={t('empty_title')}
               description={t('empty_description')}
               action={
-                <Link
-                  href="/dashboard/patients/"
-                  className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
-                >
+                <Link href="/dashboard/patients/" className={buttonClasses('primary', '', 'sm')}>
                   <PlusIcon size={14} />
                   {t('cta_go_patients')}
                 </Link>

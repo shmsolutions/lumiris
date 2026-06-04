@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import { TreatmentPlanUpsertValidation } from '@/validations/TreatmentPlanValidation';
 import type { TreatmentPlanInput } from '@/validations/TreatmentPlanValidation';
@@ -17,7 +18,7 @@ type PlanFormProps = {
 const inputClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
 
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 const statusOptions = ['active', 'achieved', 'paused', 'discontinued'] as const;
 
@@ -96,9 +97,7 @@ export const PlanForm = (props: PlanFormProps) => {
       <section className="rounded-2xl border border-ink-200 bg-surface-elevated p-5 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold tracking-wider text-ink-500 uppercase">
-              {t('objectives_title')}
-            </h2>
+            <h2 className="editorial-label text-ink-500">{t('objectives_title')}</h2>
             <p className="mt-1 max-w-prose text-xs text-ink-500">{t('objectives_description')}</p>
           </div>
           <button
@@ -113,7 +112,7 @@ export const PlanForm = (props: PlanFormProps) => {
                 targetDate: undefined,
               });
             }}
-            className="inline-flex w-full shrink-0 items-center justify-center gap-1.5 rounded-lg bg-brand-500 px-4 py-2.5 text-xs font-semibold whitespace-nowrap text-white shadow-sm transition hover:bg-brand-600 sm:w-auto sm:py-2"
+            className={buttonClasses('primary', 'w-full whitespace-nowrap sm:w-auto', 'sm')}
           >
             <PlusIcon size={14} />
             {t('add_objective')}
@@ -134,7 +133,7 @@ export const PlanForm = (props: PlanFormProps) => {
                   className="rounded-xl border border-ink-200 bg-surface p-4 sm:p-5"
                 >
                   <div className="mb-4 flex items-center justify-between">
-                    <span className="text-xs font-semibold tracking-wider text-ink-400 uppercase">
+                    <span className="editorial-label text-ink-400">
                       {t('objective_number', { number: index + 1 })}
                     </span>
                     <button
@@ -260,7 +259,7 @@ export const PlanForm = (props: PlanFormProps) => {
         <button
           type="submit"
           disabled={form.formState.isSubmitting}
-          className="inline-flex items-center justify-center rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50 sm:py-2.5"
+          className={buttonClasses('primary', '', 'sm')}
         >
           {form.formState.isSubmitting ? t('button_saving') : t('button_save')}
         </button>

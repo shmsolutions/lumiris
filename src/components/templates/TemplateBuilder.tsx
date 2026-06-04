@@ -8,6 +8,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import type * as z from 'zod';
 import { CloseIcon, PlusIcon } from '@/components/dashboard/Icons';
 import { Select } from '@/components/forms/Select';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import {
   FILL_MODES,
@@ -28,7 +29,7 @@ type TemplateBuilderProps = {
 
 const inputClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200';
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 const makeKey = (prefix: string) => `${prefix}${Math.random().toString(36).slice(2, 10)}`;
 
@@ -135,7 +136,7 @@ const SectionFields = (props: { form: UseFormReturn<FormValues>; sectionIndex: n
             guide: '',
           });
         }}
-        className="inline-flex items-center gap-1.5 rounded-md border border-ink-200 px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:border-ink-300"
+        className={buttonClasses('secondary', '', 'sm')}
       >
         <PlusIcon size={14} />
         {t('add_field')}
@@ -221,7 +222,7 @@ export const TemplateBuilder = (props: TemplateBuilderProps) => {
                 fields: [],
               });
             }}
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600"
+            className={buttonClasses('primary', '', 'sm')}
           >
             <PlusIcon size={14} />
             {t('add_section')}
@@ -325,7 +326,7 @@ export const TemplateBuilder = (props: TemplateBuilderProps) => {
         <button
           type="submit"
           disabled={form.formState.isSubmitting}
-          className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+          className={buttonClasses('primary', '', 'sm')}
         >
           {form.formState.isSubmitting ? t('button_saving') : t('button_save')}
         </button>

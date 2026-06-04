@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { CheckIcon, CloseIcon, StarIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { PaidPlanId, PlanId } from '@/utils/Plans';
 
@@ -154,9 +155,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
       <div className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-              {t('current_plan')}
-            </div>
+            <div className="editorial-label text-ink-500">{t('current_plan')}</div>
             <div className="mt-1 flex items-center gap-2">
               <span className="text-lg font-semibold text-ink-900">
                 {t(`plan_${props.currentPlan}_name` as 'plan_free_name')}
@@ -172,7 +171,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
                 {t('renews_on', { date: props.periodEndLabel })}
               </p>
             ) : null}
-            {!isPaid && typeof props.aiTrialRemaining === 'number' ? (
+            {typeof props.aiTrialRemaining === 'number' ? (
               <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700">
                 <StarIcon size={12} />
                 {t('free_trial_remaining', { count: props.aiTrialRemaining })}
@@ -339,10 +338,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
               </div>
             ) : (
               <div className="mt-4">
-                <label
-                  className="block text-xs font-semibold tracking-wide text-ink-600 uppercase"
-                  htmlFor="pix-cpf"
-                >
+                <label className="editorial-label block text-ink-600" htmlFor="pix-cpf">
                   {t('pix_cpf_label')}
                 </label>
                 <input
@@ -363,7 +359,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
                   onClick={() => {
                     void generatePix();
                   }}
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:opacity-60"
+                  className={buttonClasses('primary', 'mt-4 w-full', 'sm')}
                 >
                   {pixLoading ? <Spinner /> : null}
                   {t('pix_generate')}

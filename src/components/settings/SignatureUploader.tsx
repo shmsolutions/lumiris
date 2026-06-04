@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 
 type SignatureUploaderProps = {
@@ -78,7 +79,7 @@ export const SignatureUploader = (props: SignatureUploaderProps) => {
               type="button"
               disabled={busy}
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+              className={buttonClasses('primary', '', 'sm')}
             >
               {busy ? t('saving') : t('upload')}
             </button>

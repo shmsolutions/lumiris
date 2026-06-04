@@ -15,7 +15,8 @@ export type UserProfile = {
   studentName: string;
   plan: PlanId;
   onboarded: boolean;
-  aiTrialUsed: number;
+  aiUsed: number;
+  aiPeriod: string | null;
   taxId: string | null;
   asaasCustomerId: string | null;
   asaasSubscriptionId: string | null;
@@ -45,7 +46,8 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
     studentName: row?.studentName ?? '',
     plan: normalizePlan(row?.plan),
     onboarded: row?.onboarded ?? false,
-    aiTrialUsed: row?.aiTrialUsed ?? 0,
+    aiUsed: row?.aiUsed ?? 0,
+    aiPeriod: row?.aiPeriod ?? null,
     taxId: row?.taxId ?? null,
     asaasCustomerId: row?.asaasCustomerId ?? null,
     asaasSubscriptionId: row?.asaasSubscriptionId ?? null,
@@ -123,11 +125,17 @@ export const getUserIdByAsaasCheckout = async (checkoutId: string): Promise<stri
   return row?.userId ?? null;
 };
 
-/** Conta +1 geração de IA consumida no trial gratuito. */
-export const incrementAiTrial = async (userId: string) => {
+/**
+ * Conta +1 geração de IA no mês informado (YYYY-MM). Se o contador ainda aponta
+ * pra um mês anterior, reseta pra 1 — assim a cota mensal renova sozinha.
+ */
+export const consumeAiCredit = async (userId: string, period: string) => {
   await db
     .update(userProfileSchema)
-    .set({ aiTrialUsed: sql`${userProfileSchema.aiTrialUsed} + 1` })
+    .set({
+      aiUsed: sql`CASE WHEN ${userProfileSchema.aiPeriod} = ${period} THEN ${userProfileSchema.aiUsed} + 1 ELSE 1 END`,
+      aiPeriod: period,
+    })
     .where(eq(userProfileSchema.userId, userId));
 };
 

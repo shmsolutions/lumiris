@@ -16,6 +16,7 @@ import {
   SettingsIcon,
   StarIcon,
 } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { Link } from '@/libs/I18nNavigation';
 import type { PlanId } from '@/utils/Plans';
 
@@ -172,9 +173,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
             </div>
 
             <div className="px-3 pb-4">
-              <p className="px-3 pb-2 text-[10px] font-semibold tracking-widest text-ink-400 uppercase">
-                {t('section_workspace')}
-              </p>
+              <p className="editorial-label px-3 pb-2 text-ink-400">{t('section_workspace')}</p>
               <ul className="space-y-0.5">
                 <SheetItem
                   href="/dashboard/schedule/"
@@ -196,9 +195,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
                 />
               </ul>
 
-              <p className="mt-5 px-3 pb-2 text-[10px] font-semibold tracking-widest text-ink-400 uppercase">
-                {t('section_account')}
-              </p>
+              <p className="editorial-label mt-5 px-3 pb-2 text-ink-400">{t('section_account')}</p>
               <ul className="space-y-0.5">
                 <SheetItem
                   href="/dashboard/settings/"
@@ -227,7 +224,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
                 ) : (
                   <Link
                     href="/dashboard/settings/?tab=plano"
-                    className="inline-flex w-full items-center justify-center rounded-md bg-brand-500 px-3 py-2.5 text-xs font-semibold text-white transition hover:bg-brand-600"
+                    className={buttonClasses('primary', 'w-full', 'sm')}
                   >
                     {t('upgrade_cta')}
                   </Link>
@@ -236,10 +233,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
 
               <div className="mt-3 px-3">
                 <SignOutButton>
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-center rounded-md border border-ink-200 bg-surface-elevated px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-ink-300"
-                  >
+                  <button type="button" className={buttonClasses('secondary', 'w-full', 'sm')}>
                     {t('sign_out')}
                   </button>
                 </SignOutButton>

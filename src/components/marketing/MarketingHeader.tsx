@@ -24,13 +24,13 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
       </Link>
 
       <nav className="hidden items-center gap-8 text-sm text-ink-600 md:flex">
-        <a href="#how-it-works" className="transition hover:text-ink-900">
+        <a href="#evolucao" className="transition hover:text-ink-900">
           {t('how_it_works_link')}
         </a>
-        <a href="#features" className="transition hover:text-ink-900">
+        <a href="#relatorio" className="transition hover:text-ink-900">
           {t('features_link')}
         </a>
-        <a href="#pricing" className="transition hover:text-ink-900">
+        <a href="#plano" className="transition hover:text-ink-900">
           {t('pricing_link')}
         </a>
       </nav>
@@ -39,7 +39,7 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
         {props.isSignedIn ? (
           <Link
             href="/dashboard/"
-            className="inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+            className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
           >
             {t('dashboard_link')}
           </Link>
@@ -53,7 +53,7 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
             </Link>
             <Link
               href="/sign-up/"
-              className="inline-flex items-center justify-center rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
             >
               {t('sign_up_link')}
             </Link>
@@ -80,21 +80,21 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
         >
           <nav className="mx-auto flex max-w-6xl flex-col gap-0.5 px-4 py-3 text-sm text-ink-700">
             <a
-              href="#how-it-works"
+              href="#evolucao"
               onClick={close}
               className="rounded-md px-3 py-3 transition hover:bg-ink-100"
             >
               {t('how_it_works_link')}
             </a>
             <a
-              href="#features"
+              href="#relatorio"
               onClick={close}
               className="rounded-md px-3 py-3 transition hover:bg-ink-100"
             >
               {t('features_link')}
             </a>
             <a
-              href="#pricing"
+              href="#plano"
               onClick={close}
               className="rounded-md px-3 py-3 transition hover:bg-ink-100"
             >

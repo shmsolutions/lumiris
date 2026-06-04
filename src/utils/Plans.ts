@@ -2,14 +2,11 @@ export type PlanId = 'free' | 'student' | 'pro';
 
 export const PLAN_IDS = ['free', 'student', 'pro'] as const;
 
-/** Gerações de IA gratuitas (vitalícias) que o plano free ganha pra experimentar. */
-export const FREE_AI_TRIAL = 3;
-
 export type PlanLimits = {
   /** Max active patients. Number.POSITIVE_INFINITY = unlimited. */
   maxPatients: number;
-  /** Audio transcription + report generation. */
-  ai: boolean;
+  /** AI generations allowed per calendar month. Number.POSITIVE_INFINITY = unlimited. */
+  aiPerMonth: number;
   /** Which documents can be exported as PDF. */
   pdf: { anamnesis: boolean; note: boolean; report: boolean };
   /** Upload a signature image embedded into exported documents. */
@@ -21,8 +18,8 @@ export type PlanLimits = {
 /** Preço mensal em centavos (BRL). Free não é cobrável. */
 export const PLAN_PRICE_CENTS: Record<PlanId, number> = {
   free: 0,
-  student: 1900,
-  pro: 8900,
+  student: 900,
+  pro: 2900,
 };
 
 /** Planos pagos (geram assinatura no Asaas). */
@@ -43,22 +40,22 @@ export const getPlanByValueCents = (cents: number): PlanId | null => {
 
 export const PLAN_LIMITS: Record<PlanId, PlanLimits> = {
   free: {
-    maxPatients: 3,
-    ai: false,
+    maxPatients: 5,
+    aiPerMonth: 5,
     pdf: { anamnesis: true, note: false, report: false },
     signature: false,
     customTemplates: false,
   },
   student: {
     maxPatients: 10,
-    ai: true,
+    aiPerMonth: 30,
     pdf: { anamnesis: true, note: true, report: true },
     signature: true,
     customTemplates: true,
   },
   pro: {
     maxPatients: Number.POSITIVE_INFINITY,
-    ai: true,
+    aiPerMonth: Number.POSITIVE_INFINITY,
     pdf: { anamnesis: true, note: true, report: true },
     signature: true,
     customTemplates: true,

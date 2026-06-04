@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { ReportEditor } from '@/components/reports/ReportEditor';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 import type { ReportContent } from '@/validations/ReportValidation';
 
@@ -70,7 +71,7 @@ export const ReportDetail = (props: ReportDetailProps) => {
             type="button"
             onClick={save}
             disabled={saving || deleting}
-            className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+            className={buttonClasses('primary', '', 'sm')}
           >
             {saving ? t('saving') : t('save')}
           </button>

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { CheckIcon, MicIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 
 type AudioRecorderProps = {
   onAudioReady: (blob: Blob, mimeType: string) => void;
@@ -225,7 +226,7 @@ export const AudioRecorder = (props: AudioRecorderProps) => {
           <button
             type="button"
             onClick={reset}
-            className="rounded-lg border border-ink-200 bg-surface-elevated px-3 py-1.5 text-xs font-semibold text-ink-700 transition hover:border-ink-300 hover:bg-ink-50"
+            className={buttonClasses('secondary', '', 'sm')}
             disabled={props.disabled}
           >
             {t('record_again')}

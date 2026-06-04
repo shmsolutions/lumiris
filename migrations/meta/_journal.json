@@ -134,6 +134,13 @@
       "when": 1780097866987,
       "tag": "0018_panoramic_famine",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1780537026707,
+      "tag": "0019_strong_captain_cross",
+      "breakpoints": true
     }
   ]
 }

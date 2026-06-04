@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { FileIcon, PlusIcon } from '@/components/dashboard/Icons';
+import { buttonClasses } from '@/components/ui/Button';
 import { useRouter } from '@/libs/I18nNavigation';
 
 type Attachment = {
@@ -88,9 +89,7 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
   return (
     <div className="space-y-6">
       <section className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
-        <h2 className="text-sm font-semibold tracking-wider text-ink-500 uppercase">
-          {t('upload_title')}
-        </h2>
+        <h2 className="editorial-label text-ink-500">{t('upload_title')}</h2>
         <p className="mt-1 text-xs text-ink-500">{t('upload_hint')}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -129,7 +128,7 @@ export const AttachmentsManager = (props: AttachmentsManagerProps) => {
             type="button"
             disabled={uploading}
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 rounded-md bg-brand-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+            className={buttonClasses('primary', '', 'sm')}
           >
             <PlusIcon size={14} />
             {uploading ? t('uploading') : t('upload_button')}

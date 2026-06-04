@@ -12,7 +12,7 @@ type ReportEditorProps = {
 const fieldClass =
   'mt-1.5 w-full rounded-md border border-ink-200 bg-surface-elevated px-3 py-2 text-sm text-ink-900 transition placeholder:text-ink-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-200 disabled:bg-ink-50';
 
-const labelClass = 'block text-xs font-semibold tracking-wide text-ink-600 uppercase';
+const labelClass = 'editorial-label block text-ink-600';
 
 export const ReportEditor = (props: ReportEditorProps) => {
   const t = useTranslations('ReportEditor');
@@ -68,9 +68,7 @@ export const ReportEditor = (props: ReportEditorProps) => {
       </section>
 
       <section className="rounded-xl border border-ink-200 bg-surface-elevated p-6">
-        <h3 className="text-xs font-semibold tracking-wider text-ink-500 uppercase">
-          {t('objective_progress')}
-        </h3>
+        <h3 className="editorial-label text-ink-500">{t('objective_progress')}</h3>
         {v.objectiveProgress.length === 0 ? (
           <p className="mt-3 text-sm text-ink-500">{t('objective_progress_empty')}</p>
         ) : (
