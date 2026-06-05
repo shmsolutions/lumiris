@@ -45,6 +45,18 @@ const aj = arcjet.withRule(
 );
 
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  // Canonicaliza para o apex: www.* redireciona (301 permanente) para o domínio
+  // sem www — evita conteúdo duplicado e divergência de host/certificado.
+  const forwardedHost = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  if (forwardedHost?.startsWith('www.')) {
+    const proto = request.headers.get('x-forwarded-proto') ?? 'https';
+    const apexHost = forwardedHost.slice(4);
+    return NextResponse.redirect(
+      `${proto}://${apexHost}${request.nextUrl.pathname}${request.nextUrl.search}`,
+      308,
+    );
+  }
+
   // Webhooks externos passam direto, sem Arcjet nem Clerk.
   if (isWebhookRoute(request)) {
     return NextResponse.next();
