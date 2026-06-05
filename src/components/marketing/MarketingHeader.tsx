@@ -1,21 +1,27 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Logo } from '@/components/brand/Logo';
 import { CloseIcon, MenuIcon } from '@/components/dashboard/Icons';
 import { Link } from '@/libs/I18nNavigation';
 
-type MarketingHeaderProps = {
-  isSignedIn?: boolean;
-};
-
-export const MarketingHeader = (props: MarketingHeaderProps) => {
+export const MarketingHeader = () => {
   const t = useTranslations('RootLayout');
   const [open, setOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
   const close = () => {
     setOpen(false);
   };
+
+  // Detect a likely Clerk session from cookies on the client so the marketing
+  // pages stay static (no server-side cookies() read, which forces dynamic
+  // rendering and kills TTFB + bfcache). A wrong guess self-corrects on click.
+  useEffect(() => {
+    const { cookie } = document;
+    const uat = cookie.match(/__client_uat=([^;]+)/)?.at(1);
+    setIsSignedIn(/(?:^|;\s*)__session=/.test(cookie) || Boolean(uat && uat !== '0'));
+  }, []);
 
   return (
     <>
@@ -36,7 +42,7 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
       </nav>
 
       <div className="flex items-center gap-2">
-        {props.isSignedIn ? (
+        {isSignedIn ? (
           <Link
             href="/dashboard/"
             className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
@@ -100,7 +106,7 @@ export const MarketingHeader = (props: MarketingHeaderProps) => {
             >
               {t('pricing_link')}
             </a>
-            {props.isSignedIn ? (
+            {isSignedIn ? (
               <Link
                 href="/dashboard/"
                 onClick={close}
