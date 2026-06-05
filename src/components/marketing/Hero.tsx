@@ -22,25 +22,19 @@ export const Hero = () => {
       </div>
 
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28 lg:py-36">
-        <p className="lume-fade-up editorial-label flex items-center gap-3 text-ink-500">
+        <p className="editorial-label flex items-center gap-3 text-ink-500">
           <span className="font-mono text-brand-600 tabular-nums">01</span>
           <span className="h-px w-10 bg-ink-300" />
           {t('hero_masthead')}
         </p>
 
-        <h1
-          className="lume-fade-up font-display mt-8 text-[3.25rem] leading-[0.98] text-balance text-ink-900 sm:text-7xl lg:text-[6.5rem]"
-          style={{ animationDelay: '80ms' }}
-        >
+        <h1 className="font-display mt-8 text-[3.25rem] leading-[0.98] text-balance text-ink-900 sm:text-7xl lg:text-[6.5rem]">
           {t('hero_title_a')}{' '}
           <em className="font-normal text-brand-600 italic">{t('hero_title_highlight')}</em>{' '}
           {t('hero_title_b')}
         </h1>
 
-        <div
-          className="lume-fade-up mt-10 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end"
-          style={{ animationDelay: '160ms' }}
-        >
+        <div className="mt-10 grid gap-8 sm:grid-cols-[1fr_auto] sm:items-end">
           <p className="max-w-md text-lg leading-relaxed text-ink-600">{t('hero_subtitle')}</p>
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
