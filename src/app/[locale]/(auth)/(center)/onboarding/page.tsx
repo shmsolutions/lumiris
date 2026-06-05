@@ -2,7 +2,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { redirect } from 'next/navigation';
-import { MetaPixelEvent } from '@/components/analytics/MetaPixelEvent';
+import { CaptureEventOnce } from '@/components/analytics/CaptureEventOnce';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { getUserProfile } from '@/libs/UserProfile';
 
@@ -35,7 +35,7 @@ export default async function OnboardingPage(props: OnboardingPageProps) {
 
   return (
     <>
-      <MetaPixelEvent event="CompleteRegistration" once />
+      <CaptureEventOnce event="registration_completed" />
       <OnboardingWizard
         firstName={firstName}
         initial={{ therapistName: profile.therapistName || clerkFullName }}

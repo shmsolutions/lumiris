@@ -23,6 +23,26 @@ const baseConfig: NextConfig = {
     // aren't reachable from the app's import graph).
     '/': ['./migrations/**/*', './node_modules/drizzle-orm/**/*', './node_modules/pg/**/*'],
   },
+  // Baseline security headers (Lighthouse "best practices"). COOP allows popups
+  // so Clerk's OAuth flow keeps working; CSP is intentionally left out to avoid
+  // breaking Clerk/PostHog/Asaas until it can be calibrated.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+        ],
+      },
+    ];
+  },
 };
 
 // Initialize the Next-Intl plugin

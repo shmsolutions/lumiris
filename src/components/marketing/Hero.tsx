@@ -16,7 +16,7 @@ export const Hero = () => {
 
       {/* Vertical masthead pinned to the right edge — the spine of a bound chart. */}
       <div className="pointer-events-none absolute top-0 right-6 hidden h-full items-center lg:flex">
-        <span className="editorial-label text-ink-400 [writing-mode:vertical-rl]">
+        <span className="editorial-label text-ink-500 [writing-mode:vertical-rl]">
           {t('chart_doc_label')} · {t('hero_eyebrow')}
         </span>
       </div>

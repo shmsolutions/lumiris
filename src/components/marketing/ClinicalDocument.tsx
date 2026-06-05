@@ -16,7 +16,7 @@ export const ClinicalDocument = () => {
       {/* Letterhead */}
       <header className="flex items-end justify-between border-b border-ink-300 px-7 pt-6 pb-4">
         <span className="font-display text-xl leading-none text-ink-900">Lumiris</span>
-        <span className="editorial-label text-ink-400">{t('nav_evolucao')}</span>
+        <span className="editorial-label text-ink-500">{t('nav_evolucao')}</span>
       </header>
 
       <div className="px-7 pt-5 pb-7">
@@ -45,7 +45,7 @@ export const ClinicalDocument = () => {
           <span className="mt-2 font-mono text-[11px] text-ink-500">{t('doc_signer')}</span>
         </div>
 
-        <p className="mt-7 flex items-center gap-2 border-t border-ink-200 pt-4 text-[11px] text-ink-400">
+        <p className="mt-7 flex items-center gap-2 border-t border-ink-200 pt-4 text-[11px] text-ink-500">
           <SparkIcon size={13} />
           {t('doc_note')}
         </p>

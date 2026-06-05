@@ -13,7 +13,7 @@ export const Faq = () => {
             <span className="font-display text-xl leading-none text-brand-600">§</span>
             <span className="editorial-label text-ink-700">{t('chart_notas')}</span>
           </div>
-          <span className="font-mono text-[11px] text-ink-400 tabular-nums">
+          <span className="font-mono text-[11px] text-ink-500 tabular-nums">
             {t('chart_folio')} 11
           </span>
         </div>
@@ -34,7 +34,7 @@ export const Faq = () => {
                 <span className="flex-1">{t(`faq_${key}_q` as 'faq_a_q')}</span>
                 <span
                   aria-hidden
-                  className="text-lg leading-none text-ink-400 transition group-open:rotate-45 group-open:text-brand-600"
+                  className="text-lg leading-none text-ink-500 transition group-open:rotate-45 group-open:text-brand-600"
                 >
                   +
                 </span>

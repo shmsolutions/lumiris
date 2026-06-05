@@ -37,7 +37,7 @@ export const ChartChapter = (props: ChartChapterProps) => {
     </div>
   );
   const folio = (
-    <span className="font-mono text-[11px] text-ink-400 tabular-nums">
+    <span className="font-mono text-[11px] text-ink-500 tabular-nums">
       {t('chart_folio')} {props.folio}
     </span>
   );
