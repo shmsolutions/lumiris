@@ -4,9 +4,16 @@ import createMiddleware from 'next-intl/middleware';
 import type { NextFetchEvent, NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import arcjet from '@/libs/Arcjet';
+import { Env } from '@/libs/Env';
 import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
+
+// Clerk keyless mode (local dev sem chaves) não funciona com i18n, então só
+// roda o middleware do Clerk em todas as rotas quando há chave publicável. Com
+// ele ativo na landing, a sessão é renovada durante a navegação normal — o
+// clique para o painel já chega com token fresco, sem bounce para o /sign-in.
+const hasClerkKey = Boolean(Env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
 // Behind Traefik, req.url carries the internal host (0.0.0.0:3000). Build the
 // public origin from the forwarded headers so redirects point at the real domain.
@@ -78,8 +85,9 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     return clerkMiddleware()(request, event);
   }
 
-  // Clerk keyless mode doesn't work with i18n, so we run it conditionally.
-  if (isAuthPage(request) || isProtectedRoute(request)) {
+  // Com chave Clerk, roda em todas as navegações para manter a sessão fresca;
+  // sem chave (keyless), restringe às rotas de auth/protegidas.
+  if (hasClerkKey || isAuthPage(request) || isProtectedRoute(request)) {
     // oxlint-disable-next-line typescript/return-await
     return clerkMiddleware(async (auth, req) => {
       if (isProtectedRoute(req)) {
