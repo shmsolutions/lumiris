@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { track } from '@/components/analytics/track';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { AutoGrowTextarea } from '@/components/ui/AutoGrowTextarea';
 import { buttonClasses } from '@/components/ui/Button';
@@ -121,6 +122,7 @@ export const PatientForm = (props: PatientFormProps) => {
       router.push(`/dashboard/patients/${props.patientId}/`);
     } else {
       const json = (await response.json()) as { patient: { id: string } };
+      track('patient_created');
       router.push(`/dashboard/patients/${json.patient.id}/`);
     }
     router.refresh();

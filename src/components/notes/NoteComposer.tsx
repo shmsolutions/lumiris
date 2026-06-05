@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { track } from '@/components/analytics/track';
 import { CloseIcon, FileIcon, MicIcon, SparkIcon, Spinner } from '@/components/dashboard/Icons';
 import { ProcessingOverlay } from '@/components/feedback/ProcessingOverlay';
 import { AudioRecorder } from '@/components/notes/AudioRecorder';
@@ -161,6 +162,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
         evolution: data.draft.evolution ?? emptyEvolution,
         structured: data.draft.structured,
       });
+      track('evolution_generated', { mode, structured: data.draft.structured });
       setPhase('review');
     } catch {
       setErrorMessage(t('error_draft'));
@@ -198,6 +200,7 @@ export const NoteComposer = (props: NoteComposerProps) => {
     }
 
     const { note } = (await response.json()) as { note: { id: string } };
+    track('note_saved', { withTemplate: Boolean(selectedTemplate), aiLocked });
     router.push(`/dashboard/patients/${props.patientId}/notes/${note.id}/`);
     router.refresh();
   };
