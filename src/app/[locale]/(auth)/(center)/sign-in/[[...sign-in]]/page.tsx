@@ -29,7 +29,13 @@ export default async function SignInPage(props: SignInPageProps) {
       <SignIn
         path={getI18nPath('/sign-in', locale)}
         appearance={{
-          variables: { colorPrimary: '#e8923c', borderRadius: '0.5rem' },
+          variables: {
+            colorPrimary: '#e8923c',
+            // Texto escuro no botao laranja (WCAG AA ~6:1); o branco padrao do
+            // Clerk daria so 2,4:1 sobre #e8923c.
+            colorTextOnPrimaryBackground: '#0f0f0d',
+            borderRadius: '0.5rem',
+          },
           elements: {
             rootBox: 'w-full',
             cardBox: 'w-full shadow-none',
