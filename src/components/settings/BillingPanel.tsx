@@ -210,7 +210,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
               } ${isCurrent ? 'ring-2 ring-brand-300' : ''}`}
             >
               {isRecommended ? (
-                <span className="absolute -top-2.5 right-5 inline-flex items-center gap-1 rounded-full bg-brand-500 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase shadow-sm">
+                <span className="absolute -top-2.5 right-5 inline-flex items-center gap-1 rounded-full bg-brand-500 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-ink-900 uppercase shadow-sm">
                   <StarIcon size={11} />
                   {t('recommended')}
                 </span>
@@ -251,7 +251,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
                 className={`mt-6 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold shadow-sm transition disabled:cursor-not-allowed ${
                   isCurrent
                     ? 'bg-ink-100 text-ink-500'
-                    : 'bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-60'
+                    : 'bg-brand-500 text-ink-900 hover:bg-brand-600 disabled:opacity-60'
                 }`}
               >
                 {loadingPlan === plan ? <Spinner /> : null}
@@ -332,7 +332,7 @@ export const BillingPanel = (props: BillingPanelProps) => {
                     onClick={() => {
                       void copyPix();
                     }}
-                    className="shrink-0 rounded-md bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-brand-600"
+                    className="shrink-0 rounded-md bg-brand-500 px-3 py-1.5 text-xs font-semibold text-ink-900 transition hover:bg-brand-600"
                   >
                     {copied ? t('pix_copied') : t('pix_copy')}
                   </button>

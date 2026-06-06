@@ -211,7 +211,7 @@ export const MobileBottomNav = (props: MobileBottomNavProps) => {
                     href="/dashboard/settings/?tab=plano"
                     className="flex items-center gap-3 rounded-md bg-brand-50 px-3 py-3 text-sm transition hover:bg-brand-100"
                   >
-                    <span className="inline-flex size-8 items-center justify-center rounded-md bg-brand-500 text-white">
+                    <span className="inline-flex size-8 items-center justify-center rounded-md bg-brand-500 text-ink-900">
                       <StarIcon size={14} />
                     </span>
                     <span className="flex-1">

@@ -98,7 +98,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
               onClick={() => {
                 setStep(1);
               }}
-              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-ink-900 shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {t('continue')}
             </button>
@@ -141,7 +141,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
                   <span
                     className={`mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full border ${
                       selected
-                        ? 'border-brand-500 bg-brand-500 text-white'
+                        ? 'border-brand-500 bg-brand-500 text-ink-900'
                         : 'border-ink-300 text-transparent'
                     }`}
                   >
@@ -174,7 +174,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps) => {
               type="button"
               onClick={finish}
               disabled={submitting}
-              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
+              className="inline-flex items-center rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-ink-900 shadow-sm transition hover:bg-brand-600 disabled:opacity-50"
             >
               {submitting ? t('finishing') : t('finish')}
             </button>

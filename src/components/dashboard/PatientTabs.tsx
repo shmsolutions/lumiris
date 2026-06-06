@@ -41,7 +41,7 @@ export const PatientTabs = (props: PatientTabsProps) => {
               aria-current={active ? 'page' : undefined}
               className={`shrink-0 snap-start rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
                 active
-                  ? 'bg-brand-500 text-white shadow-sm shadow-brand-500/25'
+                  ? 'bg-brand-500 text-ink-900 shadow-sm shadow-brand-500/25'
                   : 'bg-surface-elevated text-ink-600 ring-1 ring-ink-200 hover:text-ink-900 hover:ring-ink-300'
               }`}
             >

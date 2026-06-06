@@ -160,7 +160,7 @@ export const PatientForm = (props: PatientFormProps) => {
                   }}
                   className={`rounded px-4 py-1.5 text-sm font-medium transition ${
                     patientType === type
-                      ? 'bg-brand-500 text-white shadow-sm'
+                      ? 'bg-brand-500 text-ink-900 shadow-sm'
                       : 'text-ink-600 hover:text-ink-900'
                   }`}
                 >
