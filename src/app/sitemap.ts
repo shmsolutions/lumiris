@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { getAllPosts } from '@/libs/Blog';
 import { routing } from '@/libs/I18nRouting';
 import { getBaseUrl, getI18nPath } from '@/utils/Helpers';
 
@@ -8,7 +9,7 @@ const routes = ['', '/privacy', '/terms', '/lgpd'] as const;
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = getBaseUrl();
 
-  return routes.map((route) => {
+  const staticEntries: MetadataRoute.Sitemap = routes.map((route) => {
     const languages: Record<string, string> = {};
     for (const locale of routing.locales) {
       languages[locale] = `${baseUrl}${getI18nPath(route, locale)}`;
@@ -23,4 +24,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: { languages },
     };
   });
+
+  // Blog is Portuguese-only, so no hreflang alternates here.
+  const blogIndex: MetadataRoute.Sitemap[number] = {
+    url: `${baseUrl}/blog`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.7,
+  };
+  const blogPosts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'yearly',
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, blogIndex, ...blogPosts];
 }

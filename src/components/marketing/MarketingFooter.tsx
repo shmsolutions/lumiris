@@ -39,6 +39,11 @@ export const MarketingFooter = () => {
               {t('link_faq')}
             </a>
           </li>
+          <li>
+            <Link href="/blog/" className="transition hover:text-ink-900">
+              {t('link_blog')}
+            </Link>
+          </li>
         </ul>
       </div>
 

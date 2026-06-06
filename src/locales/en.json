@@ -25,6 +25,7 @@
     "col_account": "Account",
     "col_legal": "Legal",
     "link_features": "Features",
+    "link_blog": "Blog",
     "link_how_it_works": "How it works",
     "link_pricing": "Pricing",
     "link_faq": "FAQ",
@@ -34,6 +35,19 @@
     "link_privacy": "Privacy policy",
     "link_terms": "Terms of use",
     "link_lgpd": "LGPD"
+  },
+  "BlogPage": {
+    "meta_title": "Blog",
+    "meta_description": "Practical guides on records, intake, progress notes and reports for occupational therapists.",
+    "eyebrow": "Blog",
+    "title": "Content for occupational therapists",
+    "subtitle": "Practical guides on records, intake, progress notes and reports — written by someone who lives the occupational therapy routine.",
+    "read_more": "Read article",
+    "back": "Back to the blog",
+    "by": "By {author}",
+    "cta_title": "Less paperwork, more presence with your patients",
+    "cta_body": "Try Lumiris for free and get your time back.",
+    "cta_button": "Start free"
   },
   "PrivacyPage": {
     "meta_title": "Privacy Policy",

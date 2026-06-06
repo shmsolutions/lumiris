@@ -25,6 +25,7 @@
     "col_account": "Conta",
     "col_legal": "Legal",
     "link_features": "Funcionalidades",
+    "link_blog": "Blog",
     "link_how_it_works": "Como funciona",
     "link_pricing": "Preços",
     "link_faq": "Perguntas frequentes",
@@ -34,6 +35,19 @@
     "link_privacy": "Política de privacidade",
     "link_terms": "Termos de uso",
     "link_lgpd": "LGPD"
+  },
+  "BlogPage": {
+    "meta_title": "Blog",
+    "meta_description": "Guias práticos de prontuário, anamnese, evolução e relatórios para terapeutas ocupacionais.",
+    "eyebrow": "Blog",
+    "title": "Conteúdo para terapeutas ocupacionais",
+    "subtitle": "Guias práticos sobre prontuário, anamnese, evolução e relatórios — escritos por quem vive a rotina da terapia ocupacional.",
+    "read_more": "Ler artigo",
+    "back": "Voltar para o blog",
+    "by": "Por {author}",
+    "cta_title": "Menos papelada, mais presença com seus pacientes",
+    "cta_body": "Experimente o Lumiris grátis e veja o tempo voltar pras suas mãos.",
+    "cta_button": "Começar grátis"
   },
   "PrivacyPage": {
     "meta_title": "Política de Privacidade",

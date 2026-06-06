@@ -77,6 +77,32 @@ export const softwareAppSchema = (description: string) => {
   };
 };
 
+/** BlogPosting node for an article — eligible for article rich results. */
+export const blogPostingSchema = (post: {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  author: string;
+}) => {
+  const baseUrl = getBaseUrl();
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    inLanguage: 'pt-BR',
+    author: { '@type': 'Person', name: post.author },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Lumiris',
+      logo: { '@type': 'ImageObject', url: `${baseUrl}/assets/images/lumiris-logo.png` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': `${baseUrl}/blog/${post.slug}` },
+  };
+};
+
 /** FAQPage node from question/answer pairs — eligible for FAQ rich results. */
 export const faqSchema = (items: { question: string; answer: string }[]) => ({
   '@context': 'https://schema.org',

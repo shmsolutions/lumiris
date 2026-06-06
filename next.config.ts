@@ -21,7 +21,13 @@ const baseConfig: NextConfig = {
     // Ship migrations + the drizzle migrator/pg files into the standalone
     // bundle so the container can self-apply migrations on startup (they
     // aren't reachable from the app's import graph).
-    '/': ['./migrations/**/*', './node_modules/drizzle-orm/**/*', './node_modules/pg/**/*'],
+    '/': [
+      './migrations/**/*',
+      './node_modules/drizzle-orm/**/*',
+      './node_modules/pg/**/*',
+      // Blog posts are read from disk; ship them with the standalone bundle.
+      './src/content/**/*',
+    ],
   },
   // Baseline security headers (Lighthouse "best practices"). COOP allows popups
   // so Clerk's OAuth flow keeps working; CSP is intentionally left out to avoid
