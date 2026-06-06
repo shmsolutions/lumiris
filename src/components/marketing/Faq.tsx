@@ -10,7 +10,7 @@ export const Faq = () => {
       <div className="mx-auto max-w-3xl px-6 py-20 sm:py-28">
         <div className="flex items-center justify-between border-b border-ink-200 pb-4">
           <div className="flex items-center gap-2.5">
-            <span className="font-display text-xl leading-none text-brand-600">§</span>
+            <span className="font-display text-xl leading-none text-brand-700">§</span>
             <span className="editorial-label text-ink-700">{t('chart_notas')}</span>
           </div>
           <span className="font-mono text-[11px] text-ink-500 tabular-nums">
@@ -28,7 +28,7 @@ export const Faq = () => {
               className="group border-b border-ink-200 py-5 [&_summary::-webkit-details-marker]:hidden"
             >
               <summary className="flex cursor-pointer list-none items-start gap-4 text-base font-medium text-ink-900">
-                <span className="pt-0.5 font-mono text-xs text-brand-600 tabular-nums">
+                <span className="pt-0.5 font-mono text-xs text-brand-700 tabular-nums">
                   {`0${index + 1}`}
                 </span>
                 <span className="flex-1">{t(`faq_${key}_q` as 'faq_a_q')}</span>

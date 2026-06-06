@@ -24,7 +24,7 @@ export const Evolucao = () => {
           {flows.map((flow, index) => (
             <div key={flow} className="border-b border-ink-200 py-6">
               <dt className="grid grid-cols-[2rem_1fr] gap-x-4 text-base font-semibold text-ink-900">
-                <span className="font-mono text-xs text-brand-600 tabular-nums">{`0${index + 1}`}</span>
+                <span className="font-mono text-xs text-brand-700 tabular-nums">{`0${index + 1}`}</span>
                 <span>{t(`solution_${flow}_title` as 'solution_a_title')}</span>
               </dt>
               <dd className="mt-2 pl-12 text-sm leading-relaxed text-ink-600">

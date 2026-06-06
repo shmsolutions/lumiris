@@ -45,7 +45,7 @@ export const MarketingHeader = () => {
         {isSignedIn ? (
           <Link
             href="/dashboard/"
-            className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
+            className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
           >
             {t('dashboard_link')}
           </Link>
@@ -59,7 +59,7 @@ export const MarketingHeader = () => {
             </Link>
             <Link
               href="/sign-up/"
-              className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
+              className="inline-flex items-center justify-center rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] transition duration-200 hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_12px_26px_-12px_rgba(232,146,60,0.6)]"
             >
               {t('sign_up_link')}
             </Link>

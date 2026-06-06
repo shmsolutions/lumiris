@@ -61,7 +61,7 @@ export const Pricing = () => {
                   {t(`pricing_${plan.key}_name` as 'pricing_free_name')}
                 </h3>
                 {isFeatured ? (
-                  <span className="editorial-label text-brand-600">
+                  <span className="editorial-label text-brand-700">
                     {t('pricing_featured_badge')}
                   </span>
                 ) : null}

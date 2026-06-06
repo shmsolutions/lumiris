@@ -26,7 +26,7 @@ export const Relatorio = () => {
             className="border-b border-ink-200 py-5 sm:odd:border-r sm:odd:pr-8 sm:even:pl-8"
           >
             <dt className="grid grid-cols-[2rem_1fr] gap-x-3 text-sm font-semibold text-ink-900">
-              <span className="font-mono text-xs text-brand-600 tabular-nums">{`0${index + 1}`}</span>
+              <span className="font-mono text-xs text-brand-700 tabular-nums">{`0${index + 1}`}</span>
               <span>{t(`features_${key}_title` as 'features_a_title')}</span>
             </dt>
             <dd className="mt-1.5 pl-[2.75rem] text-sm leading-relaxed text-ink-600">

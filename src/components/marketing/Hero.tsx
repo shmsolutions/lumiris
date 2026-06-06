@@ -23,7 +23,7 @@ export const Hero = () => {
 
       <div className="mx-auto max-w-5xl px-6 py-20 sm:py-28 lg:py-36">
         <p className="editorial-label flex items-center gap-3 text-ink-500">
-          <span className="font-mono text-brand-600 tabular-nums">01</span>
+          <span className="font-mono text-brand-700 tabular-nums">01</span>
           <span className="h-px w-10 bg-ink-300" />
           {t('hero_masthead')}
         </p>

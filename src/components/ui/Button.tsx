@@ -15,7 +15,7 @@ const variants: Record<Variant, string> = {
   // Flat amber per brand, lifted by a 1px top sheen and a warm ember glow that
   // only appears on hover — the heat held in check made tactile.
   primary:
-    'bg-brand-500 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_14px_30px_-12px_rgba(232,146,60,0.6)] active:translate-y-0',
+    'bg-brand-500 text-ink-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.22)] hover:-translate-y-px hover:bg-brand-600 hover:shadow-[0_14px_30px_-12px_rgba(232,146,60,0.6)] active:translate-y-0',
   secondary:
     'border border-ink-300 bg-surface-elevated text-ink-800 hover:-translate-y-px hover:border-ink-400 hover:shadow-[0_10px_24px_-14px_rgba(15,15,13,0.4)] active:translate-y-0',
   ghost:

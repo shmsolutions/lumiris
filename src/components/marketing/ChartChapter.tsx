@@ -31,7 +31,7 @@ export const ChartChapter = (props: ChartChapterProps) => {
 
   const meta = (
     <div className="flex items-center gap-2.5">
-      <span className="font-display text-xl leading-none text-brand-600">§</span>
+      <span className="font-display text-xl leading-none text-brand-700">§</span>
       <span className="font-mono text-xs text-ink-500 tabular-nums">{props.num}</span>
       <span className="editorial-label text-ink-700">{props.label}</span>
     </div>
